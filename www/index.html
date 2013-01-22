@@ -33,8 +33,13 @@
                 <p class="status pending blink">App wird initialisiert.</p>
                 <p class="status complete blink hide">App gestartet.</p>
             </div>
+            <div class="pcdebug">
+              <p>Debug: <a href="javascript:RunDebug()">Click to Run without deviceready</a></p>
+            </div>
         </div>
         <script type="text/javascript" src="phonegap.js"></script>
+        <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();
