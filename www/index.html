@@ -23,12 +23,14 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
         <title>Kühne-Webseiten News</title>
+        <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" />
         <link rel="stylesheet"  href="css/jquery.mobile-1.2.0.min.css" type="text/css" media="handheld" />
         <link rel="stylesheet"  href="css/mobile.css" type="text/css" media="handheld" />
         <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script>
+        <!-- <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script> -->
         <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/kwd-synch.js"></script>
     </head>
     <body>
       <div data-role="page" id="page">
@@ -41,6 +43,91 @@
            </div>
        
            <div data-role="content" id="content">
+           	<p id="load-result"></p>
+           	
+           	<div id="projekt1" class="projekt">
+           		<div class="name"><a id="name1" href="#"><span class="namestring"></span></a></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+           	
+           	<div id="projekt2" class="projekt">
+           		<div class="name"><a id="name2" href="#"><span class="namestring"></span></a></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt3" class="projekt">
+           		<div class="name"><a id="name3" href="#"><span class="namestring"></span></a></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt4" class="projekt">
+           		<div class="name"><a id="name4" href="#"><span class="namestring"></span></a></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt5" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt6" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt7" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt8" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt9" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt10" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<div id="projekt11" class="projekt">
+           		<div class="name"></div>
+           		<div class="image"></div>
+           		<div class="info"></div>           		
+           		<div class="url"></div>
+           	</div>
+
+           	<script type="text/javascript">
+           		$(document).ready( function()
+           		{
+           			read_kwd_projects();
+           		});
+           	</script>
            </div> 
        
            <div data-role="footer" id="footer">

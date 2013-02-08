@@ -1,0 +1,28 @@
+/*
+ * basic styles indpendent of eventual mobile view
+ * = test layout
+ */
+
+#load-result {
+	color: green;
+}
+.projekt {
+	display:none;
+	width:350px;
+	float:left;
+	min-height:20px;
+	margin:0 20px 20px 0;
+	border:1px solid red;
+}
+.name {
+	border-bottom: 1px solid blue;
+}
+.url {
+	border-top: 1px solid green;
+}
+.name, .info, .image, .url {
+	padding:10px;
+}
+.info{
+	display: none;
+}
