@@ -31,6 +31,8 @@
         <!-- <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script> -->
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript" src="js/kwd-synch.js"></script>
+        <script type="text/javascript" src="js/kwd-save.js"></script>
+        <script type="text/javascript" src="js/kwd-effects.js"></script>
     </head>
     <body>
       <div data-role="page" id="page">
@@ -38,11 +40,13 @@
            <div data-role="header" id="header">
             <h1>KÜHNE-Webdienste.de News!</h1>
            </div>
+           
            <div data-role="navbar" id="navbar">
-              News Projekte Kontakt
+              News Projekte Kontakt | <a id="doUpdate" href="#">Update</a> <a id="doRestore" href="#">Laden</a> <a id="doSave" href="#">Speichern</a>
            </div>
        
            <div data-role="content" id="content">
+           
            	<p id="load-result"></p>
            	
            	<div id="projekt1" class="projekt">
@@ -121,11 +125,22 @@
            		<div class="info"></div>           		
            		<div class="url"></div>
            	</div>
-
+			
+			<canvas id="mycanvas"></canvas>
+			
            	<script type="text/javascript">
            		$(document).ready( function()
            		{
-           			read_kwd_projects();
+           			$('#doUpdate').click(function(){
+	           			read_kwd_projects();           				
+           			});
+           			$('#doRestore').click(function(){
+           				$('#load-result').html('Laden noch nicht implementiert.')
+           			});
+           			$('#doSave').click(function(){
+           				saveProjects();
+           				$('#load-result').html('Speichern noch nicht implementiert.')
+           			});
            		});
            	</script>
            </div> 

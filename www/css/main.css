@@ -3,6 +3,11 @@
  * = test layout
  */
 
+/*#page {
+	background: url(../res/sommerfeld.jpg) fixed top left no-repeat;
+}
+*/
+
 #load-result {
 	color: green;
 }

@@ -46,3 +46,6 @@
     <gap:splash src="res/screen/ios/screen-ipad-landscape.png"     gap:platform="ios"     width="1024" height="768" />
     <gap:splash src="res/screen/windows-phone/screen-portrait.jpg" gap:platform="winphone" />
 </widget>
+
+<access origin="http://www.kuehne-webdienste.de" />
+<access origin="http://www.kuehne-webseiten.de" />

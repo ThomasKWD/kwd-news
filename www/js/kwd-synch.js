@@ -3,7 +3,12 @@
   
   * mit JSONP aus jQuery, da andere Domain als Datei
   * oder geht mit speziellen Funktionen aus Phonegap?
-  * alle Funktionen setzen voraus, dass sie innerhalb eines $(document).ready(...)-Aufrufs gestartet wurden.  
+  * alle Funktionen setzen voraus, dass sie innerhalb eines $(document).ready(...)-Aufrufs gestartet wurden.
+  * 
+  * um Bilder auch später speichern zu können ist es evtl. sinnvoll, sie per JSONP und base64 codiert zu laden
+  * anstatt sie normal zu erzeugen (es wird nur src geladen)
+  * 
+  * TODO: warum geht Fehlermeldung nicht?  
 */
 
 function ajax_success(data, textStatus, jqXHR ) {
@@ -15,35 +20,47 @@ function ajax_error(jqXHR,textStatus,errorThrown) {
 
 function getResponse(response) {
 	
-	
-	if(response) {
+	if(response) {		
 		
-		$("#load-result").append('Daten aus dem Internet aktualisiert.');
-		
-		
+		console.log(response);
+			
 		var i=0;
 		for(var entry in response) {
 			
-			if(response[i]['info']=='') $('#projekt' + (i + 1) +' .name').append(response[i]['name']);
-			else $('#projekt' + (i + 1) +' .name .namestring').append(response[i]['name']);
-			$('#projekt' + (i + 1) +' .info').append(response[i]['info']);
+			// use html, not append!
+			
+			if(response[i]['info']=='') $('#projekt' + (i + 1) +' .name').html(response[i]['name']);
+			else $('#projekt' + (i + 1) +' .name .namestring').html(response[i]['name']);
+			$('#projekt' + (i + 1) +' .info').html(response[i]['info']);
 			// make image from kwd-site
 			var image_markup = '<img src="http://www.kuehne-webdienste.de/files/'+(response[i]['imgsrc'])+'" />';
-			$('#projekt' + (i + 1) +' .image').append(image_markup);
-			$('#projekt' + (i + 1) +' .url').append(response[i]['url']);
+			$('#projekt' + (i + 1) +' .image').html(image_markup);
+			$('#projekt' + (i + 1) +' .url').html(response[i]['url']);
 
-			$('#projekt' + (i + 1)).slideToggle();
+			$('#projekt' + (i + 1)).show();
 			
 			i++;
 
 		}
+		
+		$("#load-result").html('Daten aus dem Internet aktualisiert.');		
+	}
+	else {
+		$("#load-result").html('Aktualisierung fehlgeschlagen.');				
 	}
 }
 
 
 function read_kwd_projects (argument) {
 	
-	// Abfrage ob Netzwerk-Kommunikation möglich (phonegap)
+	//$('#load-result').html('AKTUALSIEREN');
+	console.log('starte aktualisieren');
+	
+	$(document).ajaxError(function(event, request, settings){
+   		$('#load-result').html("<li>Error requesting page " + settings.url + "</li>");
+ 	});
+ 
+ // Abfrage ob Netzwerk-Kommunikation möglich (phonegap)
 	// TODO: Auswertung durch caller ermöglichen (Status weiterleiten, evtl. sogar exception handling)
 	
 	//networkState = navigator.connection.type;
@@ -59,12 +76,15 @@ function read_kwd_projects (argument) {
       //url: 'http://localhost/tk/kwd-news-data/jsonp.php',
       url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
       //url: 'http://www.kuehne-webseiten.de/jp.php',
+      timeout: 10000
       
-    }).success(getResponse).error(function(jqXHR,textStatus,errorThrown){
-		alert (textStatus);
+    }).error(function(){
+		//$('#load-result').html("");
+		$('#load-result').append("update error");		
 	}).complete(function(){
-		//alert("fertig");
-	});
+		console.log('update fertig');
+		//$('#load-result').html('fertig');
+	}).success(getResponse);
 	
 }
 	
@@ -119,27 +139,3 @@ $(document).ready(function() {
 	
 	
 });
-
-
-function murks() {
-	
-		// ajax setup (could be in an own section if several different requests are done)
-	$.ajaxSetup({
-		url : 'http://localhost/tk/kwd-news-data/jsonp.txt',
-		dataType : 'jsonp',
-		cache : false,
-		//success : ajax_success,
-		//error : ajax_error,
-		crossDomain : true
-	}); 
-
-	// JSONP Funktion
-	$.ajax().error(function(jqXHR,textStatus,errorThrown){
-		alert (textStatus);
-	}).success(function(){
-		alert ("Hurra");
-	}).complete(function(){
-		alert ("Fertig");	
-	});
-
-}
