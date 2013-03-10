@@ -31,3 +31,8 @@
 .info{
 	display: none;
 }
+/* nur Breite ergibt proportional?? */
+.projekt .image img {
+	width:325px;
+	height:250px;
+}

@@ -5,6 +5,10 @@
  * als "duales System" könnte man die bereits bestehenden Projekte im phonegap Projekt
  * als Ressource hinterlegen, so dass nur neue und Änderungen nachgeladen werden.
  * 
+ * TODO: das encode geht nur von "eigener Domain"/"vertrauenswürdiger Quelle". Bilder können also nicht 
+ * gespeichert werden ohne weiteres. die cordova-Variante wäre am sinnvollsten, da das speichern
+ * in einem Browser, der ohnehin online ist, nicht so wichtig ist.
+ * 
  */
 
 // versuche canvas zu füllen mit Bild von Projekt 1

@@ -27,6 +27,7 @@ function getResponse(response) {
 		var i=0;
 		for(var entry in response) {
 			
+			// TODO: weniger um das entgültige Layout kümmern??
 			// use html, not append!
 			
 			if(response[i]['info']=='') $('#projekt' + (i + 1) +' .name').html(response[i]['name']);
@@ -74,8 +75,8 @@ function read_kwd_projects (argument) {
       dataType: 'jsonp',
       jsonp: 'jsonp_callback',
       //url: 'http://localhost/tk/kwd-news-data/jsonp.php',
-      url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
-      //url: 'http://www.kuehne-webseiten.de/jp.php',
+      //url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
+      url: 'http://www.kuehne-webseiten.de/index.php?article_id=10',
       timeout: 10000
       
     }).error(function(){
