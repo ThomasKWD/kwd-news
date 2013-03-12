@@ -11,8 +11,54 @@
  * 
  */
 
-// versuche canvas zu füllen mit Bild von Projekt 1
+//  ---------------- check filesystem
+
+function onDeviceReady() {
+    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
+}
+
+function onFileSystemSuccess(fileSystem) {
+    console.log(fileSystem.name);
+    console.log(fileSystem.root.name);
+    alert(filesystem.root.name)
+}
+
+function fail(evt) {
+    console.log(evt.target.error.code);
+}
+
+
+// ------------------ read test file
 function saveProjects() {
+	
+	// !! Assumes filePath is a valid path on the device
+	var fileTransfer = new FileTransfer();
+	var uri = encodeURI("http://www.kuehne-webdienste.de/files/apn-shot.jpg");
+	
+	// filePath must be set!!!
+	var filePath = '/mnt/sdcard'; // valid for most android
+	
+	fileTransfer.download(
+	    uri,
+	    filePath,
+	    function(entry) {
+	        console.log("download complete: " + entry.fullPath);
+	    },
+	    function(error) {
+	        console.log("download error source " + error.source);
+	        console.log("download error target " + error.target);
+	        console.log("upload error code" + error.code);
+	    }
+	);
+	
+}
+
+
+// --------------old canvas code (won't work cross sites)
+
+// versuche canvas zu füllen mit Bild von Projekt 1
+
+function saveProjects_Canvas() {
 	var canvas = $('#mycanvas').get(0); // get gets *always* array of matched!!
 	//var canvas = document.createElement('canvas');
 	console.log(canvas);
