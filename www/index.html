@@ -22,32 +22,44 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=yes, initial-scale=1, maximum-scale=3, minimum-scale=1, width=device-width, height=device-height, target-densitydpi=device-dpi" />
-        <title>Kühne-Webseiten News</title>
-        <link rel="stylesheet" href="css/main.css" type="text/css" media="screen" />
-       	<link rel="stylesheet"  href="css/jquery.mobile-1.2.0.min.css" type="text/css" media="screen handheld" />
-        <link rel="stylesheet"  href="css/mobile.css" type="text/css" media="handheld" />
+        <title>KÜHNE-Webdienste.de News</title>
+       	<link rel="stylesheet"  href="css/jquery.mobile-1.4.2.min.css" type="text/css" />
+       	<link rel="stylesheet"  href="css/main.css" type="text/css" charset="UTF-8"/>
         <script type="text/javascript" src="phonegap.js"></script>
+        <script type="text/javascript" src="js/debug.js"></script>
         <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.mobile-1.2.0.min.js"></script>
-        <script type="text/javascript" src="js/index.js"></script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.2.min.js"></script>
+        <script type="text/javascript" src="js/index.js" charset="UTF-8"></script>
         <script type="text/javascript" src="js/kwd-synch.js"></script>
         <script type="text/javascript" src="js/kwd-save.js"></script>
         <script type="text/javascript" src="js/kwd-effects.js"></script>
     </head>
     <body>
-      <div data-role="page" id="page">
+
+
+	<div id="kopfbereich" style="width:100%;height:3em"><p>Willkommen</p> Willkommen </div>
+
+      <div data-role="page" id="page-start">
        
            <div data-role="header" id="header">
-            <h1>KÜHNE-Webdienste.de News!</h1>
+            <h1>Wilkommen</h1>
            </div>
-           
+
+          
            <div data-role="navbar" id="navbar">
-              News Projekte Kontakt | <a id="doUpdate" href="#">Update</a> <a id="doRestore" href="#">Laden</a> <a id="doSave" href="#">Speichern</a>
+              <a href="#page-news">News</a>
+              |
+              <a id="doRestore" href="#">Laden</a> <a id="doSave" href="#">Speichern</a>
+              <a id="doUpdate" href="#">Update</a>
+              <a id="doTest__" href="page1.html">Test page call</a>              
+              <a id="doTest2" href="#">Test URL call</a>              
+              <a id="doTest3" href="#">Test AJAX page load</a>              
            </div>
        
-           <div data-role="content" id="content">
+			<div role="main" class="ui-content">
            
-           	<p id="load-result"></p>
+           	<div id="load-result"></div>
+           	<div id="device-info"></div>
            	
            	<div id="projekt1" class="projekt">
            		<div class="name"><a id="name1" href="#"><span class="namestring"></span></a></div>
@@ -128,27 +140,19 @@
 			
 			<canvas id="mycanvas"></canvas>
 			
-           	<script type="text/javascript">
-           		$(document).ready( function()
-           		{
-           			$('#doUpdate').click(function(){
-	           			read_kwd_projects();           				
-           			});
-           			$('#doRestore').click(function(){
-           				$('#load-result').html('Laden noch nicht implementiert.')
-           			});
-           			$('#doSave').click(function(){
-           				saveProjects();
-           				$('#load-result').html('Speichern noch nicht implementiert.')
-           			});
-           		});
-           	</script>
            </div> 
-       
-           <div data-role="footer" id="footer">
-           </div>          
-       
-      </div>
+              
+
+
+      </div><!--page-start-->
+      
+		<div data-role="page" id="page-news">
+		
+			Das sind die News	
+			
+		</div>
+		
+		
       <script type="text/javascript">
           app.initialize();
       </script>

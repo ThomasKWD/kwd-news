@@ -13,9 +13,10 @@
 
 //  ---------------- check filesystem
 
-function onDeviceReady() {
-    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
-}
+//function declared in index.js
+//function onDeviceReady() {
+//    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
+//}
 
 function onFileSystemSuccess(fileSystem) {
     console.log(fileSystem.name);
@@ -35,7 +36,7 @@ function saveProjects() {
 	var fileTransfer = new FileTransfer();
 	var uri = encodeURI("http://www.kuehne-webdienste.de/files/apn-shot.jpg");
 	
-	// filePath must be set!!!
+	// TODO: in new phongegap you must use function to create url 
 	var filePath = '/mnt/sdcard'; // valid for most android
 	
 	fileTransfer.download(
