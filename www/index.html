@@ -37,30 +37,57 @@
     <body>
 
 	
-	<div id="kopfbereich" style="width:100%;height:3em"><p>Willkommen</p> Willkommen </div>
+       <div data-role="header" id="header" data-position="fixed" data-theme=a>
+        <h1>Willkommen</h1>
+        <a href=#page-start data-icon=bars data-iconpos=notext></a> 
+        <a href="#" data-rel=back data-icon=back data-iconpos=notext></a>
+        <a id="data-rel-forward" href="#" data-icon="forward" data-iconpos="notext"></a><!--geht noch nicht-->
+       </div>
 
       <div data-role="page" id="page-start">
        
-           <div data-role="header" id="header">
-            <h1>Wilkommen</h1>thomas
-           </div>
 
           
-           <div data-role="navbar" id="navbar">
-              <a href="#page-news">News</a>
-              |
-              <a id="doRestore" href="#">Laden</a> <a id="doSave" href="#">Speichern</a>
-              <a id="doUpdate" href="#">Update</a>
-              <a id="doTest__" href="page1.html">Test page call</a>              
-              <a id="doTest2" href="#">Test URL call</a>              
-              <a id="doTest3" href="#">Test AJAX page load</a>              
+           <!--<div data-role="navbar" id="navbar">
+           	<ul>
+              <li><a href="#page-news">News</a></li>              
+              <li><a id="doRestore" href="#">Laden</a></li> <li><a id="doSave" href="#">Speichern</a></li>
+              <li><a id="doUpdate" href="#">Update</a></li>
+              <li><a id="doTest_" href="page1.html">Test page call</a></li>              
+              <li><a id="doTest__" href="http://www.kuehne-webdienste.de/?viewmode=app">call URL foreign *</a></li>              
+              <li><a id="doTest___" href="http://localhost/tk/kwd-redaxo/index.php?article_id=16&viewmode=app">call URL this</a></li>              
+              <li><a id="doTest3" href="#">Test AJAX page load</a></li>
+              </ul>              
            </div>
+          -->
        
 			<div role="main" class="ui-content">
+				
+
+              <div data-role="controlgroup"> 
+	              <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
+	              <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Projekte</a>              
+	              <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
+	              <a id="doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>
+	          </div>              
+              <div data-role="controlgroup" data-theme="b"> 
+	              <a id="doRestore" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Laden</a>
+	              <a id="doSave" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Speichern</a>
+	              <a id="doUpdate" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Update</a>
+	              <a id="doTest_" href="page1.html" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Test page call</a>              
+	              <a id="doTest__" href="http://www.kuehne-webdienste.de/?viewmode=app" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">call URL foreign *</a>              
+	              <a id="doTest___" href="http://localhost/tk/kwd-redaxo/index.php?article_id=16&viewmode=app" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">call URL this</a>              
+	              <a id="doTest3" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Test AJAX page load</a>
+              </div>
+
+			<p>Dies ist die erste Demo App von <a href="http://www.kuehne-webdienste.de">http://www.kuehne-webdienste.de</a>.</p>
+			<p>* Beachte dass "call URL foreign auf App (phonegap) eher laufen müsste, da diese Domain für phonegap registriert."</p>
+			<p>Platform:<br /></p>
+			<p>System:<br /></p>
            
            	<div id="load-result"></div>
            	<div id="device-info"></div>
-           	
+
            	<div id="projekt1" class="projekt">
            		<div class="name"><a id="name1" href="#"><span class="namestring"></span></a></div>
            		<div class="image"></div>
@@ -148,13 +175,26 @@
       
 		<div data-role="page" id="page-news">
 		
-			Das sind die News	
+
+			<div role="main" class="ui-content">
+
+				<div data-role="collapsible">
+				    <h4>Heading</h4>
+				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				</div>
+
+			</div>
 			
 		</div>
 		
 		
-      <script type="text/javascript">
-          app.initialize();
-      </script>
+		<script type="text/javascript">
+			app.initialize();
+			
+			$(function(){
+				$( "[data-role='header'], [data-role='footer']" ).toolbar();
+			});
+			          
+		</script>
     </body>
 </html>

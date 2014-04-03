@@ -53,17 +53,19 @@ var app = {
 
 $(document).ready(function() {
 	
+	
 	kwd_log ('KWD: document ready.');
     // are we running in native app or in a browser?
     // leider ist das kontraproduktiv, wenn ich versuche, eine http Seite in app zu laden
-    window.isphone = false;
+    window.isDevice = false;
+    
     if(document.URL.indexOf("http://") == -1 
         && document.URL.indexOf("https://") == -1
         && document.URL.indexOf("file://") == -1) {
-        window.isphone = true;
+        window.isDevice = true;
     }
 
-    if( window.isphone ) {
+    if( window.isDevice ) {
     	kwd_log('Wird als Device erkannt.');
         //document.addEventListener("deviceready", onDeviceReady, false); wird ja schon oben gemacht
     } else {
@@ -101,6 +103,11 @@ function onDeviceReady() {
 		$('#device-info').load('page1.html');
 				           				
 	});
+	$('#data-rel-forward').click(function(){
+		window.history.go(1); // try to go forward history				           				
+	});
+	$('#doQuit').click(function() {
+		navigator.device.exitApp(); // does work on Android // iOS and other Systems don't have an user invoked exit!		           						
+	});
 	
-
 }
