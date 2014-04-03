@@ -109,5 +109,6 @@ function onDeviceReady() {
 	$('#doQuit').click(function() {
 		navigator.device.exitApp(); // does work on Android // iOS and other Systems don't have an user invoked exit!		           						
 	});
-	
+	// schreibe Funktion, die dies für alle Links automatisiert!
+	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 }
