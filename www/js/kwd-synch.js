@@ -27,7 +27,6 @@ function getResponse(response) {
 		var i=0;
 		for(var entry in response) {
 			
-			// TODO: weniger um das entgültige Layout kümmern??
 			// use html, not append!
 			
 			if(response[i]['info']=='') $('#projekt' + (i + 1) +' .name').html(response[i]['name']);
