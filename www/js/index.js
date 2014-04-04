@@ -56,8 +56,8 @@ $(document).ready(function() {
 	
 	kwd_log ('KWD: document ready.');
     // are we running in native app or in a browser?
-    // leider ist das kontraproduktiv, wenn ich versuche, eine http Seite in app zu laden
-    window.isDevice = false;
+    // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
+    window.isDevice = false; 
     
     if(document.URL.indexOf("http://") == -1 
         && document.URL.indexOf("https://") == -1
@@ -80,7 +80,23 @@ function onDeviceReady() {
     // document ready check nicht mehr nötig!!
     kwd_log('onDeviceReady');
     
-	$('#device-info').html('page1.html');
+    // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
+
+	if(window.isDevice) {
+		$('#info-platform').html(device.platform);
+		$('#info-os').html(device.version);		
+	}
+	
+	
+    // EVENT LISTENER ------------------------------------------------------------
+    
+	// geht nicht auf ios (muss ich es extra abfragen oder wird es dort automatisch ignoriert??
+	document.addEventListener("menubutton", onMenuButtonClick, false);
+ 	document.addEventListener("online", onOnline, false);	
+ 	document.addEventListener("online", onOffline, false);	
+	
+	
+	// CLICK HANDLER -------------------------------------------------------------
 	
 	$('#doUpdate').click(function(){
 		read_kwd_projects();           				
@@ -90,7 +106,7 @@ function onDeviceReady() {
 	});
 	$('#doSave').click(function(){
 		saveProjects();
-		$('#load-result').html('Speichern eines Test-Bildes ausgeführt (nur auf device).')
+		$('#load-result').html('Speichern eines Test-Bildes ausgeführt (nur auf device).');
 	});
 	$('#doTest1').click(function(){
 		location.href='spec.html';           				
@@ -111,4 +127,16 @@ function onDeviceReady() {
 	});
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
+}
+
+function onMenuButtonClick() {
+	// (deviceready auf jeden Fall gegeben)
+	$.mobile.changePage ($("#page-start")); //( hard codiert unsere Startpage)
+	//TODO: abfragen ob Startpage schon da?
+}
+function onOnline() {
+	$("#online-status").html('online');	
+}
+function onOffline() {
+	$("#online-status").html('offline');	
 }

@@ -3,10 +3,21 @@
  * = test layout
  */
 
-/*#page {
-	background: url(../res/sommerfeld.jpg) fixed top left no-repeat;
+/*experimental*/
+#page-start,#header {
+	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
 }
-*/
+
+
+.wichtig {
+	font-weight:bold;
+	font-size: 1.2em;
+}
+
+/* Startzustand: */
+#headbackbutton {
+	display:none;
+}
 
 #load-result {
 	color: green;

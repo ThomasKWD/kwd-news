@@ -38,29 +38,31 @@
 
 	
        <div data-role="header" id="header" data-position="fixed" data-theme=a>
-        <h1>Willkommen</h1>
-        <a href=#page-start data-icon=bars data-iconpos=notext></a>
+       	<!--<div id="kwd-header">-->
+       		
+        <h1></h1>
          <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
-	        <a href="#" data-rel=back data-icon=back data-iconpos=notext data-inline=true class="ui-btn-right"></a>
+	        <a id="headbackbutton" href="#" data-rel=back data-icon=carat-l data-iconpos="notext"></a><!-- TODO: not on Mainpage -->
+	        <a href=#page-start data-icon=bars data-iconpos=notext></a>
 	        <!--<a id="data-rel-forward" href="#" data-icon="forward" data-iconpos="notext" data-inline=true class="ui-btn-right"></a>-->
 	  	<!--</div> -->
+	  	
+       	<!--</div>-->
        </div>
 
       <div data-role="page" id="page-start">
-       
-
-          
-       
+        
 			<div role="main" class="ui-content">
 				
 
-              <div data-role="controlgroup"> 
+              <div data-role="contolgroup"> 
 	              <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
 	              <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Projekte</a>              
 	              <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
 	              <!--<a id="doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-nodisc-icon ui-alt-icon ui-btn-icon-left">Beenden</a>-->
 	          </div>              
-	          
+
+				          
 	          <!--
               <div data-role="controlgroup" data-theme="b"> 
 	              <a id="doRestore" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Laden</a>
@@ -72,23 +74,67 @@
 	              <a id="doTest3" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Test AJAX page load</a>
               </div>
              -->
+			<p>Dies ist die erste Demo App von <strong>KÜHNE-Webdienste.de</strong></p>
+			<p>Lesen Sie Inhalte der Webpräsenz offline! Diese werden bei Internetverbindung automatisch aktualisiert.</p>
+			<p>Ihr Gerät ist zur Zeit <span id="online-status" class="wichtig">offline</span>.</p>
+           
+              
+
            <div data-role="navbar" id="navbar" data-theme="b">
            	<ul>
-              <li><a href="#page-news">News</a></li>              
               <li><a id="doRestore" href="#">Laden</a></li> <li><a id="doSave" href="#">Speichern</a></li>
               <li><a id="doUpdate" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
-              <li><a id="doTest_" href="page1.html">Test page call</a></li>              
-              <li><a id="doTest__" href="http://www.kuehne-webdienste.de/?viewmode=app">call URL foreign *</a></li>              
-              <li><a id="doTest___" href="http://localhost/tk/kwd-redaxo/index.php?article_id=16&viewmode=app">call URL this</a></li>              
-              <li><a id="doTest3" href="#">Test AJAX page load</a></li>
+              
               </ul>              
            </div>
-          
-			<p>Dies ist die erste Demo App von <strong>www.kuehne-webdienste.de</strong></p>
-			<p>Lesen Sie Inhalte von KÜHNE-Webdienste.de online und offline! Bei Internetverbindung wird automatisch aktualisiert.</p>
            
-           	<div id="load-result"></div>
-           	<div id="device-info"></div>
+          </div>
+          
+
+      </div><!--page-start-->
+      
+		<div data-role="page" id="page-news">
+		
+
+			<div role="main" class="ui-content">
+
+				<div data-role="collapsible">
+				    <h4>News 1</h4>
+				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				</div>
+				<div data-role="collapsible">
+				    <h4>News 2</h4>
+				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				</div>
+				<div data-role="collapsible">
+				    <h4>News 3</h4>
+				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				</div>
+
+			</div>
+			
+		</div><!--page news-->
+		
+		
+		<div data-role="page" id="page-projects">
+		
+
+			<div data-role="content">
+
+				<h2>Referenzen, Auswahl</h2>
+				<ul data-role="listview">
+					<li data-role=list-divider>Webprojekte</li>
+					<li><a href="#page-project1">Tangará Brasil</a></li>
+					<li><a href="#page-project1">Shuri Ryu Berlin</a></li>
+					<li><a href="#page-project1">Pointsnap</a></li>
+					<li><a href="#page-project1">Coach-Concept ICTD GmbH</a></li>
+					<li><a href="#page-project1">Moldt Events</a></li>
+					<li><a href="#page-project1">Samspel e.V.</a></li>
+					<li><a href="#page-project1">Murah Soares</a></li>
+					<li><a href="#page-project1">Augenarztpraxis Nussbaum</a></li>
+				</ul>
+
+	           	<div id="load-result"></div>
 
            	<div id="projekt1" class="projekt">
            		<div class="name"><a id="name1" href="#"><span class="namestring"></span></a></div>
@@ -167,57 +213,8 @@
            		<div class="url"></div>
            	</div>
 			
-			<canvas id="mycanvas"></canvas>
-			
            </div> 
-              
-
-
-      </div><!--page-start-->
-      
-		<div data-role="page" id="page-news">
 		
-
-			<div role="main" class="ui-content">
-
-				<div data-role="collapsible">
-				    <h4>News 1</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div>
-				<div data-role="collapsible">
-				    <h4>News 2</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div>
-				<div data-role="collapsible">
-				    <h4>News 3</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div>
-
-			</div>
-			
-		</div><!--page news-->
-		
-		
-		<div data-role="page" id="page-projects">
-		
-
-			<div data-role="content">
-
-				<h2>Referenzen, Auswahl</h2>
-				<ul data-role="listview">
-					<li data-role=list-divider>Webprojekte</li>
-					<li><a href="#page-project1">Tangará Brasil</a></li>
-					<li><a href="#page-project1">Shuri Ryu Berlin</a></li>
-					<li><a href="#page-project1">Pointsnap</a></li>
-					<li><a href="#page-project1">Coach-Concept ICTD GmbH</a></li>
-					<li><a href="#page-project1">Moldt Events</a></li>
-					<li><a href="#page-project1">Samspel e.V.</a></li>
-					<li><a href="#page-project1">Murah Soares</a></li>
-					<li><a href="#page-project1">Augenarztpraxis Nussbaum</a></li>
-				</ul>
-
-			</div>
-			
 		</div><!--page projects-->
 		
 		
@@ -227,13 +224,14 @@
 			<div role="main" class="ui-content">
 
 				<p>Allgemeine Infos:</p>
-			<p>* Beachte dass "call URL foreign auf App (phonegap) eher laufen müsste, da diese Domain für phonegap registriert."</p>
-			<p>Platform:<br /></p>
-			<p>System:<br /></p>
+			<p>Platform: <span id="info-platform"></span><br /></p>
+			<p>System: <span id="info-os"></span><br /></p>
 
+			<a href="#">Facebook</a>
+			<a href="#">Google+</a>
 			<a href="tel:+491705191814">Rufen Sie einfach an!</a>
 			<a href="sms:+491705191814">Schreiben Sie eine SMS!</a>
-			Besuchen Sie mich: <a href="#" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">www.kuehne-webdienste.de</a>
+			<a href="#" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">www.kuehne-webdienste.de</a>
 			<!--
 				für Erzwingen externer Browser: bei www-Links
 				javascript:
