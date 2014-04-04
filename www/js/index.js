@@ -109,7 +109,7 @@ function onDeviceReady() {
 		$('#load-result').html('Speichern eines Test-Bildes ausgeführt (nur auf device).');
 	});
 	$('#doTest1').click(function(){
-		location.href='spec.html';           				
+		$('#header').css ( { 'background-size':'100%' });           				
 	});           			
 	$('#doTest2').click(function(){
 		location.href='http://www.kuehne-webdienste.de/?viewmode=app';           				

@@ -1,11 +1,18 @@
 /*
  * basic styles indpendent of eventual mobile view
  * = test layout
+ * 
+ * --> Schriftart und grundlegende Farben/Formen in theme-roller gestalten!
  */
 
 /*experimental*/
 #page-start,#header {
 	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
+	background-size: 75%;
+}
+.page {
+	background-image: linear-gradient(top, white 0%, black 100%); important!
+	
 }
 
 
@@ -17,6 +24,12 @@
 /* Startzustand: */
 #headbackbutton {
 	display:none;
+}
+
+.ui-content h2 {
+	font-size:1em;
+	font-style:italic;
+	font-weight:bold;
 }
 
 #load-result {

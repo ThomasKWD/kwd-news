@@ -21,7 +21,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
-        <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height" />
+        <meta name="viewport" content="user-scalable=no, initial-scale=1, width=device-width, height=device-height" />
         <title>KÜHNE-Webdienste.de News</title>
        	<link rel="stylesheet"  href="css/jquery.mobile-1.4.2.min.css" type="text/css" />
        	<link rel="stylesheet"  href="css/main.css" type="text/css" charset="UTF-8"/>
@@ -50,11 +50,12 @@
        	<!--</div>-->
        </div>
 
-      <div data-role="page" id="page-start">
+      <div data-role="page" id="page-start" class="page">
         
 			<div role="main" class="ui-content">
 				
-
+				<h2>Design und Programmierung für Web, App und Druck</h2>
+				
               <div data-role="contolgroup"> 
 	              <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
 	              <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Projekte</a>              
@@ -84,6 +85,7 @@
            	<ul>
               <li><a id="doRestore" href="#">Laden</a></li> <li><a id="doSave" href="#">Speichern</a></li>
               <li><a id="doUpdate" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
+              <li><a id="doTest1" href="#">Hintergrund</a></li>
               
               </ul>              
            </div>
@@ -93,7 +95,7 @@
 
       </div><!--page-start-->
       
-		<div data-role="page" id="page-news">
+		<div data-role="page" id="page-news" class="page">
 		
 
 			<div role="main" class="ui-content">
@@ -218,25 +220,29 @@
 		</div><!--page projects-->
 		
 		
-		<div data-role="page" id="page-info">
+		<div data-role="page" id="page-info" class="page">
 		
 
-			<div role="main" class="ui-content">
+			<div datarole="content" class="ui-content">
 
-				<p>Allgemeine Infos:</p>
-			<p>Platform: <span id="info-platform"></span><br /></p>
-			<p>System: <span id="info-os"></span><br /></p>
-
-			<a href="#">Facebook</a>
-			<a href="#">Google+</a>
-			<a href="tel:+491705191814">Rufen Sie einfach an!</a>
-			<a href="sms:+491705191814">Schreiben Sie eine SMS!</a>
-			<a href="#" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">www.kuehne-webdienste.de</a>
-			<!--
-				für Erzwingen externer Browser: bei www-Links
-				javascript:
-				navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
-			--> 
+					<p>Diese App wurde mit "Phonegap" erstellt und ist für Android und iOS,
+						mit Einschränkungen auch für BlackBerry und Windows Phone und weitere Systeme verfügbar.</p>
+				<p>Platform: <span id="info-platform"></span><br />
+				System: <span id="info-os"></span><br /></p>
+				
+				<div data-role="controlgroup"> 
+					<a href="#"  class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">www.kuehne-webdienste.de</a>
+					<!--
+						für Erzwingen externer Browser: bei www-Links
+						javascript:
+						navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
+					--> 
+					<a href="mailto:thomas@kuehne-webdienste.de" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-left">Mail an thomas@kuehne-webdienste.de</a>
+					<a href="sms:+491705191814" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-left">Schreiben Sie eine SMS!</a>
+					<a href="tel:+491705191814" class="ui-btn ui-corner-all ui-icon-phone ui-btn-icon-left">Rufen Sie einfach an!</a>
+					<a href="https://www.facebook.com/kuhne.webdienste" class="ui-btn ui-corner-all ui-icon-user ui-btn-icon-left">Facebook</a>
+					<a href="#" class="ui-btn ui-corner-all ui-icon-plus ui-btn-icon-left  ui-state-disabled">Google+</a>
+				</div>
 			</div>
 			
 		</div><!--page info-->
