@@ -10,3 +10,23 @@
  *  man kann auch einfach .get('...') nehmen
  *  beachte Path-Bildungsfunktionen bei filetransfer
  */
+
+/*
+ * alle Variablen global
+ */
+function kwd_readProjects() {
+	
+	strread = localStorage.getItem(kwd_storage_projects);
+	if (strread==null) {
+		kwd_log('konnte Projekte nicht laden');
+		kwd_projects = null;
+	}
+	else {
+		kwd_projects = JSON.parse(strread);
+		kwd_log('Projekte geladen');
+		kwd_log(kwd_projects);
+	}
+	
+	if (kwd_projects==null) return false;
+	else return true;
+}

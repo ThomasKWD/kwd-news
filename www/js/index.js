@@ -50,6 +50,12 @@ var app = {
     }
 };
 
+// Globale Datenstrukturen für Inhalte ---------------------------------------
+var kwd_projects = null;
+var kwd_news = null;
+
+
+
 
 $(document).ready(function() {
 	
@@ -98,6 +104,10 @@ function onDeviceReady() {
 	
 	// CLICK HANDLER -------------------------------------------------------------
 	
+	//$('#doStart').click(function(){
+		//window.history.go(-2);  // Mein Trick funktioniert solange die logische Tiefe der Links nur 2
+		//TODO: geht nicht --> benötige Zähler
+	//});
 	$('#doUpdate').click(function(){
 		read_kwd_projects();           				
 	});
@@ -125,8 +135,14 @@ function onDeviceReady() {
 	$('#doQuit').click(function() {
 		navigator.device.exitApp(); // does work on Android // iOS and other Systems don't have an user invoked exit!		           						
 	});
+	$('#doShowProjects').click(function() {
+		kwd_projects2list();		           						
+	});
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
+	
+	// UPDATE CONTENT-----------------------------------------------------------
+	read_kwd_projects();
 }
 
 function onMenuButtonClick() {
@@ -140,3 +156,20 @@ function onOnline() {
 function onOffline() {
 	$("#online-status").html('offline');	
 }
+
+
+$(function() {
+    //$( "[data-role='navbar']" ).navbar(); wenn allgemeine navbar
+    $( "[data-role='header'], [data-role='footer']" ).toolbar();
+});
+// Update the contents of the toolbars
+$( document ).on( "pageshow", "[data-role='page']", function() { // hier Abfrage einzelner pages möglich??
+	
+    // Each of the four pages in this demo has a data-title attribute
+    // which value is equal to the text of the nav button
+    // For example, on first page: <div data-role="page" data-title="Info">
+    var current = $( this ).jqmData( "title" );
+    // Change the heading
+    $( "[data-role='header'] h1" ).text( current );
+    
+});

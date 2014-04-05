@@ -11,6 +11,16 @@
   * TODO: warum geht Fehlermeldung nicht?  
 */
 
+/*
+ * Konstanten für local-storage
+ * der Einfachheit halber global
+ */
+const kwd_storage_projects = 'projects';
+const kwd_storage_news = 'news';
+
+/*
+ * Funktionen
+ */
 function ajax_success(data, textStatus, jqXHR ) {
 	alert(textStatus);
 }
@@ -18,30 +28,18 @@ function ajax_error(jqXHR,textStatus,errorThrown) {
 	alert(textStatus);
 } 
 
+// TODO: wenn Anzeige-code weg, diese function wieder inline :-)
+// TODO: das gleiche für die News
 function getResponse(response) {
 	
 	if(response) {		
 		
-		console.log(response);
+		//kwd_log(response);
+		var strdata = JSON.stringify(response); 
+		localStorage.setItem(kwd_storage_projects, strdata);
+		kwd_log('habe versucht, response zu speichern.');
+		kwd_log(strdata);
 			
-		var i=0;
-		for(var entry in response) {
-			
-			// use html, not append!
-			
-			if(response[i]['info']=='') $('#projekt' + (i + 1) +' .name').html(response[i]['name']);
-			else $('#projekt' + (i + 1) +' .name .namestring').html(response[i]['name']);
-			$('#projekt' + (i + 1) +' .info').html(response[i]['info']);
-			// make image from kwd-site
-			var image_markup = '<img src="http://www.kuehne-webdienste.de/files/'+(response[i]['imgsrc'])+'" />';
-			$('#projekt' + (i + 1) +' .image').html(image_markup);
-			$('#projekt' + (i + 1) +' .url').html(response[i]['url']);
-
-			$('#projekt' + (i + 1)).show();
-			
-			i++;
-
-		}
 		
 		$("#load-result").html('Daten aus dem Internet aktualisiert.');		
 	}

@@ -22,9 +22,10 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, width=device-width, height=device-height" />
-        <title>KÜHNE-Webdienste.de News</title>
+        <title>Willkommen</title>
        	<link rel="stylesheet"  href="css/jquery.mobile-1.4.2.min.css" type="text/css" />
-       	<link rel="stylesheet"  href="css/main.css" type="text/css" charset="UTF-8"/>
+       	<link rel="stylesheet"  href="css/icon-pack-custom.css" type="text/css" />
+       	<link rel="stylesheet"  href="css/main.css" type="text/css" charset="UTF-8"/>       	
         <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/debug.js"></script>
         <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
@@ -32,7 +33,9 @@
         <script type="text/javascript" src="js/index.js" charset="UTF-8"></script>
         <script type="text/javascript" src="js/kwd-synch.js"></script>
         <script type="text/javascript" src="js/kwd-save.js"></script>
+        <script type="text/javascript" src="js/kwd-restore.js"></script>
         <script type="text/javascript" src="js/kwd-effects.js"></script>
+        <script type="text/javascript" src="js/page3.js"></script>
     </head>
     <body>
 
@@ -43,7 +46,7 @@
         <h1></h1>
          <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
 	        <a id="headbackbutton" href="#" data-rel=back data-icon=carat-l data-iconpos="notext"></a><!-- TODO: not on Mainpage -->
-	        <a href=#page-start data-icon=bars data-iconpos=notext></a>
+	        <a id="doStart" href=#page-start data-icon=bars data-iconpos=notext></a>
 	        <!--<a id="data-rel-forward" href="#" data-icon="forward" data-iconpos="notext" data-inline=true class="ui-btn-right"></a>-->
 	  	<!--</div> -->
 	  	
@@ -84,7 +87,7 @@
            <div data-role="navbar" id="navbar" data-theme="b">
            	<ul>
               <li><a id="doRestore" href="#">Laden</a></li> <li><a id="doSave" href="#">Speichern</a></li>
-              <li><a id="doUpdate" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
+              <li><a id="doUpdate" class="ui-icon-recycle" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
               <li><a id="doTest1" href="#">Hintergrund</a></li>
               
               </ul>              
@@ -95,7 +98,7 @@
 
       </div><!--page-start-->
       
-		<div data-role="page" id="page-news" class="page">
+		<div data-role="page" id="page-news" class="page" data-title="News">
 		
 
 			<div role="main" class="ui-content">
@@ -118,107 +121,22 @@
 		</div><!--page news-->
 		
 		
-		<div data-role="page" id="page-projects">
+				<div data-role="page" id="page-projects">
 		
 
 			<div data-role="content">
 
 				<h2>Referenzen, Auswahl</h2>
-				<ul data-role="listview">
-					<li data-role=list-divider>Webprojekte</li>
-					<li><a href="#page-project1">Tangará Brasil</a></li>
-					<li><a href="#page-project1">Shuri Ryu Berlin</a></li>
-					<li><a href="#page-project1">Pointsnap</a></li>
-					<li><a href="#page-project1">Coach-Concept ICTD GmbH</a></li>
-					<li><a href="#page-project1">Moldt Events</a></li>
-					<li><a href="#page-project1">Samspel e.V.</a></li>
-					<li><a href="#page-project1">Murah Soares</a></li>
-					<li><a href="#page-project1">Augenarztpraxis Nussbaum</a></li>
-				</ul>
-
+				
+				<a id="doShowProjects" href="#" class="ui-btn ui-btn-inline">Laden</a>
+				
 	           	<div id="load-result"></div>
 
-           	<div id="projekt1" class="projekt">
-           		<div class="name"><a id="name1" href="#"><span class="namestring"></span></a></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-           	
-           	<div id="projekt2" class="projekt">
-           		<div class="name"><a id="name2" href="#"><span class="namestring"></span></a></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt3" class="projekt">
-           		<div class="name"><a id="name3" href="#"><span class="namestring"></span></a></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt4" class="projekt">
-           		<div class="name"><a id="name4" href="#"><span class="namestring"></span></a></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt5" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt6" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt7" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt8" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt9" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt10" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
-
-           	<div id="projekt11" class="projekt">
-           		<div class="name"></div>
-           		<div class="image"></div>
-           		<div class="info"></div>           		
-           		<div class="url"></div>
-           	</div>
 			
            </div> 
 		
 		</div><!--page projects-->
-		
+
 		
 		<div data-role="page" id="page-info" class="page">
 		
@@ -237,23 +155,20 @@
 						javascript:
 						navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 					--> 
-					<a href="mailto:thomas@kuehne-webdienste.de" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-left">Mail an thomas@kuehne-webdienste.de</a>
-					<a href="sms:+491705191814" class="ui-btn ui-corner-all ui-icon-edit ui-btn-icon-left">Schreiben Sie eine SMS!</a>
-					<a href="tel:+491705191814" class="ui-btn ui-corner-all ui-icon-phone ui-btn-icon-left">Rufen Sie einfach an!</a>
-					<a href="https://www.facebook.com/kuhne.webdienste" class="ui-btn ui-corner-all ui-icon-user ui-btn-icon-left">Facebook</a>
-					<a href="#" class="ui-btn ui-corner-all ui-icon-plus ui-btn-icon-left  ui-state-disabled">Google+</a>
+					<a href="mailto:thomas@kuehne-webdienste.de" class="ui-btn ui-corner-all ui-icon-mail ui-btn-icon-left">Mail an thomas@kuehne-webdienste.de</a>
+					<a href="sms:+491705191814" class="ui-btn ui-corner-all ui-icon-comment ui-btn-icon-left">SMS an +49 170 5191814</a>
+					<a href="tel:+491705191814" class="ui-btn ui-corner-all ui-icon-phone ui-btn-icon-left">Oder rufen Sie einfach an: +49 170 5191814</a>
+					<a href="https://www.facebook.com/kuhne.webdienste" class="ui-btn ui-corner-all ui-icon-facebook ui-btn-icon-left">Facebook</a>
+					<a href="https://www.xing.com/profile/Thomas_Kuehne18" class="ui-btn ui-corner-all ui-icon-xing ui-btn-icon-left">Xing</a>
+					<a href="#" class="ui-btn ui-corner-all ui-icon-google-plus ui-btn-icon-left">Google+</a>
+					
 				</div>
 			</div>
 			
 		</div><!--page info-->
 		
 		<script type="text/javascript">
-			app.initialize();
-			
-			$(function(){
-				$( "[data-role='header'], [data-role='footer']" ).toolbar();
-			});
-			          
+			app.initialize();			          
 		</script>
     </body>
 </html>
