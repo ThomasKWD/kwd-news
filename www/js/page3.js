@@ -5,7 +5,7 @@ function kwd_projects2list() {
 	if (kwd_readProjects()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
 		
 		var html = "";
-		html += "<ul id=list1 data-role=listview data-inset=true >";
+		html += "<ul id=list1 data-role=listview>";
 
 
 		var i=0;
@@ -33,8 +33,30 @@ function kwd_projects2list() {
 	
 		html += "</ul>";
 		
-		$("#page-projects div:jqmData(role=content)").append(html);
+		$("#project-list").html(html);
 		$("#list1").listview();
 	}
 
 }
+
+
+$( document ).on( "pageshow", "#page-projects", function() {
+	kwd_projects2list();
+ // hier Abfrage einzelner pages möglich??
+	
+    // Each of the four pages in this demo has a data-title attribute
+    // which value is equal to the text of the nav button
+    // For example, on first page: <div data-role="page" data-title="Info">
+    //var current = $( this ).jqmData( "title" );
+    // Change the heading
+    //$( "[data-role='header'] h1" ).text( current );
+    
+});
+
+
+$( document ).on( "pageshow", "#page-aproject", function() {
+	// speichern welches Projekt
+// schon angelegt wurde. 
+// z.b. abfragen ob $('#project1) existent
+   
+});

@@ -22,10 +22,10 @@ const kwd_storage_news = 'news';
  * Funktionen
  */
 function ajax_success(data, textStatus, jqXHR ) {
-	alert(textStatus);
+	kwd_log(textStatus);
 }
 function ajax_error(jqXHR,textStatus,errorThrown) {
-	alert(textStatus);
+	kwd_log(textStatus);
 } 
 
 // TODO: wenn Anzeige-code weg, diese function wieder inline :-)
@@ -37,14 +37,14 @@ function getResponse(response) {
 		//kwd_log(response);
 		var strdata = JSON.stringify(response); 
 		localStorage.setItem(kwd_storage_projects, strdata);
-		kwd_log('habe versucht, response zu speichern.');
-		kwd_log(strdata);
+		//kwd_log('habe versucht, response zu speichern.');
+		//kwd_log(strdata);
 			
 		
-		$("#load-result").html('Daten aus dem Internet aktualisiert.');		
+		//$("#load-result").html('Daten aus dem Internet aktualisiert.');		
 	}
 	else {
-		$("#load-result").html('Aktualisierung fehlgeschlagen.');				
+		kwd_log('Aktualisierung fehlgeschlagen.');				
 	}
 }
 
@@ -52,10 +52,10 @@ function getResponse(response) {
 function read_kwd_projects (argument) {
 	
 	//$('#load-result').html('AKTUALSIEREN');
-	console.log('starte aktualisieren');
+	kwd_log('starte aktualisieren');
 	
 	$(document).ajaxError(function(event, request, settings){
-   		$('#load-result').html("<li>Error requesting page " + settings.url + "</li>");
+   		alert("<li>Error requesting page " + settings.url + "</li>");
  	});
  
  // Abfrage ob Netzwerk-Kommunikation möglich (phonegap)
@@ -78,7 +78,7 @@ function read_kwd_projects (argument) {
       
     }).error(function(){
 		//$('#load-result').html("");
-		$('#load-result').append("update error");		
+		//$('#load-result').append("update error");		
 	}).complete(function(){
 		console.log('update fertig');
 		//$('#load-result').html('fertig');

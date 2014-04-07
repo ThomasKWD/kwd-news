@@ -85,6 +85,7 @@ function onDeviceReady() {
     // alle Start-Sachen, hier tun!
     // document ready check nicht mehr nötig!!
     kwd_log('onDeviceReady');
+	kwd_debugscreen=true;// mache doch einen Schalter :-)
     
     // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
 
@@ -113,6 +114,8 @@ function onDeviceReady() {
 	});
 	$('#doRestore').click(function(){
 		$('#load-result').html('<p style="border:1px solid blue">Dies ist <i>eingefügtes</i> <b>HTML</b> &reg; &amp; CSS</p>');
+		alert('alert');
+
 	});
 	$('#doSave').click(function(){
 		saveProjects();
@@ -142,7 +145,7 @@ function onDeviceReady() {
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
 	// UPDATE CONTENT-----------------------------------------------------------
-	read_kwd_projects();
+	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 }
 
 function onMenuButtonClick() {
@@ -162,14 +165,8 @@ $(function() {
     //$( "[data-role='navbar']" ).navbar(); wenn allgemeine navbar
     $( "[data-role='header'], [data-role='footer']" ).toolbar();
 });
+
 // Update the contents of the toolbars
-$( document ).on( "pageshow", "[data-role='page']", function() { // hier Abfrage einzelner pages möglich??
-	
-    // Each of the four pages in this demo has a data-title attribute
-    // which value is equal to the text of the nav button
-    // For example, on first page: <div data-role="page" data-title="Info">
-    var current = $( this ).jqmData( "title" );
-    // Change the heading
-    $( "[data-role='header'] h1" ).text( current );
-    
-});
+//$( document ).on( "pageshow", "[data-role='page']", function() {
+//}
+
