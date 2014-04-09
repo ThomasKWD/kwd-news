@@ -6,13 +6,16 @@
  */
 
 /*experimental*/
-#page-start,#header {
+#header {
 	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
 	background-size: 75%;
 }
 .page {
-	background-image: linear-gradient(top, white 0%, black 100%); important!
-	
+	background-image: linear-gradient(top,white 0%,black 50%);
+	background-color: #83C2FD;
+	padding:1em;
+	margin:0.25em;
+	border:1px solid blue;
 }
 
 

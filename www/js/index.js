@@ -59,6 +59,7 @@ var kwd_news = null;
 
 $(document).ready(function() {
 	
+	kwd_debugscreen=true;// mache doch einen Schalter :-)
 	
 	kwd_log ('KWD: document ready.');
     // are we running in native app or in a browser?
@@ -82,10 +83,11 @@ $(document).ready(function() {
 
 
 function onDeviceReady() {
-    // alle Start-Sachen, hier tun!
-    // document ready check nicht mehr nötig!!
+
+ 	kwd_debugscreen=true;// mache doch einen Schalter :-)
+
     kwd_log('onDeviceReady');
-	kwd_debugscreen=true;// mache doch einen Schalter :-)
+    kwd_log (document.URL);
     
     // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
 
@@ -93,6 +95,11 @@ function onDeviceReady() {
 		$('#info-platform').html(device.platform);
 		$('#info-os').html(device.version);		
 	}
+
+	//if (navigator.onLine) {
+		//$('#online-status').html(navigator.connection.type);
+	//}
+
 	
 	
     // EVENT LISTENER ------------------------------------------------------------
@@ -100,7 +107,7 @@ function onDeviceReady() {
 	// geht nicht auf ios (muss ich es extra abfragen oder wird es dort automatisch ignoriert??
 	document.addEventListener("menubutton", onMenuButtonClick, false);
  	document.addEventListener("online", onOnline, false);	
- 	document.addEventListener("online", onOffline, false);	
+ 	document.addEventListener("offline", onOffline, false);	
 	
 	
 	// CLICK HANDLER -------------------------------------------------------------
@@ -110,16 +117,12 @@ function onDeviceReady() {
 		//TODO: geht nicht --> benötige Zähler
 	//});
 	$('#doUpdate').click(function(){
-		read_kwd_projects();           				
-	});
+		read_kwd_projects();        		});
 	$('#doRestore').click(function(){
-		$('#load-result').html('<p style="border:1px solid blue">Dies ist <i>eingefügtes</i> <b>HTML</b> &reg; &amp; CSS</p>');
 		alert('alert');
-
 	});
 	$('#doSave').click(function(){
 		saveProjects();
-		$('#load-result').html('Speichern eines Test-Bildes ausgeführt (nur auf device).');
 	});
 	$('#doTest1').click(function(){
 		$('#header').css ( { 'background-size':'100%' });           				
@@ -145,6 +148,9 @@ function onDeviceReady() {
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
 	// UPDATE CONTENT-----------------------------------------------------------
+
+  window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, onFileSystemError);
+
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 }
 
@@ -157,16 +163,13 @@ function onOnline() {
 	$("#online-status").html('online');	
 }
 function onOffline() {
-	$("#online-status").html('offline');	
+	$("#online-status").html('offline');
 }
 
 
 $(function() {
-    //$( "[data-role='navbar']" ).navbar(); wenn allgemeine navbar
+    $( "[data-role='navbar']" ).navbar(); wenn allgemeine navbar
     $( "[data-role='header'], [data-role='footer']" ).toolbar();
 });
 
-// Update the contents of the toolbars
-//$( document ).on( "pageshow", "[data-role='page']", function() {
-//}
 

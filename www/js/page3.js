@@ -15,7 +15,8 @@ function kwd_projects2list() {
 			
 			html += "<a href=#page-project>";
 			
-			html +=     "<img style=\"height:80px\"src=http://www.kuehne-webdienste.de/index.php?rex_img_type=projektvorschau&rex_img_file="+kwd_projects[i]['imgsrc']+" />"; // http://www.kuehne-webdienste.de/tbd-shot.jpg
+			html +=     '<img style="height:80px" src="http://www.kuehne-webdienste.de/index.php?rex_img_type=projektvorschau&rex_img_file='+kwd_projects[i]['imgsrc']+'" />';
+ // http://www.kuehne-webdienste.de/tbd-shot.jpg
 			
 			html +=     "<h3>"+kwd_projects[i]['name']+"</h3>";
 			
@@ -53,10 +54,3 @@ $( document ).on( "pageshow", "#page-projects", function() {
     
 });
 
-
-$( document ).on( "pageshow", "#page-aproject", function() {
-	// speichern welches Projekt
-// schon angelegt wurde. 
-// z.b. abfragen ob $('#project1) existent
-   
-});

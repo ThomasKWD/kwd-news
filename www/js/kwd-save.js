@@ -13,19 +13,17 @@
 
 //  ---------------- check filesystem
 
-//function declared in index.js
-//function onDeviceReady() {
-//    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, fail);
-//}
+//function window.requestFileSystem called in index.js
 
 function onFileSystemSuccess(fileSystem) {
-    console.log(fileSystem.name);
-    console.log(fileSystem.root.name);
-    alert(filesystem.root.name)
+    kwd_log(fileSystem.name);
+    kwd_log(fileSystem.root.name);
+    alert(filesystem.root.name);
 }
 
-function fail(evt) {
-    console.log(evt.target.error.code);
+function onFileSystemError(evt) {
+    kwd_log(evt.target.error.code);
+
 }
 
 
@@ -34,7 +32,7 @@ function saveProjects() {
 	
 	// !! Assumes filePath is a valid path on the device
 	var fileTransfer = new FileTransfer();
-	var uri = encodeURI("http://www.kuehne-webdienste.de/files/apn-shot.jpg");
+	var uri = encodeURI('http://www.kuehne-webdienste.de/files/apn-shot.jpg');
 	
 	// TODO: in new phongegap you must use function to create url 
 	var filePath = '/mnt/sdcard'; // valid for most android
@@ -48,7 +46,7 @@ function saveProjects() {
 	    function(error) {
 	        console.log("download error source " + error.source);
 	        console.log("download error target " + error.target);
-	        console.log("upload error code" + error.code);
+	        console.log("download error code" + error.code);
 	    }
 	);
 	
