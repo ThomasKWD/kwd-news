@@ -8,14 +8,21 @@
 /*experimental*/
 #header {
 	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
-	background-size: 75%;
+	background-size: 100%;
 }
 .page {
+	background-color: #83C2FD;	
+}
+.page-content {
 	background-image: linear-gradient(top,white 0%,black 50%);
-	background-color: #83C2FD;
+	background-color: white;
 	padding:1em;
 	margin:0.25em;
 	border:1px solid blue;
+	border-radius:5px;
+	border-top-right-radius: 20px;
+	box-shadow:4px 4px 7px #aaa inset;
+	text-shadow: 0 0 0;
 }
 
 

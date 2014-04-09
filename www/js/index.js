@@ -97,7 +97,7 @@ function onDeviceReady() {
 	}
 
 	//if (navigator.onLine) {
-		//$('#online-status').html(navigator.connection.type);
+	//$('#online-status').html(navigator.connection.type);
 	//}
 
 	
@@ -144,12 +144,17 @@ function onDeviceReady() {
 	$('#doShowProjects').click(function() {
 		kwd_projects2list();		           						
 	});
+	$('.aproject').click(function() {
+		alert('project');
+		kwd_log('project');
+	});
+
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
-  window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, onFileSystemError);
+	//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, onFileSystemError);
 
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 }
@@ -168,7 +173,7 @@ function onOffline() {
 
 
 $(function() {
-    $( "[data-role='navbar']" ).navbar(); wenn allgemeine navbar
+    $( "[data-role='navbar']" ).navbar();
     $( "[data-role='header'], [data-role='footer']" ).toolbar();
 });
 

@@ -34,7 +34,6 @@
         <script type="text/javascript" src="js/kwd-synch.js"></script>
         <script type="text/javascript" src="js/kwd-save.js"></script>
         <script type="text/javascript" src="js/kwd-restore.js"></script>
-        <script type="text/javascript" src="js/kwd-effects.js"></script>
         <script type="text/javascript" src="js/page3.js"></script>
     </head>
     <body>
@@ -43,19 +42,19 @@
        <div data-role="header" id="header" data-position="fixed" data-theme=a>
        	<!--<div id="kwd-header">-->
        		
-        <h1>kwd</h1>
+        <h1></h1>
          <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
-	        <a id="headbackbutton" href="#" data-rel=back data-icon=carat-l data-iconpos="notext"></a><!-- TODO: not on Mainpage -->
-	        <a id="doStart" href=#page-start data-icon=bars data-iconpos=notext></a>
+	        <a id="headbackbutton" href="#" data-rel="back" data-icon="carat-l" data-iconpos="notext"></a><!-- TODO: not on Mainpage -->
+	        <a id="doStart" href="#page-start" data-icon="bars" data-iconpos="notext"></a>
 	        
 	  	<!--</div> -->
 	  	
        	<!--</div>-->
        </div>
 
-      <div data-role="page" id="page-start">
+      <div data-role="page" id="page-start" class="page">
         
-			<div role="main" class="ui-content page">
+			<div role="main" class="ui-content page-content">
 				
 				<h2>Design und Programmierung für Web, App und Druck</h2>
 				
@@ -98,10 +97,10 @@
 
       </div><!--page-start-->
       
-		<div data-role="page" id="page-news" class="page" data-title="News">
+		<div data-role="page" id="page-news" data-title="News" class="page">
 		
 
-			<div role="main" class="ui-content">
+			<div role="main" class="ui-content page-content">
 
 				<div data-role="collapsible">
 				    <h4>News 1</h4>
@@ -121,10 +120,10 @@
 		</div><!--page news-->
 		
 		
-				<div data-role="page" id="page-projects">
+		<div data-role="page" id="page-projects" class="page">
 		
 
-			<div data-role="content">
+			<div data-role="content" class="ui-content page-content">
 
 				<h2>Referenzen, Auswahl</h2>
 				
@@ -134,21 +133,34 @@
 		
 		</div><!--page projects-->
 
-		<div data-role="page" id="page-aproject">
+		<div data-role="page" id="page-aproject" class="page">
 
+			<div data-role="content" class="ui-content page-content">
+				
+				<div id="project-info"></div>
+				
+				<a href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left">Projekt im Web</a>
+				<a href="#" class="ui-btn ui-corner-all ui-icon-plus ui-btn-icon-left">Adresse kopieren</a>
+				
+			
+           </div> 
 		</div>
 
 		<div data-role="page" id="page-info" class="page">
 		
 
-			<div datarole="content" class="ui-content">
+			<div datarole="content" class="ui-content page-content">
 
-			<p id="p-debug">Log:<br/></p>
+			<div data-role="collapsible">
+			    <h4>Log</h4>
+				<p id="p-debug"></p>
+				<p>Platform: <span id="info-platform"></span><br />
+				System: <span id="info-os"></span><br /></p>
+			</div>
+
 
 					<p>Diese App wurde mit "Phonegap" erstellt und ist für Android und iOS,
 						mit Einschränkungen auch für BlackBerry und Windows Phone und weitere Systeme verfügbar.</p>
-				<p>Platform: <span id="info-platform"></span><br />
-				System: <span id="info-os"></span><br /></p>
 				
 				<div data-role="controlgroup"> 
 					<a href="#"  class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">Web</a>
