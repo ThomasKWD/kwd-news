@@ -6,9 +6,13 @@
  */
 
 /*experimental*/
+body {
+	background-color: #83C2FD;		
+}
 #header {
 	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
 	background-size: 100%;
+	border:0;
 }
 .page {
 	background-color: #83C2FD;	
