@@ -67,7 +67,7 @@ $(document).ready(function() {
     window.isDevice = false; 
     
     if(document.URL.indexOf("http://") == -1 
-        && document.URL.indexOf("https://") == 1)
+        && document.URL.indexOf("https://") == 1
         && document.URL.indexOf("/kwd-news/") == -1)
  {
         window.isDevice = true;
