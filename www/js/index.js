@@ -17,7 +17,7 @@
  * under the License.
  */
 
-/* ich nehme an, dass das Verwenen der var app dazu dient,
+/* ich nehme an, dass das Verwenden der Klasse app dazu dient,
  * diesen Code zu ignorieren, falls er im Browser gestartet wird.
  */
 var app = {
@@ -32,10 +32,9 @@ var app = {
         // This is an event handler function, which means the scope is the event.
         // So, we must explicitly called `app.report()` instead of `this.report()`.
         app.report('deviceready');
-        navigator.splashscreen.hide();
         kwd_log('Verdammt. Ich bin drin!');
- 		onDeviceReady();
-        
+        navigator.splashscreen.hide();
+ 		onDeviceReady();        
     },
     report: function(id) {
         // Report the event in the console
@@ -44,9 +43,9 @@ var app = {
         // Toggle the state from "pending" to "complete" for the reported ID.
         // Accomplished by adding .hide to the pending element and removing
         // .hide from the complete element.
-        document.querySelector('#' + id + ' .pending').className += ' hide';
-        var completeElem = document.querySelector('#' + id + ' .complete');
-        completeElem.className = completeElem.className.split('hide').join('');
+        //document.querySelector('#' + id + ' .pending').className += ' hide';
+        //var completeElem = document.querySelector('#' + id + ' .complete');
+        //completeElem.className = completeElem.className.split('hide').join('');
     }
 };
 
@@ -88,7 +87,7 @@ function onDeviceReady() {
  	kwd_debugscreen=true;// mache doch einen Schalter :-)
 
     kwd_log('onDeviceReady');
-    kwd_log (document.URL);
+    //kwd_log (document.URL);
     
     // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
 
