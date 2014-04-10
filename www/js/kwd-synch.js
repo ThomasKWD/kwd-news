@@ -80,7 +80,7 @@ function read_kwd_projects (argument) {
 		//$('#load-result').html("");
 		//$('#load-result').append("update error");		
 	}).complete(function(){
-		console.log('update fertig');
+		//console.log('update fertig');
 		//$('#load-result').html('fertig');
 	}).success(getResponse);
 	

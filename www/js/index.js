@@ -124,9 +124,6 @@ function onDeviceReady() {
 	$('#doSave').click(function(){
 		saveProjects();
 	});
-	$('#doTest1').click(function(){
-		$('#header').css ( { 'background-size':'100%' });           				
-	});           			
 	$('#doTest2').click(function(){
 		location.href='http://www.kuehne-webdienste.de/?viewmode=app';           				
 	});
@@ -154,7 +151,8 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
-	window.requestFileSystem(window.PERSISTENT, 1000, onFileSystemSuccess, onFileSystemError);
+	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+	window.requestFileSystem(window.PERSISTENT,0, onFileSystemSuccess, onFileSystemError);
 	kwd_log('after window.requestFileSystem');
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 }

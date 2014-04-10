@@ -11,19 +11,37 @@
  * 
  */
 
+// global ----------------
+var appRootPath = '';
+
 //  ---------------- check filesystem
+
+function onGotDir(d) {
+	appRootPath = d;
+
+	//var reader = DATADIR.createReader();
+	//reader.readEntries(gotFiles,onError);
+}
+
+function onDirError(e) {
+	kwd_log('Fehler bei getDirectory.');
+	kwd_log(JSON.stringify(e));
+}
 
 //function window.requestFileSystem called in index.js
 
 function onFileSystemSuccess(fileSystem) {
-    kwd_log(fileSystem.name);
-    kwd_log(fileSystem.root.name);
-    alert(filesystem.root.name);
+	kwd_log('onFileSystemSuccess');
+	kwd_log(fileSystem.name);
+	kwd_log(fileSystem.root);
+	kwd_log(fileSystem.root.name);// ist evtl. leer
+	fileSystem.root.getDirectory("files",{create:true},onGotDir,onDirError);
+	//fileSystem.root.getDirectory("Android/data/de.kuehne-webdienste.files",{create:true},onGotDir,onDirError); // teste auf Android
 }
 
 function onFileSystemError(evt) {
 	kwd_log('onFileSystemError');
-    kwd_log(evt.target.error.code);
+    kwd_log(evt.target.error.code); // warum so?
     
   var msg = '';
 
