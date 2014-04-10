@@ -12,19 +12,22 @@
  */
 
 // global ----------------
-var appRootPath = '';
+var appRootPath = ''; // ist Objekt
 
 //  ---------------- check filesystem
 
 function onGotDir(d) {
 	appRootPath = d;
+	kwd_log(d);
+	kwd_log(JSON.stringify(d));
+	kwd_log('endlich Pfad:'+d.toUrl+'--');
 
 	//var reader = DATADIR.createReader();
 	//reader.readEntries(gotFiles,onError);
 }
 
 function onDirError(e) {
-	kwd_log('Fehler bei getDirectory.');
+	kwd_log('onDirError');
 	kwd_log(JSON.stringify(e));
 }
 
