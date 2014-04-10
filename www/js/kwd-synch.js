@@ -52,7 +52,7 @@ function getResponse(response) {
 function read_kwd_projects (argument) {
 	
 	//$('#load-result').html('AKTUALSIEREN');
-	kwd_log('starte aktualisieren');
+	//kwd_log('starte aktualisieren');
 	
 	$(document).ajaxError(function(event, request, settings){
    		alert("<li>Error requesting page " + settings.url + "</li>");

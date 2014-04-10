@@ -4,7 +4,7 @@
         id        = "de.kuehne-webdienste.kwd-news"
         version   = "1.0.0"
         versionCode = "1" >
-    <name>KWD News</name>
+    <name>KÜHNE-Webdienste</name>
 
     <description>
         Diese App zeigt alle wichtigen infos von KÜHNE-Webdienste.de offline sowie mit Auto-Update.

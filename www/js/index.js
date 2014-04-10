@@ -96,9 +96,9 @@ function onDeviceReady() {
 		$('#info-os').html(device.version);		
 	}
 
-	//if (navigator.onLine) {
-	//$('#online-status').html(navigator.connection.type);
-	//}
+	if (navigator.connection && navigator.connection.type) {
+		$('#online-status').html(navigator.connection.type);
+	}
 
 	
 	
@@ -154,8 +154,8 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
-	//window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, onFileSystemSuccess, onFileSystemError);
-
+	window.requestFileSystem(window.PERSISTENT, 1000, onFileSystemSuccess, onFileSystemError);
+	kwd_log('after window.requestFileSystem');
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 }
 
