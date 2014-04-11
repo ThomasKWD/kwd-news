@@ -147,12 +147,15 @@ function onGetFileSuccess(fileEntry) {
 
 function showLink(url) {
     alert(url);
+    /*
     var divEl = document.getElementById('deviceready');
     var aElem = document.createElement('a');
     aElem.setAttribute('target', '_blank');
     aElem.setAttribute('href', url);
     aElem.appendChild(document.createTextNode('Ready! Click To Open.'));
     divEl.appendChild(aElem);
+    */
+    $('#deviceready').html('<p>try to show image:</p><img src="'+url+'" />');
 }
 
 function fail(evt) {
