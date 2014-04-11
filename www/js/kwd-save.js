@@ -151,7 +151,7 @@ function showLink(url) {
     var aElem = document.createElement('a');
     aElem.setAttribute('target', '_blank');
     aElem.setAttribute('href', url);
-    aElem.appendChild(document.createTextNode('Ready! Click To Open.'))
+    aElem.appendChild(document.createTextNode('Ready! Click To Open.'));
     divEl.appendChild(aElem);
 }
 
