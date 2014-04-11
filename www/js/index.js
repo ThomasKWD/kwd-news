@@ -133,7 +133,8 @@ function onDeviceReady() {
 		read_kwd_projects();        		
 	});
 	$('#doSave').click(function(){
-		saveProjects();
+		//saveProjects();
+		downloadFile();
 	});
 	$('#doTest2').click(function(){
 		location.href='http://www.kuehne-webdienste.de/?viewmode=app';           				
@@ -174,7 +175,7 @@ function onDeviceReady() {
 // NAVIGATION OVERRIDE WINDOW.HISTORY ----------------------------------------
 
 /*
- * in diesem Projekt ist Struktur unveränderlich...
+ * in diesem Projekt ist Struktur unveränderlich, deshalb statische Seitensteuerung...
  * 
  */
 function performBackAction() {
@@ -232,11 +233,20 @@ $(function() {
 $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
 	var current = $( this ).attr('id');
+	
+	var previous;
+	// da statisch hier switch (einfacher anscheinend als jquery die Daten zu entlocken)
+	switch(current) {
+		case 'page-aproject': previous = 'Referenzen'; break;
+		case 'page-anews': previous = 'News'; break;		
+		case 'page-anoffer': previous = 'Leistungen'; break;		
+		default : previous = "Start";
+	}
 	if (current=="page-start") {
 		$("#headbackbutton").css ( { 'display':'none'});
-		kwd_last_page = "";			
 	} 
 	else {
 		$("#headbackbutton").css ( { 'display':'block'});
+		$("#headbackbutton").html (previous);
 	}
 });
