@@ -22,7 +22,7 @@ function onGotDir(d) {
 	kwd_log(JSON.stringify(d));
 	kwd_log('endlich Pfad:'+d.toUrl+'--');
 
-	//var reader = DATADIR.createReader();
+	//var reader = DATADIR.createReader(); // holt anscheinend Dateiliste
 	//reader.readEntries(gotFiles,onError);
 }
 

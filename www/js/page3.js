@@ -1,3 +1,7 @@
+/*
+ * enthält Scripte für PROJEKTE-Seite und Unterseiten
+ * 
+ */
 var kwd_current_project = -1;
 
 function kwd_projects2list() {

@@ -19,8 +19,12 @@
 
 /* ich nehme an, dass das Verwenden der Klasse app dazu dient,
  * diesen Code zu ignorieren, falls er im Browser gestartet wird.
+ * 
+ * interessante Struktur aber unnötig für diesen einfachen Fall
+ * zumal lieber der Listener in document ready einfgefügt wird. 
  */
-var app = {
+/*
+ var app = {
     initialize: function() {
         this.bind();
     },
@@ -48,7 +52,7 @@ var app = {
         //completeElem.className = completeElem.className.split('hide').join('');
     }
 };
-
+*/
 // Globale Datenstrukturen für Inhalte ---------------------------------------
 var kwd_projects = null;
 var kwd_news = null;
@@ -56,6 +60,9 @@ var kwd_news = null;
 
 
 
+/*
+ * TODO: isDevice als Parameter?
+ */
 $(document).ready(function() {
 	
 	kwd_debugscreen=true;// mache doch einen Schalter :-)
@@ -74,7 +81,8 @@ $(document).ready(function() {
 
     if( window.isDevice ) {
     	kwd_log('Wird als Device erkannt.');
-        //document.addEventListener("deviceready", onDeviceReady, false); wird ja schon oben gemacht
+        document.addEventListener("deviceready", onDeviceReady, false); 
+        kwd_log('app:added listener');
     } else {
     	kwd_log('Wird als Browser erkannt');
         onDeviceReady();
@@ -105,21 +113,25 @@ function onDeviceReady() {
     // EVENT LISTENER ------------------------------------------------------------
     
 	// geht nicht auf ios (muss ich es extra abfragen oder wird es dort automatisch ignoriert??
-	document.addEventListener("menubutton", onMenuButtonClick, false);
- 	document.addEventListener("online", onOnline, false);	
- 	document.addEventListener("offline", onOffline, false);	
+	if (window.isDevice) {
+				
+		document.addEventListener("menubutton", onMenuButtonTouch, false);
+		document.addEventListener("backbutton", onBackButtonTouch, false);
+	 	// TODO: läuft noch nicht!!
+	 	document.addEventListener("online", onOnline, false);	
+	 	document.addEventListener("offline", onOffline, false);	
+	}
 	
 	
 	// CLICK HANDLER -------------------------------------------------------------
 	
-	//$('#doStart').click(function(){
-		//window.history.go(-2);  // Mein Trick funktioniert solange die logische Tiefe der Links nur 2
-		//TODO: geht nicht --> benötige Zähler
-	//});
+	// TODO: ist touch function besser??
+	
+	$('#headbackbutton').click(function(){
+		performBackAction();
+	});	
 	$('#doUpdate').click(function(){
-		read_kwd_projects();        		});
-	$('#doRestore').click(function(){
-		alert('alert');
+		read_kwd_projects();        		
 	});
 	$('#doSave').click(function(){
 		saveProjects();
@@ -151,15 +163,42 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
+	// das erstmal nach save
 	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
 	window.requestFileSystem(window.PERSISTENT,0, onFileSystemSuccess, onFileSystemError);
 	kwd_log('after window.requestFileSystem');
+
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
+		
+	// show
+	
+	if (window.isDevice) {
+		// TODO: vielleicht sogar erst nach erstem 'pageonshow' event
+        navigator.splashscreen.hide();		
+	} 
 }
 
-function onMenuButtonClick() {
+
+// NAVIGATION OVERRIDE WINDOW.HISTORY ----------------------------------------
+
+function performBackAction() {
+
+	alert('ich mache erstmal gar nichts (auch nicht App schließen??)');	
+}
+
+
+// EVENT CALLBACKS DEVICE -----------------------------------------------------
+
+function onMenuButtonTouch() {
 	// (deviceready auf jeden Fall gegeben)
 	$.mobile.changePage ($("#page-start")); //( hard codiert unsere Startpage)
+	//TODO: abfragen ob Startpage schon da?
+}
+/*
+ * der back button soll nicht die window.history abarbeiten, 
+ * da es auch einen back-button im html gibt, Funktion nutzen
+ */function onBackButtonTouch() {
+ 	performBackAction();
 	//TODO: abfragen ob Startpage schon da?
 }
 function onOnline() {
@@ -176,3 +215,17 @@ $(function() {
 });
 
 
+// PAGE START/SHOW -------------------------------------------------------------
+
+// nur Defs, die für mehr als eine Seite gelten
+// TODO: wie vermeiden hart codierte Seitennamen? (evtl. nur Zähler)
+$( document ).on( "pagebeforeshow", "[data-role='page']", function() {
+	
+	var current = $( this ).attr('id');
+	if (current=="page-start") {
+		$("#headbackbutton").css ( { 'display':'none'});			
+	} 
+	else {
+		$("#headbackbutton").css ( { 'display':'block'});	
+	}
+});
