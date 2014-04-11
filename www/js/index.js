@@ -59,7 +59,6 @@ var kwd_news = null;
 
 
 
-
 /*
  * TODO: isDevice als Parameter?
  */
@@ -147,9 +146,6 @@ function onDeviceReady() {
 	$('#data-rel-forward').click(function(){
 		window.history.go(1); // try to go forward history				           				
 	});
-	$('#doQuit').click(function() {
-		navigator.device.exitApp(); // does work on Android // iOS and other Systems don't have an user invoked exit!		           						
-	});
 	$('#doShowProjects').click(function() {
 		kwd_projects2list();		           						
 	});
@@ -163,10 +159,6 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
-	// das erstmal nach save
-	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-	window.requestFileSystem(window.PERSISTENT,0, onFileSystemSuccess, onFileSystemError);
-	kwd_log('after window.requestFileSystem');
 
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 		
@@ -181,9 +173,27 @@ function onDeviceReady() {
 
 // NAVIGATION OVERRIDE WINDOW.HISTORY ----------------------------------------
 
+/*
+ * in diesem Projekt ist Struktur unveränderlich...
+ * 
+ */
 function performBackAction() {
 
-	alert('ich mache erstmal gar nichts (auch nicht App schließen??)');	
+	var current = $( ":mobile-pagecontainer" ).pagecontainer('getActivePage').attr('id');
+	
+	// TODO: is platform name consistent??? lieber teilstring suchen
+	if (current=="page-start" && window.isDevice) {
+		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
+	}
+	else {
+		switch (current) {
+			// TODO: insert var instead of switch !!
+			case 'page-aproject': $( ":mobile-pagecontainer" ).pagecontainer( "change", "#page-projects"); break;
+			case 'page-anews': $( ":mobile-pagecontainer" ).pagecontainer( "change", "#page-news"); break;
+			case 'page-anoffer': $( ":mobile-pagecontainer" ).pagecontainer( "change", "#page-offers"); break;
+			default: $( ":mobile-pagecontainer" ).pagecontainer( "change", "#page-start" ); break;
+		}	
+	}       						
 }
 
 
@@ -223,9 +233,10 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
 	var current = $( this ).attr('id');
 	if (current=="page-start") {
-		$("#headbackbutton").css ( { 'display':'none'});			
+		$("#headbackbutton").css ( { 'display':'none'});
+		kwd_last_page = "";			
 	} 
 	else {
-		$("#headbackbutton").css ( { 'display':'block'});	
+		$("#headbackbutton").css ( { 'display':'block'});
 	}
 });

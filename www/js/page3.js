@@ -54,7 +54,7 @@ $( document ).on( "pagebeforeshow", "#page-projects", function() {
 $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 	// der Einfachheit halber Select des Contents über Variable
 	if (kwd_current_project!=-1 && kwd_readProjects()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
-		kwd_log('cur='+kwd_current_project);
+		//kwd_log('cur='+kwd_current_project);
 		$("#page-aproject h2").html(kwd_projects[kwd_current_project]['name']);
 		$("#project-info").html(kwd_projects[kwd_current_project]['info']);
 		//$("#project-info").append('<a href="'+kwd_projects[kwd_current_project]['url']+'" target="_blank">'+kwd_projects[kwd_current_project]['url']+'</a>');

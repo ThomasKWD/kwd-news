@@ -23,7 +23,7 @@ function kwd_readProjects() {
 	}
 	else {
 		kwd_projects = JSON.parse(strread);
-		kwd_log('Projekte geladen');
+		//kwd_log('Projekte geladen');
 		kwd_log(kwd_projects);
 	}
 	

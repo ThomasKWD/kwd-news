@@ -77,6 +77,11 @@ function onFileSystemError(evt) {
 // ------------------ read test file
 function saveProjects() {
 	
+	// das erstmal nach save
+	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
+	window.requestFileSystem(window.PERSISTENT,0, onFileSystemSuccess, onFileSystemError);
+	kwd_log('after window.requestFileSystem');
+
 	// !! Assumes filePath is a valid path on the device
 	var fileTransfer = new FileTransfer();
 	var uri = encodeURI('http://www.kuehne-webdienste.de/files/apn-shot.jpg');
