@@ -155,7 +155,7 @@ function showLink(url) {
     aElem.appendChild(document.createTextNode('Ready! Click To Open.'));
     divEl.appendChild(aElem);
     */
-    $('#deviceready').html('<p>try to show image:</p><img src="'+url+'" />');
+    $('#deviceready').html('<p><a href="'+url+'">try to show image</a>:</p><img src="'+url+'" />');
 }
 
 function fail(evt) {
