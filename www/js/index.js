@@ -160,6 +160,11 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
+	appRootPath= localStorage.getItem(kwd_storage_path);
+	if (appRootPath==null) {
+		kwd_log('konnte Image-Pfad nicht laden');
+		appRootPath='';
+	}
 
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 		

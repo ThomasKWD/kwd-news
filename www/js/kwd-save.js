@@ -134,8 +134,17 @@ function onGetFileSuccess(fileEntry) {
         'http://www.kuehne-webdienste.de/files/ps-shot.jpg',
         path + 'theFile.jpg',
         function(file) {
-            kwd_log('download complete: ' + file.toURI());
-            showLink(file.toURI());
+        	var u = file.toURI();
+            kwd_log('download complete: ' + u);
+            // pfad merken
+            var c = u.lastIndexOf('/');
+            var p = u.substring(0,c+1);
+            appRootPath=p;
+			localStorage.setItem(kwd_storage_path,p);
+			// testausgabe
+			kwd_log('Pfad: '+p+'--');
+			//testanzeige
+            showLink(u);
         },
         function(error) {
             kwd_log('download error source ' + error.source);
@@ -146,7 +155,7 @@ function onGetFileSuccess(fileEntry) {
 }
 
 function showLink(url) {
-    alert(url);
+    //alert(url);
     /*
     var divEl = document.getElementById('deviceready');
     var aElem = document.createElement('a');

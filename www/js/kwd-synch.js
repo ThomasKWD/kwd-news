@@ -17,6 +17,7 @@
  */
 const kwd_storage_projects = 'projects';
 const kwd_storage_news = 'news';
+const kwd_storage_path = 'path';
 
 /*
  * Funktionen
