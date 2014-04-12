@@ -165,6 +165,7 @@ function onDeviceReady() {
 		kwd_log('konnte Image-Pfad nicht laden');
 		appRootPath='';
 	}
+	kwd_log("path: "+appRootPath);
 
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
 		
@@ -239,16 +240,17 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
 	var current = $( this ).attr('id');
 	
-	var previous;
+	var previous = '';
 	// da statisch hier switch (einfacher anscheinend als jquery die Daten zu entlocken)
 	switch(current) {
+		
 		case 'page-aproject': previous = 'Referenzen'; break;
 		case 'page-anews': previous = 'News'; break;		
 		case 'page-anoffer': previous = 'Leistungen'; break;		
 		default : previous = "Start";
 	}
-	if (current=="page-start") {
-		$("#headbackbutton").css ( { 'display':'none'});
+	if (current == "page-start") {
+		$("#headbackbutton").css ({'display':'none'});
 	} 
 	else {
 		$("#headbackbutton").css ( { 'display':'block'});
