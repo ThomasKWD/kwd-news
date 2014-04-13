@@ -251,9 +251,11 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	}
 	if (current == "page-start") {
 		$("#headbackbutton").css ({'display':'none'});
+		$("#header").css({"background-image":"url(res/kwd3-titel.jpg)"});	
 	} 
 	else {
-		$("#headbackbutton").css ( { 'display':'block'});
-		$("#headbackbutton").html (previous);
+		$("#headbackbutton").css( { 'display':'block'});
+		$("#headbackbutton").html(previous);
+		$("#header").css({"background-image":"none"});
 	}
 });
