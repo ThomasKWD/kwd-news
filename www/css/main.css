@@ -48,6 +48,23 @@ body {
 	font-style:italic;
 	font-weight:bold;
 }
+.tachopage {
+	background-color : black; 
+}
+.tachopage-content {
+	color:white;
+	text-shadow:0 0 0;
+
+}
+/* Schriftgröße berechnen wäre interessant */
+#speed {
+/*	-webkit-transform:scale(-1,1);*/
+	text-align:center;
+	font-size:150px;
+	font-weight:bold;
+	margin:0;
+	padding : 0;
+}
 
 #load-result {
 	color: green;

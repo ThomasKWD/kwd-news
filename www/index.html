@@ -35,6 +35,8 @@
         <script type="text/javascript" src="js/kwd-save.js"></script>
         <script type="text/javascript" src="js/kwd-restore.js"></script>
         <script type="text/javascript" src="js/page3.js"></script>
+<script type="text/javascript" src="js/tacho.js"></script>
+ 
     </head>
     <body>
 
@@ -44,7 +46,7 @@
        		
         <h1>&nbsp;</h1>
          <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
-	        <a id="headbackbutton" href="#" data-icon="carat-l" data-iconpos="left">Start</a>
+	        <a id="headbackbutton" href="#" data-icon="carat-l" data-iconpos="left" class="autofade">Start</a>
 	        <!--<a id="doStart" href="#page-start" data-icon="bars" data-iconpos="notext"></a>-->
 	        
 	  	<!--</div> -->
@@ -56,6 +58,15 @@
         
 			<div role="main" class="ui-content page-content">
 				
+           <div data-role="navbar" id="navbar" data-theme="b">
+           	<ul>
+              <!--<li><a id="doRestore" href="#">Laden</a></li>-->
+              <li><a id="doSave" href="#">Cache</a></li>
+              <li><a id="doUpdate" class="ui-icon-recycle" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
+              <li><a id="tacho" href="#page-tacho">Tacho</a></li>
+              </ul>              
+           </div>
+
 				<p id="p-debug"></p>
 
 	            <div id="deviceready" class="blink">
@@ -89,14 +100,6 @@
            
               
 
-           <div data-role="navbar" id="navbar" data-theme="b">
-           	<ul>
-              <!--<li><a id="doRestore" href="#">Laden</a></li>-->
-              <li><a id="doSave" href="#">Speichern</a></li>
-              <li><a id="doUpdate" class="ui-icon-recycle" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
-              
-              </ul>              
-           </div>
            
           </div>
           
@@ -184,6 +187,19 @@
 			
            </div> 
 		</div><!-- an offer -->
+
+		<div data-role="page" id="page-tacho" class="tachopage">
+
+			<div data-role="content" class="ui-content tachopage-content">
+				
+				<h2 class="autofade">Tacho</h2>
+				<p class="autofade"> Auf die Anzeige tippen, 
+				um Text zu spiegeln (HUD). </p>
+				<p id="speed">0.</p>
+				<p id="nogps">(GPS nicht aktiv.)</p>
+			
+           </div> 
+		</div><!-- tacho -->
 
 		<div data-role="page" id="page-info" class="page">
 		

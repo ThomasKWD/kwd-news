@@ -238,15 +238,19 @@ $(function() {
 // TODO: wie vermeiden hart codierte Seitennamen? (evtl. nur Zähler)
 $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
-	var current = $( this ).attr('id');
-	
+	// immer: TODO: als function onTachoShutdown
+	$(".autofade").css({"opacity":"1"});
+	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
+
+	var current = $( this ).attr('id');	
 	var previous = '';
 	// da statisch hier switch (einfacher anscheinend als jquery die Daten zu entlocken)
 	switch(current) {
 		
 		case 'page-aproject': previous = 'Referenzen'; break;
 		case 'page-anews': previous = 'News'; break;		
-		case 'page-anoffer': previous = 'Leistungen'; break;		
+		case 'page-anoffer': previous = 'Leistungen'; break;
+		case 'page-tacho': onTachoInit(); // hier kein break!	
 		default : previous = "Start";
 	}
 	if (current == "page-start") {
