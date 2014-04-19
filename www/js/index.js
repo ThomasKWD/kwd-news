@@ -104,10 +104,17 @@ function onDeviceReady() {
 	}
 
 	if (navigator.connection && navigator.connection.type) {
-		$('#online-status').html(navigator.connection.type);
+		$('#online-status').html('online ('+navigator.connection.type+')');
+	}
+	if (navigator.connection) {
+		kwd_log('Connection verfügbar');
+	}
+	else {
+		kwd_log('keine connection');
 	}
 
-	
+	if (navigator.geolocation) kwd_log('GPS verfügbar');
+	else kwd_log('kein GPS.');
 	
     // EVENT LISTENER ------------------------------------------------------------
     
@@ -222,7 +229,7 @@ function onOnline() {
 	$("#online-status").html('online');	
 }
 function onOffline() {
-	$("#online-status").html('offline');
+	$("#online-status").html('OFFLINE');
 }
 
 
