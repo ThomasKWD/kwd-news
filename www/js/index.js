@@ -245,9 +245,10 @@ $(function() {
 // TODO: wie vermeiden hart codierte Seitennamen? (evtl. nur Zähler)
 $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
-	// immer: TODO: als function onTachoShutdown
+	// immer: TODO: als function onTachoShutdown/Hide
 	$(".autofade").css({"opacity":"1"});
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
+	if(window.geoWatchId) navigator.geolocation.clearWatch(window.geoWatchId);
 
 	var current = $( this ).attr('id');	
 	var previous = '';
