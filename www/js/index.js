@@ -162,6 +162,7 @@ function onDeviceReady() {
 		kwd_log('project');
 	});
 
+	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
@@ -246,10 +247,6 @@ $(function() {
 // TODO: wie vermeiden hart codierte Seitennamen? (evtl. nur Zähler)
 $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	
-	// immer: TODO: als function onTachoShutdown/Hide
-	$(".autofade").css({"opacity":"1"});
-	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
-	if(window.geoWatchId) navigator.geolocation.clearWatch(window.geoWatchId);
 
 	var current = $( this ).attr('id');	
 	var previous = '';
@@ -259,7 +256,7 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 		case 'page-aproject': previous = 'Referenzen'; break;
 		case 'page-anews': previous = 'News'; break;		
 		case 'page-anoffer': previous = 'Leistungen'; break;
-		case 'page-tacho': onTachoInit(); // hier kein break!	
+		case 'page-tacho': onTachoShow(); // hier kein break!	
 		default : previous = "Start";
 	}
 	if (current == "page-start") {
@@ -270,5 +267,8 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 		$("#headbackbutton").css( { 'display':'block'});
 		$("#headbackbutton").html(previous);
 		$("#header").css({"background-image":"none"});
+	}
+	if(current!="page-tacho") {
+		onTachoHide();
 	}
 });

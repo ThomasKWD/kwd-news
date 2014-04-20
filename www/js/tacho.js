@@ -10,15 +10,6 @@ warum Fehler bei Seitenstart IN APP??
 */
 function onTachoInit() {
 
-	// code hier wirkt bei öffnen der Seite
-	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
-	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
-	// starte Abfrage neu
-	if (navigator.geolocation)
-		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError);	
-
-	// ermögliche touch auf gesamter Seite
-	// TODO: besser nur einmal bei Programmstart setzen
 	$("#page-tacho").click(function(){
 		
 		if(window.isHUD) {
@@ -32,11 +23,32 @@ function onTachoInit() {
 		}
 		// ggf. ausgeblendetes anzeigen und wieder ausblenden
 		// nach ca. 5s
-		if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
+		if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
 		window.myHudTimeout = window.setTimeout("onFadeHud()",5000); // TODO: als function oder var für 5000
 		$(".autofade").css({"opacity":"1"});
-		//$(".autofade").fadeout(1000);
 	});
+}
+
+function onTachoShow() {
+//	<button onclick="window.plugins.insomnia.keepAwake()">keep awake</button>
+//<button onclick="window.plugins.insomnia.allowSleepAgain()">allow sleep again</button>
+
+	$(".autofade").css({"opacity":"1"});
+	// code hier wirkt bei öffnen der Seite
+	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
+	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
+	// starte Abfrage neu
+	// TODO: teste es mit getPosition im Intervall
+	if (navigator.geolocation)
+		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError);		
+}
+function onTachoHide() {
+
+	if(window.geoWatchId) navigator.geolocation.clearWatch(window.geoWatchId);
+	window.geoWatchId = null;
+	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
+	window.myHudTimeout = null;
+	$(".autofade").css({"opacity":"1"});	
 }
 
 function onFadeHud(){
@@ -47,10 +59,15 @@ function onFadeHud(){
  * beachte, dass meist speed===null auf Computern ohne GPS-Hardware, auch wenn Position bekannt und anzeigbar. 
  */
 function onGeoSuccess(pos){
-	if (pos.coords.speed) $("#speed").html(pos.coords.speed+'.');
+
 	$('#gps-status').html('GPS ok.');
+	if (pos.coords.speed) $("#speed").html(pos.coords.speed+'.');
+	if (pos.coords) {
+		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
+	}	
 }
 function onGeoError(error) {
+
 	kwd_log('geo code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
 	$('#gps-status').html('GPS nicht aktiv.');  // TODO: Ausgabe String var
  } 
