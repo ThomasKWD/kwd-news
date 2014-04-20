@@ -40,7 +40,9 @@ function onTachoShow() {
 	// starte Abfrage neu
 	// enableHighAccuracy meist *nötig*, um coords.speed zu erhalten. 
 	if (navigator.geolocation)
-		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });		
+		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });
+	//screen timeout ausschalten
+	window.plugins.insomnia.keepAwake();		
 }
 function onTachoHide() {
 
@@ -48,7 +50,9 @@ function onTachoHide() {
 	window.geoWatchId = null;
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
 	window.myHudTimeout = null;
-	$(".autofade").css({"opacity":"1"});	
+	$(".autofade").css({"opacity":"1"});
+	//screen timeout wieder an
+	window.plugins.insomnia.allowSleepAgain();	
 }
 
 function onFadeHud(){
@@ -64,7 +68,7 @@ function onGeoSuccess(pos){
 	else window.geocounter ++;
 	
 	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
-	if (pos.coords.speed!==null) $("#speed").html(pos.coords.speed+'.');
+	if (pos.coords.speed!==null) $("#speed").html(((pos.coords.speed*3.6) | 0)+'.');
 	if (pos.coords) {
 		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
 	}	
