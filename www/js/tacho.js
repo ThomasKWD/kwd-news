@@ -38,9 +38,9 @@ function onTachoShow() {
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
 	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
 	// starte Abfrage neu
-	// TODO: teste es mit getPosition im Intervall
+	// enableHighAccuracy meist *nötig*, um coords.speed zu erhalten. 
 	if (navigator.geolocation)
-		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError);		
+		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ maximumAge: 5000, enableHighAccuracy: true });		
 }
 function onTachoHide() {
 
@@ -60,7 +60,10 @@ function onFadeHud(){
  */
 function onGeoSuccess(pos){
 
-	$('#gps-status').html('GPS ok.');
+	if(!window.geocounter) window.geocounter = 1;
+	else window.geocounter ++;
+	
+	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
 	if (pos.coords.speed) $("#speed").html(pos.coords.speed+'.');
 	if (pos.coords) {
 		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
