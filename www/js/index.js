@@ -104,7 +104,7 @@ function onDeviceReady() {
 	}
 
 	if (navigator.connection && navigator.connection.type) {
-		$('#online-status').html('online ('+navigator.connection.type+')');
+		$('#online-status').html(''+navigator.connection.type);
 	}
 	if (navigator.connection) {
 		kwd_log('Connection verfügbar');
@@ -221,12 +221,13 @@ function onMenuButtonTouch() {
 /*
  * der back button soll nicht die window.history abarbeiten, 
  * da es auch einen back-button im html gibt, Funktion nutzen
- */function onBackButtonTouch() {
+ */
+ function onBackButtonTouch() {
  	performBackAction();
 	//TODO: abfragen ob Startpage schon da?
 }
 function onOnline() {
-	$("#online-status").html('online');	
+	$("#online-status").html(navigator.connection.type);	
 }
 function onOffline() {
 	$("#online-status").html('OFFLINE');
