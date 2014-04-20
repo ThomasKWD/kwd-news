@@ -39,15 +39,26 @@ function onTachoShow() {
 	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
 	// starte Abfrage neu
 	// enableHighAccuracy meist *nötig*, um coords.speed zu erhalten. 
-	if (navigator.geolocation)
-		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });
+	if (navigator.geolocation) {
+		if(window.gpsinterval) {
+			window.geoInterval=window.setInterval(function(){navigator.geolocation.getCurrentPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });},1000);
+			kwd_log('gps interval enabled');
+		}
+		else window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });
+	}
 	//screen timeout ausschalten
 	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.keepAwake();	
 }
 function onTachoHide() {
 
-	if(window.geoWatchId) navigator.geolocation.clearWatch(window.geoWatchId);
-	window.geoWatchId = null;
+	if (window.geoInterval) {
+		window.clearInterval(window.geoInterval);
+		window.geoInterval=null;
+	}
+	if(window.geoWatchId) {
+		navigator.geolocation.clearWatch(window.geoWatchId);
+		window.geoWatchId = null;
+	}
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
 	window.myHudTimeout = null;
 	$(".autofade").css({"opacity":"1"});
@@ -65,7 +76,7 @@ function onFadeHud(){
 function onGeoSuccess(pos){
 
 	if(!window.geocounter) window.geocounter = 1;
-	else window.geocounter ++;
+	else window.geocounter++;
 	
 	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
 	if (pos.coords.speed!==null) $("#speed").html(((pos.coords.speed*3.6) | 0)+'.');

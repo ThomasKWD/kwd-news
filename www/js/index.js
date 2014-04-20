@@ -123,9 +123,10 @@ function onDeviceReady() {
 				
 		document.addEventListener("menubutton", onMenuButtonTouch, false);
 		document.addEventListener("backbutton", onBackButtonTouch, false);
-	 	// TODO: läuft noch nicht!!
 	 	document.addEventListener("online", onOnline, false);	
-	 	document.addEventListener("offline", onOffline, false);	
+	 	document.addEventListener("offline", onOffline, false);
+		document.addEventListener("pause", onPause, false);	 		
+		document.addEventListener("resume", onResume, false);	 		
 	}
 	
 	
@@ -161,7 +162,10 @@ function onDeviceReady() {
 		alert('project');
 		kwd_log('project');
 	});
-
+	$('#switchtacho').click(function() {
+		window.gpsinterval=true;	
+	});
+	
 	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
@@ -233,7 +237,18 @@ function onOnline() {
 function onOffline() {
 	$("#online-status").html('OFFLINE');
 }
-
+function onPause() {
+	if(window.geoWatchId || window.geoInterval) {
+		onTachoHide();
+		window.tachopaused=true;
+	}
+}
+function onResume() {
+	if(window.tachopaused) {
+		onTachoShow();
+		window.tachopaused=false;
+	}
+}
 
 $(function() {
     $( "[data-role='navbar']" ).navbar();
