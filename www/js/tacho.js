@@ -40,7 +40,7 @@ function onTachoShow() {
 	// starte Abfrage neu
 	// enableHighAccuracy meist *nötig*, um coords.speed zu erhalten. 
 	if (navigator.geolocation)
-		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ maximumAge: 5000, enableHighAccuracy: true });		
+		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });		
 }
 function onTachoHide() {
 
@@ -64,7 +64,7 @@ function onGeoSuccess(pos){
 	else window.geocounter ++;
 	
 	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
-	if (pos.coords.speed) $("#speed").html(pos.coords.speed+'.');
+	if (pos.coords.speed!==null) $("#speed").html(pos.coords.speed+'.');
 	if (pos.coords) {
 		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
 	}	
