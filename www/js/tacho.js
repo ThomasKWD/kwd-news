@@ -42,7 +42,7 @@ function onTachoShow() {
 	if (navigator.geolocation)
 		window.geoWatchId=navigator.geolocation.watchPosition(onGeoSuccess,onGeoError,{ enableHighAccuracy: true });
 	//screen timeout ausschalten
-	window.plugins.insomnia.keepAwake();		
+	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.keepAwake();	
 }
 function onTachoHide() {
 
@@ -52,7 +52,7 @@ function onTachoHide() {
 	window.myHudTimeout = null;
 	$(".autofade").css({"opacity":"1"});
 	//screen timeout wieder an
-	window.plugins.insomnia.allowSleepAgain();	
+	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.allowSleepAgain();	
 }
 
 function onFadeHud(){
