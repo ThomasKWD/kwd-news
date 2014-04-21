@@ -13,6 +13,7 @@ body {
 	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
 	background-size: 170%;
 	border:0;
+/*	background-color:#83C2FD; */
 }
 #header h1 {
 	text-align: left;

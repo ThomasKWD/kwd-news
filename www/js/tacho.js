@@ -75,18 +75,29 @@ function onFadeHud(){
  */
 function onGeoSuccess(pos){
 
+var s;
+
 	if(!window.geocounter) window.geocounter = 1;
 	else window.geocounter++;
 	
 	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
-	if (pos.coords.speed!==null) $("#speed").html(((pos.coords.speed*3.6) | 0)+'.');
 	if (pos.coords) {
 		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
-	}	
+	}
+	if (pos.coords.speed!==null) {
+		s = pos.coords.speed*3.6;
+		if (s>5) s=s|0;
+		$("#speed").html(s);
+		window.mylastspeed = s;
+	}
+
 }
 function onGeoError(error) {
 
 	kwd_log('geo code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
 	$('#gps-status').html('GPS nicht aktiv.');  // TODO: Ausgabe String var
+	if(window.mylastspeed===0 || window.mylastspeed>0) {
+		$("#speed").html('('+window.mylastspeed+')');
+	}
  } 
 

@@ -192,8 +192,8 @@
 
 			<div data-role="content" class="ui-content tachopage-content">
 				
-				<h2 class="autofade">Tacho</h2>
-				<p id="gps-status">GPS nicht aktiv.</p>
+				<h2 class="autofade">Tachometer</h2>
+				<p id="gps-status" class="autofade">GPS nicht aktiv.</p>
 			<p id="speed">(0.)</p>
 			<p class="autofade"> Auf die Anzeige tippen, 
 				um Text zu spiegeln (HUD). </p>
@@ -211,7 +211,7 @@
 				<p>Diese App wurde mit "Phonegap" erstellt und ist für Android, iOS und
 				mit Einschränkungen auch für BlackBerry, Windows Phone und weitere Systeme verfügbar.</p>
 						
-				<div data-role="no-collapsible">
+				<div data-role="collapsible">
 				    <h4>System Info</h4>
 					<!--z.Z. in start <p id="p-debug"></p>-->
 					<p>Platform: <span id="info-platform"></span><br />
@@ -223,11 +223,14 @@
 				<div data-role="collapsible">
 					<h4>TODO:</h4>
 					<ul>
-						<li>Geo-Abfrage abschalten, wenn App im Hintergrund.</li>
-						<li>Display-Timeout verhindern, wenn Tacho (aber abschalten wenn im Hg und anschalten wenn im Vg)</li>
+						<li>Geo timeout. bei error Wert wieder in Klammern setzen</li>
+						<li>geo: letzten Wert speichern und bei error Anzeige verwenden. und kommastellen bei kleinen Werten</li>
 						<li>unschöner Bildaufbau bei Seitenwechsel</li>
 						<li>Bilder lokal speichern.</li>
 						<li>anhand von updatedate veraltete Inhalte erkennen.</li>
+						<li>alle transform Anweisungen,  nicht nur webkit-transform</li>
+						<li>teste header als persistent toolbar</li>
+						<li></li>
 						<li>Eigene Version anzeigen (aus config.xml)</li>
 					</ul>
 
