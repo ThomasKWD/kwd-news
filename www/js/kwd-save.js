@@ -5,14 +5,12 @@
  * als "duales System" könnte man die bereits bestehenden Projekte im phonegap Projekt
  * als Ressource hinterlegen, so dass nur neue und Änderungen nachgeladen werden.
  * 
- * TODO: das encode geht nur von "eigener Domain"/"vertrauenswürdiger Quelle". Bilder können also nicht 
- * gespeichert werden ohne weiteres. die cordova-Variante wäre am sinnvollsten, da das speichern
- * in einem Browser, der ohnehin online ist, nicht so wichtig ist.
  * 
  */
 
 // global ----------------
 var appRootPath = ''; // ist Objekt
+var downloadFileCounter = 0;
 
 //  ---------------- check filesystem
 
@@ -104,16 +102,31 @@ function saveProjects() {
 	
 }
 
-function downloadFile() {
-    kwd_log('downloadFile');
-    window.requestFileSystem(
-        LocalFileSystem.PERSISTENT,
-        0,
-        onRequestFileSystemSuccess,
-        fail
-    );
+// rekursiv
+// verwendet z.Z. hard codiert bestimmte verkleinerte Form der Bilder
+// (image name  + Code (redaxo))
+function _downloadNextFile() {
+	
 }
+// prüft ob Pfad erzeugt werden muss
+// wenn Pfad in local storage, wird dieser als valid angesehen und kein requestfilesystem+dummy-file benötigt
+// initalisiert rekursiven Download
+// TODO: nicht nur Projektbilder!
+function downloadImages() {
 
+	if(appRootPath) {
+		// direkter Downloadinit
+	}
+	else {		
+		// downloadinit in callback
+	    window.requestFileSystem(
+	        LocalFileSystem.PERSISTENT,
+	        0,
+	        onRequestFileSystemSuccess,
+	        fail
+    	);	
+	}
+}
 function onRequestFileSystemSuccess(fileSystem) {
     kwd_log('onRequestFileSystemSuccess');
     fileSystem.root.getFile(
@@ -123,7 +136,6 @@ function onRequestFileSystemSuccess(fileSystem) {
         fail
     );
 }
-
 function onGetFileSuccess(fileEntry) {
     kwd_log('onGetFileSuccess!');
     var path = fileEntry.toURL().replace('dummy.html', '');

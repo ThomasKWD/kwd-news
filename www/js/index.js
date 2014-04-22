@@ -142,7 +142,7 @@ function onDeviceReady() {
 	});
 	$('#doSave').click(function(){
 		//saveProjects();
-		downloadFile();
+		downloadImages();
 	});
 	$('#doTest2').click(function(){
 		location.href='http://www.kuehne-webdienste.de/?viewmode=app';           				
@@ -173,7 +173,7 @@ function onDeviceReady() {
 	// UPDATE CONTENT-----------------------------------------------------------
 
 	appRootPath= localStorage.getItem(kwd_storage_path);
-	if (appRootPath==null) {
+	if (!appRootPath) {
 		kwd_log('konnte Image-Pfad nicht laden');
 		appRootPath='';
 	}
