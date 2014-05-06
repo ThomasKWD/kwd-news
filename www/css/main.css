@@ -95,3 +95,11 @@ body {
 	width:325px;
 	height:250px;
 }
+/* Code für Entwicklung wird mit
+debug oder develope gekennzeichnet
+und bei Bedarf ausgeblendet
+*/
+.debug,
+.develope {
+	/*display:none;*/
+}

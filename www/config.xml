@@ -2,15 +2,17 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "de.kuehne-webdienste.kwd-news"
-        version   = "1.0.12"
+        version   = "1.0.15"
         versionCode = "1" >
     <name>KÜHNE-Webdienste</name>
 
     <description>
-        Diese App zeigt alle wichtigen infos von KÜHNE-Webdienste.de offline sowie mit Auto-Update.
+        Diese App zeigt alle wichtigen infos von KÜHNE-Webdienste.de offline mit Auto-Update.
+        
+        Als zusätzliches Feature enthält sie einen Tachometer mit HUD-Funktion. 
     </description>
 
-    <author href="http://phonegap.com" email="support@phonegap.com">
+    <author href="http://www.kuehne-webdienste.de" email="thomas@kuehne-webdienste.de">
       	Thomas Kühne
     </author>
 

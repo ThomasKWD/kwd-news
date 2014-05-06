@@ -165,7 +165,8 @@ function onDeviceReady() {
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
-	
+	// Intervall voreinstellen
+	window.gpsinterval=true;
 	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );

@@ -58,7 +58,7 @@
         
 			<div role="main" class="ui-content page-content">
 				
-           <div data-role="navbar" id="navbar" data-theme="b">
+           <div data-role="navbar" id="navbar" data-theme="b" class="debug">
            	<ul>
               <!--<li><a id="doRestore" href="#">Laden</a></li>-->
               <li><a id="doSave" href="#">Cache</a></li>
@@ -75,7 +75,7 @@
 	            </div>
 				<h2>Design und Programmierung für Web, App und Druck</h2>
 				
-              <div data-role="contolgroup"> 
+              <div data-role="controlgroup"> 
 	              <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
 	              <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
 	              <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
@@ -83,7 +83,8 @@
 	              <!--<a id="doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-nodisc-icon ui-alt-icon ui-btn-icon-left">Beenden</a>-->
 	          </div>              
 
-				          
+			<a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Tachometer</a>              
+	        	          
 	          <!--
               <div data-role="controlgroup" data-theme="b"> 
 	              <a id="doRestore" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Laden</a>
@@ -95,7 +96,7 @@
 	              <a id="doTest3" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Test AJAX page load</a>
               </div>
              -->
-			<p>Dies ist die erste Demo App von <strong>KÜHNE-Webdienste.de</strong></p>
+			<p>Viel Spaß mit der Demo-App von <strong>KÜHNE-Webdienste.de</strong></p>
 			<p>Lesen Sie Inhalte der Webpräsenz offline! Diese werden bei Internetverbindung automatisch aktualisiert.</p>
 	          
               
@@ -220,9 +221,14 @@
 					Netzverbindung: <span id="online-status" class="wichtig">keine</span>.</p>
 				</div>
 				
-				<div data-role="collapsible">
+				<div data-role="collapsible" class="debug">
 					<h4>TODO:</h4>
 					<ul>
+					<li>erzeuge bei bilddownload Bild-Url-Liste, die in localstorage gespeichert wird. beim nächsten update der Textdaten wird sie mit gelieferter Bildliste verglichen, und nur fehlende Bilder nachgeladen.
+						 </li>
+						
+						<li>wenn error bei update, dann setTimeout ca. 1min für nächsten Versuch
+						 </li>
 						<li>alle testausgaben und Funktionen abschaltbar (Variablen)
 						</li>
 						<li>unschöner Bildaufbau bei Seitenwechsel</li>
@@ -250,8 +256,8 @@
 					<a href="tel:+491705191814" class="ui-btn ui-corner-all ui-icon-phone ui-btn-icon-left">Telefon</a>
 					<a href="https://www.facebook.com/kuhne.webdienste" class="ui-btn ui-corner-all ui-icon-facebook ui-btn-icon-left">Facebook</a>
 					<a href="https://www.xing.com/profile/Thomas_Kuehne18" class="ui-btn ui-corner-all ui-icon-xing ui-btn-icon-left">Xing</a>
-					<a href="#" class="ui-btn ui-corner-all ui-icon-google-plus ui-btn-icon-left">Google+</a>
-					
+					<!-- <a href="#" class="ui-btn ui-corner-all ui-icon-google-plus ui-btn-icon-left">Google+</a>
+					-->
 				</div>
 			</div>
 			

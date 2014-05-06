@@ -7,15 +7,19 @@
 """###
  */
 
-// Globaler Schalter
+// Globale Schalter
+var kwd_debug=true;
 // wenn true Test Ausgaben in html
 // abhängig von jquery
 var kwd_debugscreen=false;
 
 function kwd_log(object) {
-	console.log(object);
-	if (kwd_debugscreen) {
-		$('#p-debug').append(object);
-		$('#p-debug').append('<br/>');
+	if (kwd_debug) {
+	
+		console.log(object);
+		if (kwd_debugscreen) {
+			$('#p-debug').append(object);
+			$('#p-debug').append('<br/>');
+		}
 	}
 }
