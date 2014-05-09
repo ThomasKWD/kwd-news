@@ -5,6 +5,7 @@
  * Es ist kein Objekt sondern nur eine Sammlung von Funktionen (Klasse geplant!)
 
 """###
+Test test
  */
 
 // Globaler Schalter
