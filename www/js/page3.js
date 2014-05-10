@@ -15,7 +15,7 @@ function kwd_projects2list() {
 		var i=0;
 		for(var entry in kwd_projects) {
 			
-			html += "<li class=aproject>";
+				html += "<li class=aproject>";
 			
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd_current_project="+(i)+";\">";
@@ -61,4 +61,3 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		$("#project-url").attr("href", kwd_projects[kwd_current_project]['url']);
 	}
 });
-

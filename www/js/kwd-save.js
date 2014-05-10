@@ -106,8 +106,41 @@ function saveProjects() {
 // verwendet z.Z. hard codiert bestimmte verkleinerte Form der Bilder
 // (image name  + Code (redaxo))
 function _downloadNextFile() {
+
+    var fileTransfer = new FileTransfer();
+    fileEntry.remove();
+    
+    fileTransfer.download(
+        'http://www.kuehne-webdienste.de/files/ps-shot.jpg',
+        path + 'theFile.jpg',
+        function(file) {
+			// testausgabe
+			kwd_log('Pfad: '+p+'--');
+			//testanzeige
+            //showLink(u);
+        },
+        function(error) {
+            kwd_log('download error source ' + error.source);
+            kwd_log('download error target ' + error.target);
+            kwd_log('upload error code: ' + error.code);
+        }
+    );
 	
 }
+
+// sets values and counter for use by _downloadNextFile
+function prepareDownload(path) {
+	var downloadcounter=8;
+	// if array data available
+	if (kwd_projects) {
+		// test auflistung:
+		//var i=0;
+		for(var entry in kwd_projects) {
+			kwd_log(entry[]);
+		}
+	}	
+}
+
 // prüft ob Pfad erzeugt werden muss
 // wenn Pfad in local storage, wird dieser als valid angesehen und kein requestfilesystem+dummy-file benötigt
 // initalisiert rekursiven Download
@@ -116,7 +149,8 @@ function downloadImages() {
 
 	if(appRootPath) {
 		// direkter Downloadinit
-	}
+		prepareDownload(appRootPath);
+		}
 	else {		
 		// downloadinit in callback
 	    window.requestFileSystem(
@@ -139,31 +173,10 @@ function onRequestFileSystemSuccess(fileSystem) {
 function onGetFileSuccess(fileEntry) {
     kwd_log('onGetFileSuccess!');
     var path = fileEntry.toURL().replace('dummy.html', '');
-    var fileTransfer = new FileTransfer();
-    fileEntry.remove();
-    
-    fileTransfer.download(
-        'http://www.kuehne-webdienste.de/files/ps-shot.jpg',
-        path + 'theFile.jpg',
-        function(file) {
-        	var u = file.toURI();
-            kwd_log('download complete: ' + u);
-            // pfad merken
-            var c = u.lastIndexOf('/');
-            var p = u.substring(0,c+1);
-            appRootPath=p;
-			localStorage.setItem(kwd_storage_path,p);
-			// testausgabe
-			kwd_log('Pfad: '+p+'--');
-			//testanzeige
-            showLink(u);
-        },
-        function(error) {
-            kwd_log('download error source ' + error.source);
-            kwd_log('download error target ' + error.target);
-            kwd_log('upload error code: ' + error.code);
-        }
-    );
+	appRootPath=path;
+	localStorage.setItem(kwd_storage_path,path);
+
+	prepareDownload(path);	    
 }
 
 function showLink(url) {
@@ -182,4 +195,3 @@ function showLink(url) {
 function fail(evt) {
     kwd_log(evt.target.error.code);
 }
-
