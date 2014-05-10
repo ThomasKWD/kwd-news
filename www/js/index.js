@@ -165,7 +165,7 @@ function onDeviceReady() {
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
-	// Intervall voreinstellen
+	// Intervall-Modus voreinstellen
 	window.gpsinterval=true;
 	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
 	// schreibe Funktion, die dies für alle Links automatisiert!
@@ -180,7 +180,7 @@ function onDeviceReady() {
 	}
 	kwd_log("path: "+appRootPath);
 
-	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter
+	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter	
 		
 	// show
 	

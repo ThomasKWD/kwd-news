@@ -25,6 +25,7 @@ function kwd_readProjects() {
 		kwd_projects = JSON.parse(strread);
 		//kwd_log('Projekte geladen');
 		kwd_log(kwd_projects);
+		kwd_log("Anzahl Projects: "+kwd_projects.length);
 	}
 	
 	if (kwd_projects==null) return false;

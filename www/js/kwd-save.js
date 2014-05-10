@@ -130,7 +130,7 @@ function _downloadNextFile() {
 	// filename ok bzw. vorhanden? //
 	filename = kwd_projects[downloadFileCounter]['imgsrc'];
 	// theoretisch kann imgsrc fehlen, aber im nächsten Entry vorhanden sein!!!, deshalb Aufruf, wenn nicht da
-	if (!filename || !trim(filename)) {
+	if (!filename) {
 		_downloadNextFile();		
 	}
 	else {
@@ -199,13 +199,16 @@ function onGetFileSuccess(fileEntry) {
 }
 
 function showLinks() {
+	
+	var url='';
+	
 	// lösche Zielbereich:
     $('#deviceready').html("\n");	
     // alle Bilder aus local file system
     if (appRootPath && kwd_projects) {
     	var n = kwd_projects.length; 
 		for (var i=0;i<n;i++) {
-			url = appRootPath + kwd_projects[i]['imgsrc'];
+			url = appRootPath + kwd_projects[i]['imgsrc']; // evtl. Fehler!
 		    $('#deviceready').append('<p><img src="'+url+'" /></p>');	
 		}    	
     }
