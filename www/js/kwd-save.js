@@ -9,8 +9,8 @@
  */
 
 // global ----------------
-var appRootPath = ''; // ist Objekt
-var downloadFileCounter = 0;
+var appRootPath = ''; // ist Objekt (???)
+var downloadFileCounter = -1; // 0 symbolisiert "fertig", während -1 "noch nicht angefangen" bedeutet
 
 //  ---------------- check filesystem
 
@@ -104,52 +104,68 @@ function saveProjects() {
 
 // rekursiv
 // verwendet z.Z. hard codiert bestimmte verkleinerte Form der Bilder
-// (image name  + Code (redaxo))
+// (image name  + Code (redaxo) )
+// Achtung!: wegen Nutzung als Callback keine function Parameter möglich (nur für initialen Aufrud nutzbar!)
+// TODO: für mehrere Datensätze durch übergeben der JSON-Struktur (z. B. kwd_projects)
+// TODO: mehrere Bildformate durch setzen einer var (global) und jeweils separaten Durchlauf des Daten-Array
+// return: true: download gestartet, false: konnte Download nicht starten
 function _downloadNextFile() {
 
-    var fileTransfer = new FileTransfer();
-    fileEntry.remove();
-    
-    fileTransfer.download(
-        'http://www.kuehne-webdienste.de/files/ps-shot.jpg',
-        path + 'theFile.jpg',
-        function(file) {
-			// testausgabe
-			kwd_log('Pfad: '+p+'--');
-			//testanzeige
-            //showLink(u);
-        },
-        function(error) {
-            kwd_log('download error source ' + error.source);
-            kwd_log('download error target ' + error.target);
-            kwd_log('upload error code: ' + error.code);
-        }
-    );
+	// ist counter!=, eine Zahl und path und Daten vorhanden?
+	if (isNaN(downloadFileCounter) || !appRootPath || !kwd_projects) return false;
 	
+	// -1 bedeutet Init
+	if (downloadFileCounter==-1) {
+		// TODO: prüfe auf richtige Ermittlung
+		var n = kwd_projects.length;
+		if (!n) return false;
+		 
+		kwd_log("size of kwd_projects:"+n);
+		downloadFileCounter = n;
+	}
+	
+	// downcount hier! // dadurch auto. counter auf n-1
+	downloadFileCounter--;
+	if (downloadFileCounter<0) return false;
+	// filename ok bzw. vorhanden? //
+	filename = kwd_projects[downloadFileCounter]['imgsrc'];
+	// theoretisch kann imgsrc fehlen, aber im nächsten Entry vorhanden sein!!!, deshalb Aufruf, wenn nicht da
+	if (!filename || !trim(filename)) {
+		_downloadNextFile();		
+	}
+	else {
+		
+	    var fileTransfer = new FileTransfer();
+	    
+	    // hart codierte URL- und File-Benennung!
+	    // es wird nur Original-Image gespeichert :-)
+	    fileTransfer.download(
+	        'http://www.kuehne-webdienste.de/files/'+filename,
+	        appRootPath + filename,
+	        function(file) { // success
+	        	_downloadNextFile(); 
+	        },
+	        function(error) {
+	            kwd_log('download error source ' + error.source);
+	            kwd_log('download error target ' + error.target);
+	            kwd_log('upload error code: ' + error.code);
+	        }
+	    );
+	}
+    
+    return true;	
 }
 
-// sets values and counter for use by _downloadNextFile
-function prepareDownload(path) {
-	var downloadcounter=8;
-	// if array data available
-	if (kwd_projects) {
-		// test auflistung:
-		//var i=0;
-		for(var entry in kwd_projects) {
-			kwd_log(entry[]);
-		}
-	}	
-}
 
 // prüft ob Pfad erzeugt werden muss
 // wenn Pfad in local storage, wird dieser als valid angesehen und kein requestfilesystem+dummy-file benötigt
-// initalisiert rekursiven Download
-// TODO: nicht nur Projektbilder!
+// TODO: nicht nur Projektbilder! -->
 function downloadImages() {
 
 	if(appRootPath) {
 		// direkter Downloadinit
-		prepareDownload(appRootPath);
+		downloadFileCounter = -1;
+		_downloadNextFile(); // TODO: für mehrere Datensätze durch *kopieren* der JSON-Struktur (z. B. kwd_projects)
 		}
 	else {		
 		// downloadinit in callback
@@ -173,23 +189,29 @@ function onRequestFileSystemSuccess(fileSystem) {
 function onGetFileSuccess(fileEntry) {
     kwd_log('onGetFileSuccess!');
     var path = fileEntry.toURL().replace('dummy.html', '');
+    fileEntry.remove();
+    
 	appRootPath=path;
 	localStorage.setItem(kwd_storage_path,path);
 
-	prepareDownload(path);	    
+	downloadFileCounter = -1;
+	_downloadNextFile();	    // TODO: für mehrere Datensätze durch *kopieren* der JSON-Struktur (z. B. kwd_projects)
 }
 
-function showLink(url) {
-    //alert(url);
-    /*
-    var divEl = document.getElementById('deviceready');
-    var aElem = document.createElement('a');
-    aElem.setAttribute('target', '_blank');
-    aElem.setAttribute('href', url);
-    aElem.appendChild(document.createTextNode('Ready! Click To Open.'));
-    divEl.appendChild(aElem);
-    */
-    $('#deviceready').html('<p><a href="'+url+'">try to show image</a>:</p><img src="'+url+'" />');
+function showLinks() {
+	// lösche Zielbereich:
+    $('#deviceready').html("\n");	
+    // alle Bilder aus local file system
+    if (appRootPath && kwd_projects) {
+    	var n = kwd_projects.length; 
+		for (var i=0;i<n;i++) {
+			url = appRootPath + kwd_projects[i]['imgsrc'];
+		    $('#deviceready').append('<p><img src="'+url+'" /></p>');	
+		}    	
+    }
+    else {
+    	kwd_log("no data for image test output!");
+    }
 }
 
 function fail(evt) {

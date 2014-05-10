@@ -145,7 +145,7 @@ function onDeviceReady() {
 		downloadImages();
 	});
 	$('#doTest2').click(function(){
-		location.href='http://www.kuehne-webdienste.de/?viewmode=app';           				
+		showLinks();           				
 	});
 	$('#doTest3').click(function(){
 		kwd_log('clicked test3');
