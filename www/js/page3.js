@@ -4,7 +4,12 @@
  */
 var kwd_current_project = -1;
 
-function kwd_projects2list() {
+/*TODO:
+ * - prüft ob appRootPath gesetzt, wenn ja werden lokale Bilder geladen
+ * - wenn appRootPath, aber keine Bilder vorhanden sieht man nichts 
+ *   (so ähnlich wie direkte Bilderanzeige wenn offline)
+ * - wenn keine Projekte in local storage gefunden *nicht* noch einmal update starten, sondern nur Hinweis auf offline!! 
+ */function kwd_projects2list() {
 	
 	if (kwd_readProjects()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
 		

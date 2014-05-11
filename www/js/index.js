@@ -138,8 +138,12 @@ function onDeviceReady() {
 		performBackAction();
 	});	
 	$('#doUpdate').click(function(){
+		//TODO: alle Updates hier!
 		read_kwd_projects();        		
 	});
+	$('#doQuit').click(function(){
+		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
+	});	
 	$('#doSave').click(function(){
 		//saveProjects();
 		downloadImages();
@@ -162,9 +166,24 @@ function onDeviceReady() {
 		alert('project');
 		kwd_log('project');
 	});
+	$('#flip-6').change(function() {
+		alert("update ="+$(this).val());
+	});
+	$('#flip-debug').change(function() {
+		//if(***)
+		alert("update ="+$(this).val());
+	});	
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
+	$('#doClearCache').click(function() {
+
+		// test debug adjust		
+		$("select#flip-debug").val ("off");
+		$("select#flip-debug").flipswitch("refresh"); // na endlich		
+	});
+	
+	
 	// Intervall-Modus voreinstellen
 	window.gpsinterval=true;
 	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 

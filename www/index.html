@@ -57,34 +57,24 @@
       <div data-role="page" id="page-start" class="page">
         
 			<div role="main" class="ui-content page-content">
-				
-           <div data-role="navbar" id="navbar" data-theme="b" class="debug">
-           	<ul>
-              <!--<li><a id="doRestore" href="#">Laden</a></li>-->
-              <li><a id="doSave" href="#">Cache Images</a></li>
-              <li><a id="doTest2" href="#">Show Cached Images</a></li>              
-              <li><a id="doUpdate" class="ui-icon-recycle" href="#">Update</a></li><!--geeignete Bildgrößen und Daten richtig einsetzen, schon geht es, zumindest direkt vom Server!!-->
-              <li><a id="tacho" href="#page-tacho">Tacho</a></li>
-              <!--<li><a id="switchtacho" href="#">Switch Tacho</a></li>-->
-              </ul>              
-           </div>
 
-				<p id="p-debug"></p>
-
-	            <div id="deviceready" class="blink">
-	 
-	            </div>
 				<h2>Design und Programmierung für Web, App und Druck</h2>
-				
-              <div data-role="controlgroup"> 
-	              <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
-	              <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
-	              <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
-	              <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
-	              <!--<a id="doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-nodisc-icon ui-alt-icon ui-btn-icon-left">Beenden</a>-->
-	          </div>              
 
-			<a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Tachometer</a>              
+				<p>Viel Spaß mit der Demo-App von <strong>KÜHNE-Webdienste.de</strong></p>
+				<p>Lesen Sie Inhalte der Webpräsenz offline! Diese werden bei Internetverbindung automatisch aktualisiert.</p>
+				
+			  <div data-role="controlgroup"> 
+				  <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
+				  <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
+				  <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
+				  <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
+				  <a href="#page-einstellungen" class="ui-btn ui-corner-all ui-icon-gear ui-btn-icon-left">Einstellungen</a>              
+				  <a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>
+			  </div>              
+			  
+			  
+
+			<a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Tachometer Widget</a>              
 	        	          
 	          <!--
               <div data-role="controlgroup" data-theme="b"> 
@@ -97,10 +87,22 @@
 	              <a id="doTest3" href="#" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Test AJAX page load</a>
               </div>
              -->
-			<p>Viel Spaß mit der Demo-App von <strong>KÜHNE-Webdienste.de</strong></p>
-			<p>Lesen Sie Inhalte der Webpräsenz offline! Diese werden bei Internetverbindung automatisch aktualisiert.</p>
 	          
               
+           <div data-role="navbar" id="navbar" data-theme="b" class="debug">
+           	<ul>
+              <!--<li><a id="doRestore" href="#">Laden</a></li>-->
+              <li><a id="doSave" href="#">Cache Images</a></li>
+              <li><a id="doTest2" href="#">Show Cached Images</a></li>              
+              <!--<li><a id="switchtacho" href="#">Switch Tacho</a></li>-->
+              </ul>              
+           </div>
+
+			<div data-role="collapsible" data-collapsed="false" class="debug">
+				<h4>Log:</h4>
+				<p id="p-debug"></p>
+	            <div id="deviceready" class="blink"></div>
+			</div>
 
            
           </div>
@@ -113,17 +115,19 @@
 
 			<div role="main" class="ui-content page-content">
 
-				<div data-role="collapsible">
-				    <h4>News 1</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div>
-				<div data-role="collapsible">
-				    <h4>News 2</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-				</div>
-				<div data-role="collapsible">
-				    <h4>News 3</h4>
-				    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				<div data-role="collapsibleset" data-theme="a" data-content-theme="a">
+					<div data-role="collapsible">
+					    <h4>News 1</h4>
+					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+					</div>
+					<div data-role="collapsible">
+					    <h4>News 2</h4>
+					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+					</div>
+					<div data-role="collapsible">
+					    <h4>News 3</h4>
+					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+					</div>
 				</div>
 
 			</div>
@@ -264,5 +268,50 @@
 			
 		</div><!--page info-->
 		
+		<div data-role="page" id="page-einstellungen" class="page">
+		
+			<div role="main" class="ui-content page-content">
+
+				<form>
+				    <div class="ui-field-contain">
+				        <label for="flip-6">Aktualisieren</label>
+				        <select name="flip-6" id="flip-6" data-role="flipswitch">
+				            <option value="off">Nie</option>
+				            <option value="on" selected="selected">Auto</option>
+				        </select>
+				       
+				    </div>
+				</form>
+				
+				
+		       <a id="doUpdate" class="ui-btn ui-corner-all ui-icon-refresh ui-btn-icon-left" href="#">Jetzt Aktualisieren</a>
+	
+		       <!--<a class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left debug" href="#">Cache leeren.</a>-->
+		        
+		        <a href="#popupDialog" data-rel="popup" data-position-to="window" data-transition="pop" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Cache leeren</a>
+				<div data-role="popup" id="popupDialog" data-overlay-theme="b" data-theme="a" style="max-width:400px;">
+				    <div data-role="header" data-theme="a">
+				    <h1>Cache leeren?</h1>
+				    </div>
+				    <div role="main" class="ui-content">
+				        <h3 class="ui-title">Wirklich alle gespeicherten Daten der App löschen?</h3>
+				        <a href="#" class="ui-btn ui-corner-all ui-btn-inline" data-rel="back">Abbrechen</a>
+				        <a id="doClearCache" href="#" class="ui-btn ui-corner-all ui-btn-inline" data-rel="back" data-transition="flow">Löschen</a>
+				    </div>
+				</div>
+      
+				<form>
+				    <div class="ui-field-contain">
+				        <label for="flip-debug">Debug-Modus</label>
+				        <select name="flip-debug" id="flip-debug" data-role="flipswitch">
+				            <option value="off">Aus</option>
+				            <option value="on"  selected="selected">Ein</option>
+				        </select>
+				    </div>
+				</form>
+
+			</div>		              
+		</div><!--page Einstellungen-->
+
     </body>
 </html>
