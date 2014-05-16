@@ -7,8 +7,7 @@
  * TODO: html mit css debug/develope durch js aus/einblenden
 
 """###
-Test test
- */
+*/
 
 // Globale Schalter
 var kwd_debug=true;
