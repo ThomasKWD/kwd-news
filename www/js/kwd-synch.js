@@ -8,7 +8,9 @@
   * um Bilder auch später speichern zu können ist es evtl. sinnvoll, sie per JSONP und base64 codiert zu laden
   * anstatt sie normal zu erzeugen (es wird nur src geladen)
   * 
-  * TODO: warum geht Fehlermeldung nicht?  
+  * TODO: warum geht Fehlermeldung nicht?
+  * TODO: alle synch Funktionen zusammenfassen (kwd-save)
+  * TODO: alle local storage zusammenfassen und die storage-Befehle kapseln! (kwd-restore, ...)
 */
 
 /*
@@ -18,6 +20,12 @@
 const kwd_storage_projects = 'projects';
 const kwd_storage_news = 'news';
 const kwd_storage_path = 'path';
+
+/*
+ * globale Schalter
+ * 
+ */
+kwd_update=true;
 
 /*
  * Funktionen
@@ -50,6 +58,9 @@ function getResponse(response) {
 }
 
 
+/*
+ * TODO: anders nennen z.B. kwd_DownloadProjects!!
+ */
 function read_kwd_projects (argument) {
 	
 	//$('#load-result').html('AKTUALSIEREN');
@@ -86,55 +97,29 @@ function read_kwd_projects (argument) {
 	}).success(getResponse);
 	
 }
+
+/*
+ * prüft und setzt den Pfad für eine spezielle Ausgabe (bestimmt durch Parameter type)
+ * - wenn Parameter leer, wird nur der "appRootPath" zurückgegeben (falls erhältlich).
+ * - bei fehlenden Daten oder Fehler wird Leerstring zurückgegeben
+ * 
+ * TODO: Funktion nach kwd-storage.js
+ */
+function kwd_getFilePath(type) {
 	
-$(document).ready(function() {
+	var path = localStorage.getItem(kwd_storage_path);
+	if (!path) {
+		kwd_log('appRootPath not available.');
+		path='';
+	}
+	else kwd_log("path: "+appRootPath);
+
+	if (type) {
+		if (type==kwd_storage_projects) {
+			// TODO: auch für local voreinstellungen falls es thumb-versionen gibt
+			if (!path) path = 'http://www.kuehne-webdienste.de/index.php?rex_img_type=projektvorschau&rex_img_file=';			
+		}
+	}
 	
-	// TODO: do this as loop?
-	$('#name1').click(function() {
-		$('#projekt1 .info').slideToggle();
-		return false;
-	});		
-	$('#name2').click(function() {
-		$('#projekt2 .info').slideToggle();
-		return false;
-	});		
-	$('#name3').click(function() {
-		$('#projekt3 .info').slideToggle();
-		return false;
-	});		
-	$('#name4').click(function() {
-		$('#projekt4 .info').slideToggle();
-		return false;
-	});		
-	$('#name5').click(function() {
-		$('#projekt5 .info').slideToggle();
-		return false;
-	});		
-	$('#name6').click(function() {
-		$('#projekt6 .info').slideToggle();
-		return false;
-	});		
-	$('#name7').click(function() {
-		$('#projekt7 .info').slideToggle();
-		return false;
-	});		
-	$('#name8').click(function() {
-		$('#projekt8 .info').slideToggle();
-		return false;
-	});		
-	$('#name9').click(function() {
-		$('#projekt9 .info').slideToggle();
-		return false;
-	});		
-	$('#name10').click(function() {
-		$('#projekt10 .info').slideToggle();
-		return false;
-	});		
-	$('#name11').click(function() {
-		$('#projekt11 .info').slideToggle();
-		return false;
-	});		
-	
-	
-	
-});
+	return path;
+}

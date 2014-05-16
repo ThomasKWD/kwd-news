@@ -5,13 +5,19 @@
 var kwd_current_project = -1;
 
 /*TODO:
- * - prüft ob appRootPath gesetzt, wenn ja werden lokale Bilder geladen
- * - wenn appRootPath, aber keine Bilder vorhanden sieht man nichts 
- *   (so ähnlich wie direkte Bilderanzeige wenn offline)
+ * - wenn path ok aber keine Bilder vorhanden sieht man nichts
+ * (wie prüfen, ob Bilder im Cache??) 
  * - wenn keine Projekte in local storage gefunden *nicht* noch einmal update starten, sondern nur Hinweis auf offline!! 
- */function kwd_projects2list() {
-	
+ */
+function kwd_projects2list() {
+
+	var path = kwd_getFilePath(kwd_storage_projects);  // gibt nicht nur Ordner sondern gesamte URL zurück, an die dann filename angehangen wird!!
+	kwd_log('projects image path: '+path);
+		
 	if (kwd_readProjects()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
+		
+		// vorher ggf. angezeigten Warnhinweis verstecken
+		$('#box-projects-info').css({'display':'none'});		
 		
 		var html = "";
 		html += "<ul id=list1 data-role=listview>";
@@ -25,7 +31,7 @@ var kwd_current_project = -1;
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd_current_project="+(i)+";\">";
 			
-			html += '<img style="height:80px" src="http://www.kuehne-webdienste.de/index.php?rex_img_type=projektvorschau&rex_img_file='+kwd_projects[i]['imgsrc']+'" />';
+			html += '<img style="height:80px" src="'+path+kwd_projects[i]['imgsrc']+'" />';
  // http://www.kuehne-webdienste.de/tbd-shot.jpg
 			
 			html += "<h3>"+kwd_projects[i]['name']+"</h3>";
@@ -46,6 +52,15 @@ var kwd_current_project = -1;
 		
 		$("#project-list").html(html);
 		$("#list1").listview();
+	}
+	else {
+		// vorbereitetes Hinweisfenster sichtbar machen
+		// Text
+		$('#projects-info').html('Keine Daten für Anzeige vorhanden');
+		if (!kwd_update) $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
+		$('#projects-info').append('<br />'+navigator.connection.type);
+		// sichtbar
+		$('#box-projects-info').css({'display':'block'});
 	}
 
 }

@@ -146,7 +146,8 @@ function onDeviceReady() {
 	});	
 	$('#doSave').click(function(){
 		//saveProjects();
-		downloadImages();
+		downloadImages(); // TODO: wann automatisch??
+		// z.B. kwd_downloadFiles(kwd_storage_projects);
 	});
 	$('#doTest2').click(function(){
 		showLinks();           				
@@ -167,20 +168,41 @@ function onDeviceReady() {
 		kwd_log('project');
 	});
 	$('#flip-6').change(function() {
-		alert("update ="+$(this).val());
+		//alert("update ="+$(this).val());
+		if($(this).val()=='off') {
+			kwd_update=false;
+			$('#options-info').html("Bei Aktualisieren \"Nie\" ist diese App komplett offline. Es können nur bereits gespeicherte Inhalte angezeigt werden.");
+			$('#box-options-info').css( {'display':'block'});
+		}
+		else {
+			kwd_update=true;
+			$('#options-info').html("Bei Aktualisieren \"Auto\" werden Inhalte im Hintergund aktualisiert.");
+			$('#box-options-info').css( {'display':'block'});
+			//TODO: gleich Daten-Update aufrufen??
+		}		
 	});
 	$('#flip-debug').change(function() {
-		//if(***)
-		alert("update ="+$(this).val());
+		if($(this).val()=='on') {
+			kwd_debug=true;
+			// CSS Sichtbarkeit
+			$('.debug').css( {'display':'block'});			
+		}
+		else {
+			kwd_debug=false;
+			$('.debug').css( {'display':'none'});						
+		}
 	});	
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
 	$('#doClearCache').click(function() {
 
-		// test debug adjust		
-		$("select#flip-debug").val ("off");
-		$("select#flip-debug").flipswitch("refresh"); // na endlich		
+		// localstorage gespeicherte Keys auflisten?
+		kwd_log("ClearCache Items: "+window.localStorage.length);
+		window.localStorage.clear();
+		// test debug adjust - Code to change state of switch:		
+		// $("select#flip-debug").val ("off");
+		// $("select#flip-debug").flipswitch("refresh"); // na endlich		
 	});
 	
 	
@@ -192,13 +214,7 @@ function onDeviceReady() {
 	
 	// UPDATE CONTENT-----------------------------------------------------------
 
-	appRootPath= localStorage.getItem(kwd_storage_path);
-	if (!appRootPath) {
-		kwd_log('konnte Image-Pfad nicht laden');
-		appRootPath='';
-	}
-	kwd_log("path: "+appRootPath);
-
+	appRootPath = kwd_getFilePath(); // Pfad in local storage?, nein= leerstring // eigentlich benötigt man Variable nicht oder nur lokal, wenn sowieso immer auf localStorage gearbeitet wird! 
 	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter	
 		
 	// show
