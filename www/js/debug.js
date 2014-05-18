@@ -10,7 +10,7 @@
 */
 
 // Globale Schalter
-var kwd_debug=true;
+var kwd_debug=false;
 // wenn true Test Ausgaben in html
 // abhängig von jquery
 var kwd_debugscreen=false;

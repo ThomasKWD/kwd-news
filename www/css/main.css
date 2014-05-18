@@ -100,6 +100,7 @@ debug oder develope gekennzeichnet
 und bei Bedarf ausgeblendet
 */
 .debug,
-.develope {
-	/*display:none;*/
+.develope,
+#debug-switch {
+	display:none;
 }

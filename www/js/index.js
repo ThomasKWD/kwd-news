@@ -186,6 +186,7 @@ function onDeviceReady() {
 			kwd_debug=true;
 			// CSS Sichtbarkeit
 			$('.debug').css( {'display':'block'});			
+			//$('#debug-switch').css( {'display':'block'});			
 		}
 		else {
 			kwd_debug=false;
