@@ -92,7 +92,10 @@ $(document).ready(function() {
 function onDeviceReady() {
 
  	kwd_debugscreen=true;// mache doch einen Schalter :-)
-
+ 	if (!kwd_debug) {
+ 		$('.debug').css( {'display':'none'});
+ 		$('.develope').css( {'display':'none'});
+ 	}
     kwd_log('onDeviceReady');
     //kwd_log (document.URL);
     
@@ -139,7 +142,8 @@ function onDeviceReady() {
 	});	
 	$('#doUpdate').click(function(){
 		//TODO: alle Updates hier!
-		read_kwd_projects();        		
+		kwd_DownloadProjects();
+		kwd_DownloadNews();        		
 	});
 	$('#doQuit').click(function(){
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
@@ -160,9 +164,6 @@ function onDeviceReady() {
 	$('#data-rel-forward').click(function(){
 		window.history.go(1); // try to go forward history				           				
 	});
-	$('#doShowProjects').click(function() {
-		kwd_projects2list();		           						
-	});
 	$('.aproject').click(function() {
 		alert('project');
 		kwd_log('project');
@@ -176,7 +177,7 @@ function onDeviceReady() {
 		}
 		else {
 			kwd_update=true;
-			$('#options-info').html("Bei Aktualisieren \"Auto\" werden Inhalte im Hintergund aktualisiert.");
+			$('#options-info').html("Bei Aktualisieren \"Auto\" werden Inhalte im Hintergrund aktualisiert.");
 			$('#box-options-info').css( {'display':'block'});
 			//TODO: gleich Daten-Update aufrufen??
 		}		
@@ -216,7 +217,8 @@ function onDeviceReady() {
 	// UPDATE CONTENT-----------------------------------------------------------
 
 	appRootPath = kwd_getFilePath(); // Pfad in local storage?, nein= leerstring // eigentlich benötigt man Variable nicht oder nur lokal, wenn sowieso immer auf localStorage gearbeitet wird! 
-	read_kwd_projects();//TODO: allgemeine Funktion mit Parameter	
+	kwd_DownloadProjects();//TODO: allgemeine Funktion mit Parameter
+	kwd_DownloadNews();	
 		
 	// show
 	

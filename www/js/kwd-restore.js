@@ -31,3 +31,21 @@ function kwd_readProjects() {
 	if (kwd_projects==null) return false;
 	else return true;
 }
+
+function kwd_readNews() {
+	
+	strread = localStorage.getItem(kwd_storage_news);
+	if (strread==null) {
+		kwd_log('konnte News nicht laden');
+		kwd_news = null;
+	}
+	else {
+		kwd_news = JSON.parse(strread);
+		//kwd_log('News geladen');
+		kwd_log(kwd_news);
+		kwd_log("Anzahl news: "+kwd_news.length);
+	}
+	
+	if (kwd_news==null) return false;
+	else return true;
+}

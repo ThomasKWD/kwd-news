@@ -31,7 +31,7 @@ function kwd_projects2list() {
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd_current_project="+(i)+";\">";
 			
-			html += '<img style="height:80px" src="'+path+kwd_projects[i]['imgsrc']+'" />';
+			html += '<img style="width:80px" src="'+path+kwd_projects[i]['imgsrc']+'" />';
  // http://www.kuehne-webdienste.de/tbd-shot.jpg
 			
 			html += "<h3>"+kwd_projects[i]['name']+"</h3>";

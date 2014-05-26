@@ -102,5 +102,5 @@ und bei Bedarf ausgeblendet
 .debug,
 .develope,
 #debug-switch {
-	display:none;
+	display:block;
 }

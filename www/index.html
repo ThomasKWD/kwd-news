@@ -35,6 +35,7 @@
         <script type="text/javascript" src="js/kwd-save.js"></script>
         <script type="text/javascript" src="js/kwd-restore.js"></script>
         <script type="text/javascript" src="js/page3.js"></script>
+        <script type="text/javascript" src="js/page21.js"></script>
 <script type="text/javascript" src="js/tacho.js"></script>
  
     </head>
@@ -113,20 +114,19 @@
 		<div data-role="page" id="page-news" data-title="News" class="page">
 		
 
-			<div role="main" class="ui-content page-content">
+			<div data-role="content" class="ui-content page-content">
 
-				<div data-role="collapsibleset" data-theme="a" data-content-theme="a">
-					<div data-role="collapsible">
-					    <h4>News 1</h4>
-					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+				<h2>News</h2>
+				
+				<div id="news-list"></div>
+
+				<div id="box-news-info" class="ui-corner-all" style="display:auto">
+					<div class="ui-bar ui-bar-a">
+						<h3>Achtung!</h3>
 					</div>
-					<div data-role="collapsible">
-					    <h4>News 2</h4>
-					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
-					</div>
-					<div data-role="collapsible">
-					    <h4>News 3</h4>
-					    <p>I'm the collapsible content. By default I'm closed, but you can click the header to open me.</p>
+					<div class="ui-body ui-body-a">
+						<!-- prüfen ob update aus oder nur keine Verbindung -->
+						<p id="news-warning">Keine Daten zur Anzeige vorhanden.</p>
 					</div>
 				</div>
 
@@ -139,6 +139,11 @@
 			<div data-role="content" class="ui-content page-content">
 				
 				<h2>Überschrift!!</h2>
+				<div id="news-info"></div>
+				
+				<a id="news-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
+				<a id="news-copy" href="#" class="ui-btn ui-corner-all ui-icon-clipboard ui-btn-icon-left">Adresse kopieren</a>
+				<a id="news-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
 				
 			
            </div> 
@@ -188,6 +193,18 @@
 			<div data-role="content" class="ui-content page-content">
 
 				<h2>Leistungen</h2>
+				
+				<div id="offers-list"></div>
+
+				<div id="box-offers-info" class="ui-corner-all" style="display:auto">
+					<div class="ui-bar ui-bar-a">
+						<h3>Achtung!</h3>
+					</div>
+					<div class="ui-body ui-body-a">
+						<!-- prüfen ob update aus oder nur keine Verbindung -->
+						<p id="offers-info">Keine Daten zur Anzeige vorhanden.</p>
+					</div>
+				</div>
 				
 			
            </div> 
