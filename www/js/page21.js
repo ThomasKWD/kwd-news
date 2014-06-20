@@ -34,11 +34,11 @@ function kwd_news2list() {
 			
 			// da imgsrc jetzt auch eine Liste enthalten kann(!)
 			// nur erstes Bild herausfiltern (kommagetrennte Namen):
-			curimg = kwd_projects[i]['imgsrc'];			
+			curimg = kwd_news[i]['imgsrc'];			
 			if (curimg.indexOf(',')!=-1) {
 				curimg = curimg.substr(0,curimg.indexOf(','));	
 			}
-			html += '<img style="width:80px" src="'+path+curimg+'" />';
+			//html += '<img style="width:80px" src="'+path+curimg+'" />';
 			//html += '<img style="height:80px" src="'+path+kwd_news[i]['imgsrc']+'" />';
  // http://www.kuehne-webdienste.de/tbd-shot.jpg
 			
