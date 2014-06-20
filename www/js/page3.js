@@ -22,18 +22,25 @@ function kwd_projects2list() {
 		var html = "";
 		html += "<ul id=list1 data-role=listview>";
 
-
+		var curimg = '';
 		var i=0;
 		for(var entry in kwd_projects) {
 			
-				html += "<li class=aproject>";
+			curimg= '';
+			
+			html += "<li class=aproject>";
 			
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd_current_project="+(i)+";\">";
 			
-			html += '<img style="width:80px" src="'+path+kwd_projects[i]['imgsrc']+'" />';
- // http://www.kuehne-webdienste.de/tbd-shot.jpg
-			
+			// da imgsrc jetzt auch eine Liste enthalten kann(!)
+			// nur erstes Bild herausfiltern (kommagetrennte Namen):
+			curimg = kwd_projects[i]['imgsrc'];			
+			if (curimg.indexOf(',')!=-1) {
+				curimg = curimg.substr(0,curimg.indexOf(','));	
+			}
+			html += '<img style="width:80px" src="'+path+curimg+'" />';
+						
 			html += "<h3>"+kwd_projects[i]['name']+"</h3>";
 			
 			html += "<p>"+kwd_projects[i]['url']+"</p>"; 

@@ -25,6 +25,7 @@
 	<gap:plugin name="org.apache.cordova.network-information" version="0.2.7" />
     <gap:plugin name="org.apache.cordova.geolocation" version="0.3.6" />
 	<gap:plugin name="nl.x-services.plugins.insomnia" version="3.0" />
+	<gap:plugin name="nl.x-services.plugins.socialsharing" version="4.0.8" />
 	    
     <preference name="phonegap-version" value="3.3.0" />
     <preference name="orientation"      value="portrait" />

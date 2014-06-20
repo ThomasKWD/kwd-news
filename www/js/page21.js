@@ -22,15 +22,23 @@ function kwd_news2list() {
 		var html = "";
 		html += "<ul id=list2 data-role=listview>";
 
-
+		var curimg;
 		var i=0;
 		for(var entry in kwd_news) {
 			
-				html += "<li class=anews>";
+			curimg='';
+			html += "<li class=anews>";
 			
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-anews onClick=\"kwd_current_news="+(i)+";\">"; // warum onClick??
 			
+			// da imgsrc jetzt auch eine Liste enthalten kann(!)
+			// nur erstes Bild herausfiltern (kommagetrennte Namen):
+			curimg = kwd_projects[i]['imgsrc'];			
+			if (curimg.indexOf(',')!=-1) {
+				curimg = curimg.substr(0,curimg.indexOf(','));	
+			}
+			html += '<img style="width:80px" src="'+path+curimg+'" />';
 			//html += '<img style="height:80px" src="'+path+kwd_news[i]['imgsrc']+'" />';
  // http://www.kuehne-webdienste.de/tbd-shot.jpg
 			

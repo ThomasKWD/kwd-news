@@ -206,8 +206,27 @@ function onDeviceReady() {
 		// $("select#flip-debug").val ("off");
 		// $("select#flip-debug").flipswitch("refresh"); // na endlich		
 	});
+	// TODO: wie besser die Klick-handler dort deklarieren, wo sie gebraucht werden (Seite)
+	$('#project-share').click(function() {
+		// kwd_current_project muss gesetzt sein
+		//alert ('project:'+kwd_current_project);
+		// welche Parameter angenommen werden, hängt von der Ziel-App zum Teilen ab
+		// zum Test nur URL auf die Seite im Web
+		//    diese wird aus der article-url gewonnen
+		if (kwd_projects) {
+			if (kwd_current_project > -1) {
+				//var u = kwd_projects[kwd_current_project]['article_id'];
+				// wenn kwd_projects oder article_id fehlerhaft ist Hauptteil der Adresse immer noch gültig :-)
+				var u = 'http://www.kuehne-webdienste.de/index.php?article_id='+kwd_projects[kwd_current_project]['article_id'];
+				//alert (u);
+				var name = kwd_projects[kwd_current_project]['name'];
+				if (!name) name= '';
+				window.plugins.socialsharing.share("Schauen Sie sich diese interessante Seite an!", "KÜHNE-Webdienste.de "+name, null,u);
+			}
+		}
+	}); 
 	
-	
+
 	// Intervall-Modus voreinstellen
 	window.gpsinterval=true;
 	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
