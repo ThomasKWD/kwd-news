@@ -207,6 +207,7 @@ function onDeviceReady() {
 		// $("select#flip-debug").flipswitch("refresh"); // na endlich		
 	});
 	// TODO: wie besser die Klick-handler dort deklarieren, wo sie gebraucht werden (Seite)
+	//    oder zusammenfassen als function?
 	$('#project-share').click(function() {
 		// kwd_current_project muss gesetzt sein
 		//alert ('project:'+kwd_current_project);
@@ -225,7 +226,16 @@ function onDeviceReady() {
 			}
 		}
 	}); 
-	
+	$('#news-share').click(function() {
+		if (kwd_news) {
+			if (kwd_current_news > -1) {
+				var u = 'http://www.kuehne-webdienste.de/index.php?article_id='+kwd_news[kwd_current_news]['article_id'];
+				var name = kwd_news[kwd_current_news]['name'];
+				if (!name) name= '';
+				window.plugins.socialsharing.share("Schauen Sie sich diese interessante Seite an!", "KÜHNE-Webdienste.de "+name, null,u);
+			}
+		}		
+	});
 
 	// Intervall-Modus voreinstellen
 	window.gpsinterval=true;
