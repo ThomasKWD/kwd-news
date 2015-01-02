@@ -43,17 +43,21 @@
     <body>
 
 	
-       <div data-role="header" id="header" data-position="fixed" data-theme=a>
-       	<!--<div id="kwd-header">-->
-       		
-        <h1>&nbsp;</h1>
-         <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
-	        <a id="headbackbutton" href="#" data-icon="carat-l" data-iconpos="left" class="autofade">Start</a>
-	        <!--<a id="doStart" href="#page-start" data-icon="bars" data-iconpos="notext"></a>-->
+       <div id="header-wrapper">
+       	
+	       <div data-role="header" id="header" data-position="fixed" data-theme=a>
+	       		
+			<!--<h1>&nbsp;</h1>-->
+	        <div id="logo"><div id="page-title"></div></div>
 	        
-	  	<!--</div> -->
-	  	
-       	<!--</div>-->
+	         <!--<div data-type="horizontal" data-role="controlgroup" class="ui-btn-right">-->  
+		        <a id="headbackbutton" href="#" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-carat-l ui-nodisc-icon ui-btn-icon-notext ui-alt-icon autofade"></a>
+		        
+		        <!--<a id="doStart" href="#page-start" data-icon="bars" data-iconpos="notext"></a>-->
+		        
+		  	<!--</div> -->
+		  	
+	       </div>
        </div>
 
       <div data-role="page" id="page-start" class="page">
@@ -71,12 +75,12 @@
 				  <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
 				  <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
 				  <a href="#page-einstellungen" class="ui-btn ui-corner-all ui-icon-gear ui-btn-icon-left">Einstellungen</a>              
-				  <a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>
+				  <!--<a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>-->
 			  </div>              
 			  
 			  
 
-			<a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Tachometer Widget</a>              
+			<!-- <a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-alert ui-btn-icon-left">Tachometer Widget</a> -->              
 	        	          
 	          <!--
               <div data-role="controlgroup" data-theme="b"> 
@@ -117,8 +121,6 @@
 
 			<div data-role="content" class="ui-content page-content">
 
-				<h2>News</h2>
-				
 				<div id="news-list"></div>
 
 				<div id="box-news-info" class="ui-corner-all" style="display:auto">
@@ -139,7 +141,6 @@
 
 			<div data-role="content" class="ui-content page-content">
 				
-				<h2>Überschrift!!</h2>
 				<div id="news-info"></div>
 				
 				<a id="news-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
@@ -154,7 +155,7 @@
 
 			<div data-role="content" class="ui-content page-content">
 
-				<h2>Referenzen, Auswahl</h2>
+				<!--<h2>Referenzen, Auswahl</h2>-->
 				
 				<div id="project-list"></div>
 
@@ -176,7 +177,6 @@
 
 			<div data-role="content" class="ui-content page-content">
 				
-				<h2>Überschrift!!</h2>
 				<div id="project-info"></div>
 				
 				<div data-role="controlgroup"> 
@@ -214,8 +214,6 @@
 		<div data-role="page" id="page-anoffer" class="page">
 
 			<div data-role="content" class="ui-content page-content">
-				
-				<h2>Überschrift!!</h2>
 				
 				<div id="offer-info"></div>
 

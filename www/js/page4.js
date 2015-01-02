@@ -69,13 +69,15 @@ function kwd_offers2list() {
 
 $( document ).on( "pagebeforeshow", "#page-offers", function() {
 	kwd_offers2list();
+	$('#page-title').text("Leistungen");
 });
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-anoffer", function() {
 	// der Einfachheit halber Select des Contents über Variable
 	if (kwd_current_offer!=-1 && kwd_readOffers()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
-		$("#page-anoffer h2").html(kwd_offers[kwd_current_offer]['name']);
+		//$("#page-anoffer h2").html(kwd_offers[kwd_current_offer]['name']);
+		$('#page-title').text(kwd_offers[kwd_current_offer]['name']);
 		$("#offer-info").html(kwd_offers[kwd_current_offer]['info']);
 		kwd_log(kwd_offers[kwd_current_offer]['info']);
 		//$("#offer-info").append('<a href="'+kwd_offers[kwd_current_offer]['url']+'" target="_blank">'+kwd_offers[kwd_current_offer]['url']+'</a>');

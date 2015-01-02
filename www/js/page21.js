@@ -76,13 +76,15 @@ function kwd_news2list() {
 
 $( document ).on( "pagebeforeshow", "#page-news", function() {
 	kwd_news2list();
+	$('#page-title').text("News");
 });
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-anews", function() {
 	// der Einfachheit halber Select des Contents über Variable
 	if (kwd_current_news!=-1 && kwd_readNews()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
-		$("#page-anews h2").html(kwd_news[kwd_current_news]['name']);
+		//$("#page-anews h2").html(kwd_news[kwd_current_news]['name']);
+		$('#page-title').text(kwd_news[kwd_current_news]['name']);
 		$("#news-info").html(kwd_news[kwd_current_news]['info']);
 		kwd_log(kwd_news[kwd_current_news]['info']);
 		//$("#news-info").append('<a href="'+kwd_news[kwd_current_news]['url']+'" target="_blank">'+kwd_news[kwd_current_news]['url']+'</a>');

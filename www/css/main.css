@@ -7,25 +7,41 @@
 
 /*experimental*/
 body {
-	background-color: #83C2FD;		
+	background-color: #83C2FD !important;		
+}
+/* falls gradient gewünscht, umgebenden div für #header implementieren */
+#header-wrapper {
+	margin-top:10px;
 }
 #header {
-	background: url(../res/kwd3-titel.jpg) fixed top left no-repeat;
-	background-size: 170%;
+	height:40px;
 	border:0;
-/*	background-color:#83C2FD; */
+	background-color:#83C2FD;
+	background-image: linear-gradient(180deg, white 0%, #83C2FD 100%); 
 }
 #header h1 {
 	text-align: left;
+}
+#logo {
+	width:100%;
+	height:100%;
+	
+	background: url(../res/kwd-4-title.png) center center no-repeat;
+	background-size:contain;
+}
+#page-title {
+	padding-top:10px;
+	margin-right:20px;
+	text-align:right;
 }
 .page {
 	background-color: #83C2FD;	
 }
 .page-content {
-	background-image: linear-gradient(top,white 0%,black 50%);
 	background-color: white;
 	padding:1em;
 	margin:0.25em;
+	margin-top:0;
 	border:1px solid blue;
 	border-radius:5px;
 	border-top-right-radius: 50px;

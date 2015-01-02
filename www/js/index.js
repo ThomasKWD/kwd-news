@@ -331,7 +331,9 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 
 	var current = $( this ).attr('id');	
 	var previous = '';
+	var title ='';
 	// da statisch hier switch (einfacher anscheinend als jquery die Daten zu entlocken)
+	// z.Z. ungenutzt, da kein Back-Button mit Text
 	switch(current) {
 		
 		case 'page-aproject': previous = 'Referenzen'; break;
@@ -342,12 +344,15 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	}
 	if (current == "page-start") {
 		$("#headbackbutton").css ({'display':'none'});
-		$("#header").css({"background-image":"url(res/kwd3-titel.jpg)"});	
+		$("#logo").css({"background-image":"url(res/kwd-4-title.png)"});
+		$("#page-title").text("");	
 	} 
 	else {
 		$("#headbackbutton").css( { 'display':'block'});
-		$("#headbackbutton").html(previous);
-		$("#header").css({"background-image":"none"});
+		//$("#headbackbutton").html(previous);
+		$("#logo").css({"background-image":"none"});
+		if (current=="page-info") $("#page-title").text("Infos & Kontakt");
+		if (current=="page-einstellungen") $("#page-title").text("Einstellungen");	
 	}
 	if(current!="page-tacho") {
 		onTachoHide();
