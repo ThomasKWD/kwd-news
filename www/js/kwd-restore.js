@@ -49,3 +49,21 @@ function kwd_readNews() {
 	if (kwd_news==null) return false;
 	else return true;
 }
+
+function kwd_readOffers() {
+	
+	strread = localStorage.getItem(kwd_storage_offers);
+	if (strread==null) {
+		kwd_log('konnte offers nicht laden');
+		kwd_offers = null;
+	}
+	else {
+		kwd_offers = JSON.parse(strread);
+		//kwd_log('Offers geladen');
+		kwd_log(kwd_offers);
+		kwd_log("Anzahl Offers: "+kwd_offers.length);
+	}
+	
+	if (kwd_offers==null) return false;
+	else return true;
+}

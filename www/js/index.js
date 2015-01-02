@@ -56,6 +56,7 @@
 // Globale Datenstrukturen für Inhalte ---------------------------------------
 var kwd_projects = null;
 var kwd_news = null;
+var kwd_offers = null;
 
 
 
@@ -143,7 +144,8 @@ function onDeviceReady() {
 	$('#doUpdate').click(function(){
 		//TODO: alle Updates hier!
 		kwd_DownloadProjects();
-		kwd_DownloadNews();        		
+		kwd_DownloadNews();
+		kwd_DownloadOffers();        		
 	});
 	$('#doQuit').click(function(){
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
@@ -155,11 +157,6 @@ function onDeviceReady() {
 	});
 	$('#doTest2').click(function(){
 		showLinks();           				
-	});
-	$('#doTest3').click(function(){
-		kwd_log('clicked test3');
-		$('#device-info').load('page1.html');
-				           				
 	});
 	$('#data-rel-forward').click(function(){
 		window.history.go(1); // try to go forward history				           				
@@ -247,7 +244,8 @@ function onDeviceReady() {
 
 	appRootPath = kwd_getFilePath(); // Pfad in local storage?, nein= leerstring // eigentlich benötigt man Variable nicht oder nur lokal, wenn sowieso immer auf localStorage gearbeitet wird! 
 	kwd_DownloadProjects();//TODO: allgemeine Funktion mit Parameter
-	kwd_DownloadNews();	
+	kwd_DownloadNews();
+	kwd_DownloadOffers();
 		
 	// show
 	

@@ -36,6 +36,7 @@
         <script type="text/javascript" src="js/kwd-restore.js"></script>
         <script type="text/javascript" src="js/page3.js"></script>
         <script type="text/javascript" src="js/page21.js"></script>
+        <script type="text/javascript" src="js/page4.js"></script>
 <script type="text/javascript" src="js/tacho.js"></script>
  
     </head>
@@ -142,7 +143,6 @@
 				<div id="news-info"></div>
 				
 				<a id="news-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
-				<a id="news-copy" href="#" class="ui-btn ui-corner-all ui-icon-clipboard ui-btn-icon-left">Adresse kopieren</a>
 				<a id="news-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
 				
 			
@@ -179,10 +179,10 @@
 				<h2>Überschrift!!</h2>
 				<div id="project-info"></div>
 				
-				<a id="project-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
-				<a id="project-copy" href="#" class="ui-btn ui-corner-all ui-icon-clipboard ui-btn-icon-left">Adresse kopieren</a>
-				<a id="project-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
-				
+				<div data-role="controlgroup"> 
+					<a id="project-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
+					<a id="project-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
+				</div>
 			
            </div> 
 		</div>
@@ -217,6 +217,12 @@
 				
 				<h2>Überschrift!!</h2>
 				
+				<div id="offer-info"></div>
+
+				<div data-role="controlgroup"> 
+					<a id="offer-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Im Web...</a>
+					<a id="offer-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
+				</div>
 			
            </div> 
 		</div><!-- an offer -->
@@ -249,27 +255,33 @@
 					<!--z.Z. in start <p id="p-debug"></p>-->
 					<p>Platform: <span id="info-platform"></span><br />
 					System: <span id="info-os"></span><br />
-					Build (intern): 1.0.11<br />
+					Build (intern): 1.0.12<br />
 					Netzverbindung: <span id="online-status" class="wichtig">keine</span>.</p>
 				</div>
 				
 				<div data-role="collapsible" class="debug">
 					<h4>TODO:</h4>
 					<ul>
-					<li>erzeuge bei bilddownload Bild-Url-Liste, die in localstorage gespeichert wird. beim nächsten update der Textdaten wird sie mit gelieferter Bildliste verglichen, und nur fehlende Bilder nachgeladen.
-						 </li>
-						
+						<li>Bug?: Auto-Update zumindest im Browser läuft nicht --> es müsste wenigstens korrekte Meldung erscheinen statt einfrieren bzw. falscher Anzeige!!</li>
+						<li>der jetzige CSS-background-Autozoom des Titels ist inakzeptabel, der Schriftzug wird fest, ohne Sommerfeld (höchstens mit Wolken) dargestellt,
+							eine Verkleinerung bei sehr schmalen Displays (jquery width bei onResize oder beim Start abfragen) evtl. denkbar</li>
+						<li>Kopfbereich mit Hintergrundfarbe!</li>
+						<li>02.01.15 was passiert in Texten mit Links und anderen Tags im App-Content (verlinken in den Browser oder Link tag löschen?, falls verlinken, müsste funktionsfähigkeit des Links geprüft werden)
+						außerdem wird bei Begriffen verlinken <i>innerhalb</i> der App erwartet. Diese Links deaktivieren? oder mit page-load und richtiger kwd_current_* anzeigen?							
+						 
+</li>
+						<li>02.01.15 Problem: ###teaser## sind bei get appdata schon weg (verarbeitet), deshalb kann auch nicht ###app### ohne weiteres implementiert werden
+							</li>
+						<li></li>
 						<li>wenn error bei update, dann setTimeout ca. 1min für nächsten Versuch
 						 </li>
-						<li>alle testausgaben und Funktionen abschaltbar (Variablen)
-						</li>
-						<li>unschöner Bildaufbau bei Seitenwechsel</li>
-						<li>Bilder lokal speichern.</li>
 						<li>anhand von updatedate veraltete Inhalte erkennen.</li>
 						<li>alle transform Anweisungen,  nicht nur webkit-transform</li>
 						<li>teste header als persistent toolbar</li>
 						<li></li>
+						<li></li>
 						<li>Eigene Version anzeigen (aus config.xml)</li>
+						
 					</ul>
 
 				</div>

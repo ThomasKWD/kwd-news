@@ -19,6 +19,7 @@
  */
 const kwd_storage_projects = 'projects';
 const kwd_storage_news = 'news';
+const kwd_storage_offers = 'offers';
 const kwd_storage_path = 'path';
 
 /*
@@ -66,6 +67,20 @@ function getResponseNews(response) {
 	}
 	else {
 		kwd_log('News Aktualisierung fehlgeschlagen.');				
+	}
+}
+
+function getResponseOffers(response) {
+	
+	if(response) {		
+		
+		kwd_log("folgend die Angebote:");
+		kwd_log(response);
+		var strdata = JSON.stringify(response); 
+		localStorage.setItem(kwd_storage_offers, strdata);
+	}
+	else {
+		kwd_log('Angebote Aktualisierung fehlgeschlagen.');				
 	}
 }
 
@@ -146,13 +161,35 @@ function kwd_DownloadNews (argument) {
 	
 }
 
+function kwd_DownloadOffers (argument) {
+	
+	$(document).ajaxError(function(event, request, settings){
+   		alert("<li>Error requesting page " + settings.url + "</li>");
+ 	});
+ 
+    $.ajax({
+      dataType: 'jsonp',
+      jsonp: 'jsonp_callback',
+      //url: 'http://www.kuehne-webseiten.de/index.php?article_id=25',
+      //url: 'http://www.kuehne-webseiten.de/index.php?article_id=25',
+      //url : 'http://localhost/tk/kwd-redaxo-46/index.php?article_id=45',
+      url : 'http://www.kuehne-webseiten.de/index.php?article_id=45',
+      timeout: 10000
+      
+    }).error(function(){
+		//$('#load-result').html("");
+		kwd_log("update OFFERS error");		
+	}).complete(function(){
+		//console.log('update fertig');
+		//$('#load-result').html('fertig');
+	}).success(getResponseOffers);
+	
+}
 
 /*
  * prüft und setzt den Pfad für eine spezielle Ausgabe (bestimmt durch Parameter type)
  * - wenn Parameter leer, wird nur der "appRootPath" zurückgegeben (falls erhältlich).
  * - bei fehlenden Daten oder Fehler wird Leerstring zurückgegeben
- * 
- * TODO: Funktion nach kwd-storage.js
  */
 function kwd_getFilePath(type) {
 	

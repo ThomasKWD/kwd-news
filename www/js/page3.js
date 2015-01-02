@@ -20,7 +20,7 @@ function kwd_projects2list() {
 		$('#box-projects-info').css({'display':'none'});		
 		
 		var html = "";
-		html += "<ul id=list1 data-role=listview>";
+		html += "<ul id=list1 data-role=listview data-inset=true>";
 
 		var curimg = '';
 		var i=0;

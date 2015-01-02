@@ -1,5 +1,5 @@
 /*
- * speichern der Projektdaten (inklusive Bilder!) als Datei oder in DB
+ * speichern der Bilder der Projekte als Datei
  * 
  * direkt als FileTransfer.download siehe cordova Doc. - Nachteil: schlecht in anderen Browsern zu testen.
  * als "duales System" könnte man die bereits bestehenden Projekte im phonegap Projekt

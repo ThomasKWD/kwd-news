@@ -20,7 +20,7 @@ function kwd_news2list() {
 		$('#box-news-info').css({'display':'none'});		
 		
 		var html = "";
-		html += "<ul id=list2 data-role=listview>";
+		html += "<ul id=list2 data-role=listview data-inset=true>";
 
 		var curimg;
 		var i=0;
@@ -65,7 +65,7 @@ function kwd_news2list() {
 		// vorbereitetes Hinweisfenster sichtbar machen
 		// Text
 		$('#news-warning').html('Keine Daten für Anzeige vorhanden');
-		if (!kwd_update) $('#news-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
+		if (!kwd_update) $('#news-warning').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
 		$('#news-warning').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-news-info').css({'display':'block'});
