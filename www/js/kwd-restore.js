@@ -18,14 +18,14 @@ function kwd_readProjects() {
 	
 	strread = localStorage.getItem(kwd_storage_projects);
 	if (strread==null) {
-		kwd_log('konnte Projekte nicht laden');
+		kwd_log('keine Projekte in Cache');
 		kwd_projects = null;
 	}
 	else {
 		kwd_projects = JSON.parse(strread);
 		//kwd_log('Projekte geladen');
-		kwd_log(kwd_projects);
-		kwd_log("Anzahl Projects: "+kwd_projects.length);
+		//kwd_log(kwd_projects);
+		//kwd_log("Anzahl Projects: "+kwd_projects.length);
 	}
 	
 	if (kwd_projects==null) return false;
@@ -42,8 +42,8 @@ function kwd_readNews() {
 	else {
 		kwd_news = JSON.parse(strread);
 		//kwd_log('News geladen');
-		kwd_log(kwd_news);
-		kwd_log("Anzahl news: "+kwd_news.length);
+		//kwd_log(kwd_news);
+		//kwd_log("Anzahl news: "+kwd_news.length);
 	}
 	
 	if (kwd_news==null) return false;
@@ -60,8 +60,8 @@ function kwd_readOffers() {
 	else {
 		kwd_offers = JSON.parse(strread);
 		//kwd_log('Offers geladen');
-		kwd_log(kwd_offers);
-		kwd_log("Anzahl Offers: "+kwd_offers.length);
+		//kwd_log(kwd_offers);
+		//kwd_log("Anzahl Offers: "+kwd_offers.length);
 	}
 	
 	if (kwd_offers==null) return false;

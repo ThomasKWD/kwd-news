@@ -53,11 +53,6 @@
     }
 };
 */
-// Globale Datenstrukturen für Inhalte ---------------------------------------
-var kwd_projects = null;
-var kwd_news = null;
-var kwd_offers = null;
-
 
 
 /*
@@ -65,9 +60,9 @@ var kwd_offers = null;
  */
 $(document).ready(function() {
 	
-	kwd_debugscreen=true;// mache doch einen Schalter :-)
+	kwd_debugscreen=true;// TODO: mache doch einen Schalter :-)
 	
-	kwd_log ('KWD: document ready.');
+	//kwd_log ('KWD: document ready.');
     // are we running in native app or in a browser?
     // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
     window.isDevice = false; 
@@ -84,7 +79,7 @@ $(document).ready(function() {
         document.addEventListener("deviceready", onDeviceReady, false); 
         kwd_log('app:added listener');
     } else {
-    	kwd_log('Wird als Browser erkannt');
+    	kwd_log('Achtung!: im BROWSER-Modus zur Zeit alle Daten-Requests an *localhost*');
         onDeviceReady();
     }
 });
@@ -226,6 +221,7 @@ function onDeviceReady() {
 	$('#news-share').click(function() {
 		if (kwd_news) {
 			if (kwd_current_news > -1) {
+				//TODO: prüfen ob url gesetzt, nur wenn nicht dann id nehmen (dies am besten in function, da min. 4 mal gebraucht)
 				var u = 'http://www.kuehne-webdienste.de/index.php?article_id='+kwd_news[kwd_current_news]['article_id'];
 				var name = kwd_news[kwd_current_news]['name'];
 				if (!name) name= '';
@@ -333,7 +329,7 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 	var previous = '';
 	var title ='';
 	// da statisch hier switch (einfacher anscheinend als jquery die Daten zu entlocken)
-	// z.Z. ungenutzt, da kein Back-Button mit Text
+	// z.Z. previous ungenutzt, da kein Back-Button mit Text
 	switch(current) {
 		
 		case 'page-aproject': previous = 'Referenzen'; break;

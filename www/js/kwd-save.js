@@ -3,8 +3,8 @@
  * 
  * direkt als FileTransfer.download siehe cordova Doc. - Nachteil: schlecht in anderen Browsern zu testen.
  * als "duales System" könnte man die bereits bestehenden Projekte im phonegap Projekt
- * als Ressource hinterlegen, so dass nur neue und Änderungen nachgeladen werden.
- * 
+ * als Ressource hinterlegen, so dass nur neue und Änderungen nachgeladen werden. Dann wären Abfragen eines Bildes/Datei
+ * also 3-stufig: im Cache?, als Ressource?, direkt aus dem Web als URI
  * 
  */
 
@@ -128,6 +128,7 @@ function _downloadNextFile() {
 	downloadFileCounter--;
 	if (downloadFileCounter<0) return false;
 	// filename ok bzw. vorhanden? //
+	// TODO: so nicht lauffähig, da imgsrc ,-getrennte Liste sein kann
 	filename = kwd_projects[downloadFileCounter]['imgsrc'];
 	// theoretisch kann imgsrc fehlen, aber im nächsten Entry vorhanden sein!!!, deshalb Aufruf, wenn nicht da
 	if (!filename) {
@@ -162,6 +163,8 @@ function _downloadNextFile() {
 // TODO: nicht nur Projektbilder! -->
 function downloadImages() {
 
+	kwd_getNewFileList(); // TODO: besser Objekt!
+	
 	if(appRootPath) {
 		// direkter Downloadinit
 		downloadFileCounter = -1;

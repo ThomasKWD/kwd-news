@@ -4,6 +4,7 @@
  * Dieses Script kapselt alle Debug Ausgaben und weiteren Funktionen, damit sie umgeleitet oder deaktiviert werden können.
  * Es ist kein Objekt sondern nur eine Sammlung von Funktionen (Klasse geplant!)
  * 
+ * Außerdem wird die Unterscheidung zwischen Browser-Ansicht und App-Ansicht verwaltet. (siehe auch onDeviceReady )
  * TODO: html mit css debug/develope durch js aus/einblenden
 
 """###
@@ -25,3 +26,4 @@ function kwd_log(object) {
 		}
 	}
 }
+

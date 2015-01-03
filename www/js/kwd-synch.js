@@ -14,21 +14,6 @@
 */
 
 /*
- * Konstanten für local-storage
- * der Einfachheit halber global
- */
-const kwd_storage_projects = 'projects';
-const kwd_storage_news = 'news';
-const kwd_storage_offers = 'offers';
-const kwd_storage_path = 'path';
-
-/*
- * globale Schalter
- * 
- */
-kwd_update=true;
-
-/*
  * Funktionen
  */
 function ajax_success(data, textStatus, jqXHR ) {
@@ -107,12 +92,13 @@ function kwd_DownloadProjects (argument) {
 	// http://remysharp.com/visual-jquery/
 	// for phonegap:
 	// http://samcroft.co.uk/2012/my-article-for-adobes-appliness-magazine-data-in-phonegap-apps/
+
     $.ajax({
       dataType: 'jsonp',
       jsonp: 'jsonp_callback',
       //url: 'http://localhost/tk/kwd-news-data/jsonp.php',
       //url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
-      url: 'http://www.kuehne-webseiten.de/index.php?article_id=10',
+      url: kwd_getUrlFromId(10),
       timeout: 10000
       
     }).error(function(){
@@ -190,6 +176,9 @@ function kwd_DownloadOffers (argument) {
  * prüft und setzt den Pfad für eine spezielle Ausgabe (bestimmt durch Parameter type)
  * - wenn Parameter leer, wird nur der "appRootPath" zurückgegeben (falls erhältlich).
  * - bei fehlenden Daten oder Fehler wird Leerstring zurückgegeben
+ *
+ * - falls Datei im Cache verfügbar, wird der lokale Pfad des Device zurückgegeben TODO: wie werden einzelne Dateien geprüft??? 
+ * - es wird sonst ein gültiger URI im Web zurückgegeben (Datei wird also direkt vom Web geladen)
  */
 function kwd_getFilePath(type) {
 	
