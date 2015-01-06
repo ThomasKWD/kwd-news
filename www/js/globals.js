@@ -47,14 +47,79 @@ kapselt, alles was bisher "herumschwirrte",
  sollte
 
 */
-var function KwdApp {
+function KwdApp()	 {
+	
+	// public properties
+	this.cache = new CachedWebContent({ 
+		remote : 'http://www.kuehne-webseiten.de/index.php?article_id=',
+		local : 'http://localhost/tk/kwd-redaxo-46/index.php?article_id='
+	 });
+	
+	//construct code
+	kwd_log('starting oop test');
+
+	// public methods
+	this.testIt = function(key) {
+		
+		// ugly code just for test
+		kwd_readProjects();
+		if (kwd_readProjects===null) {
+			kwd_log('no test data');
+			return null;
+		}
+		else return new KwdIterator(kwd_projects,key);			
+	};
 }
 
 /*
-da nicht ECMA6 überall vorausgesetzt werden kann,
+da nicht ECMA 6 überall vorausgesetzt werden kann,
 eigenes Iterator-Konzept.
+
+Zunächst nur für mehrdimensionale Arrays konzipiert.
 */
-var KwdIterator {
+function KwdIterator(source, key) {
+	// public properties
+
+	// private properties
+	var length;
+	// enthält Schlüsselwort um zu spezifizieren, was aus den Daten gewünscht ist
+	//(sozusagen Erwaiterung des Iterator-Konzepts)
+	var sourcekey; 
+	var data;
+	var i = 0;
+	
+	//kwd_log('iterator instance');
+	sourcekey = key;
+	data = source;
+	length = source.length;
+
+	// public methods
+	this.next = function() {
+		var entry;
+		// Liefere nächstes Element
+		// doppelte Sicherheit i<length?
+		if(i<length) {
+			if (key!='') entry = data[i][key];
+			else entry = data[i];
+			i++;
+			return entry;
+		}
+		else return null;
+	}
+	this.hasNext = function() {
+		//kwd_log('length:'+length);
+		if (i<length) return true;
+		else return false;
+	};
+	// aus Performance-Gründen kann man mit dem gleichen Objekt von vorn beginnen
+	// obwohl es aus 
+	this.rewind = function() {
+		i = 0;
+	};
+	//helper(mostly for debug)
+	this.getKey = function() {
+		return sourcekey;
+	};
 }
 
 /*
@@ -62,8 +127,11 @@ Iterator mit Features
 key: definiert einen Filter (entspricht array key von JSON-Daten von web, 
 mehrere keys oder Ausdrücke geplant
 */
-var KwdSelector {
+/*
+ *
+ * function KwdSelector() {
 }
+*/
 
 /*
 im folgenden werden die Vererbungshierarchien festgelegt

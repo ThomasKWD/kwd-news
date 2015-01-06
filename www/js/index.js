@@ -251,10 +251,20 @@ function onDeviceReady() {
 	kwd_DownloadNews();
 	kwd_DownloadOffers();
 		
-	// show
+	// TEST OOP 
+	
+	app = new KwdApp();
+	it = app.testIt('name');
+	kwd_log('check key:'+it.getKey());
+	while(it.hasNext()) {
+		kwd_log('next entry: '+it.next());
+	}
+	
+	// SHOW
 	
 	if (window.isDevice) {
 		// TODO: vielleicht sogar erst nach erstem 'pageonshow' event
+		// TODO: oder mit timeout;
         navigator.splashscreen.hide();		
 	} 
 }
