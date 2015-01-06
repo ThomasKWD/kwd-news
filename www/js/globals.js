@@ -39,3 +39,32 @@ const kwd_storage_thumbs = 'thumbs';       // Liste alternativer Dateien (Vorsch
  */
 kwd_update=true;
 
+/*
+Entwurf eines kwd Object, das globale Strukturen
+kapselt, alles was bisher "herumschwirrte",
+
+ sogar debug, obwohl dies eigenständiges Object sein
+ sollte
+
+*/
+var function KwdApp {
+}
+
+/*
+da nicht ECMA6 überall vorausgesetzt werden kann,
+eigenes Iterator-Konzept.
+*/
+var KwdIterator {
+}
+
+/*
+Iterator mit Features
+key: definiert einen Filter (entspricht array key von JSON-Daten von web, 
+mehrere keys oder Ausdrücke geplant
+*/
+var KwdSelector {
+}
+
+/*
+im folgenden werden die Vererbungshierarchien festgelegt
+*/

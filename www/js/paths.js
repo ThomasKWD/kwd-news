@@ -38,6 +38,8 @@ function getRawListItems(sourcelist,entryname) {
 
 	var list = [];
 	
+	// TODO: for mit i verwenden da for in nicht die 
+	// richtige Reihenfolge garantiert
 	for(var i in sourcelist) {
 		curimg=sourcelist[i][entryname]; // Teste das!!!!
 		kwd_log("curimg:"+curimg);
@@ -67,6 +69,8 @@ function kwd_getNewFileList() {
 	
 	kwd_log("folgend entry Test:");
 	
+	// TODO: for mit i verwenden da for in nicht die
+ 	// richtige Reihenfolge garantiert
 	for(var i in kwd_projects) {
 		// warum entry-Deref Problem???
 		curimg=kwd_projects[i].imgsrc;

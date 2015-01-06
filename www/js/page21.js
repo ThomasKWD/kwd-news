@@ -24,6 +24,8 @@ function kwd_news2list() {
 
 		var curimg;
 		var i=0;
+		// TODO: for mit i verwenden da for in nicht die 
+		// richtige Reihenfolge garantiert
 		for(var entry in kwd_news) {
 			
 			curimg='';

@@ -1,4 +1,9 @@
 /*
+alle Deviceready Funktionen
+und Event Handler
+
+für Code-Fragmente aus dem Phonegap-Example gilt:
+
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
  * distributed with this work for additional information
@@ -22,6 +27,9 @@
  * 
  * interessante Struktur aber unnötig für diesen einfachen Fall
  * zumal lieber der Listener in document ready einfgefügt wird. 
+ 
+ Stattdessen ist es Vorlage für das geplante kwd-Object
+ "KwdApp"
  */
 /*
  var app = {
