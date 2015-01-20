@@ -15,7 +15,7 @@ function kwd_getUrlFromId (id) {
 	
 	var url = '';
 	
-	if(window.isDevice) {
+	if(app && app.isDevice) {
 		
 		url = 'http://www.kuehne-webseiten.de/index.php?article_id='+id;
 		

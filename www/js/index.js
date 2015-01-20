@@ -20,6 +20,8 @@ für Code-Fragmente aus dem Phonegap-Example gilt:
  * KIND, either express or implied.  See the License for the
  * specific language governing permissions and limitations
  * under the License.
+
+		***
  */
 
 /* ich nehme an, dass das Verwenden der Klasse app dazu dient,
@@ -30,37 +32,10 @@ für Code-Fragmente aus dem Phonegap-Example gilt:
  
  Stattdessen ist es Vorlage für das geplante kwd-Object
  "KwdApp"
+ 
+ Features
+ - code to make it run under DroidScript
  */
-/*
- var app = {
-    initialize: function() {
-        this.bind();
-    },
-    bind: function() {
-        document.addEventListener('deviceready', this.deviceready, false);
-        kwd_log('app:added listener');
-    },
-    deviceready: function() {
-        // This is an event handler function, which means the scope is the event.
-        // So, we must explicitly called `app.report()` instead of `this.report()`.
-        app.report('deviceready');
-        kwd_log('Verdammt. Ich bin drin!');
-        navigator.splashscreen.hide();
- 		onDeviceReady();        
-    },
-    report: function(id) {
-        // Report the event in the console
-        kwd_log("Report: " + id);
-
-        // Toggle the state from "pending" to "complete" for the reported ID.
-        // Accomplished by adding .hide to the pending element and removing
-        // .hide from the complete element.
-        //document.querySelector('#' + id + ' .pending').className += ' hide';
-        //var completeElem = document.querySelector('#' + id + ' .complete');
-        //completeElem.className = completeElem.className.split('hide').join('');
-    }
-};
-*/
 
 
 /*
@@ -69,25 +44,16 @@ für Code-Fragmente aus dem Phonegap-Example gilt:
 $(document).ready(function() {
 	
 	kwd_debugscreen=true;// TODO: mache doch einen Schalter :-)
-	
-	//kwd_log ('KWD: document ready.');
-    // are we running in native app or in a browser?
-    // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
-    window.isDevice = false; 
-    
-    if(document.URL.indexOf("http://") == -1 
-        && document.URL.indexOf("https://") == -1
-        && document.URL.indexOf("/kwd-news/") == -1)
- {
-        window.isDevice = true;
-    }
+		
+	app = new KwdApp(); // wird hier schon gebraucht
 
-    if( window.isDevice ) {
+    if( app.isDevice ) {
     	kwd_log('Wird als Device erkannt.');
         document.addEventListener("deviceready", onDeviceReady, false); 
         kwd_log('app:added listener');
     } else {
     	kwd_log('Achtung!: im BROWSER-Modus zur Zeit alle Daten-Requests an *localhost*');
+    	// TODO: localhost sollte nicht verwendet werden, wenn isDroidscript 
         onDeviceReady();
     }
 });
@@ -101,11 +67,14 @@ function onDeviceReady() {
  		$('.develope').css( {'display':'none'});
  	}
     kwd_log('onDeviceReady');
+    if(window.isDroidscript==true) {
+    	kwd_log("isDroidScript enabled.");
+    }
     //kwd_log (document.URL);
     
     // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
 
-	if(window.isDevice) {
+	if(app.isDevice) {
 		$('#info-platform').html(device.platform);
 		$('#info-os').html(device.version);		
 	}
@@ -126,7 +95,7 @@ function onDeviceReady() {
     // EVENT LISTENER ------------------------------------------------------------
     
 	// geht nicht auf ios (muss ich es extra abfragen oder wird es dort automatisch ignoriert??
-	if (window.isDevice) {
+	if (app.isDevice) {
 				
 		document.addEventListener("menubutton", onMenuButtonTouch, false);
 		document.addEventListener("backbutton", onBackButtonTouch, false);
@@ -154,7 +123,6 @@ function onDeviceReady() {
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
 	});	
 	$('#doSave').click(function(){
-		//saveProjects();
 		downloadImages(); // TODO: wann automatisch??
 		// z.B. kwd_downloadFiles(kwd_storage_projects);
 	});
@@ -252,17 +220,15 @@ function onDeviceReady() {
 	kwd_DownloadOffers();
 		
 	// TEST OOP 
-	
-	app = new KwdApp();
-	it = app.testIt('name');
-	kwd_log('check key:'+it.getKey());
-	while(it.hasNext()) {
-		kwd_log('next entry: '+it.next());
-	}
+	//it = app.getSourceList('thumbsrc');
+	//kwd_log('check key:'+it.getKey());
+	//while(it.hasNext()) {
+		//kwd_log('next entry: '+it.next());
+	//}
 	
 	// SHOW
 	
-	if (window.isDevice) {
+	if (app.isDevice) {
 		// TODO: vielleicht sogar erst nach erstem 'pageonshow' event
 		// TODO: oder mit timeout;
         navigator.splashscreen.hide();		
@@ -281,7 +247,7 @@ function performBackAction() {
 	var current = $( ":mobile-pagecontainer" ).pagecontainer('getActivePage').attr('id');
 	
 	// TODO: is platform name consistent??? lieber teilstring suchen
-	if (current=="page-start" && window.isDevice) {
+	if (current=="page-start" && app.isDevice) {
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
 	}
 	else {

@@ -1,3 +1,5 @@
+// globales Objekt
+// app = null;
 // Globale Datenstrukturen für Inhalte ---------------------------------------
 var kwd_projects = null;
 var kwd_news = null;
@@ -46,29 +48,131 @@ kapselt, alles was bisher "herumschwirrte",
  sogar debug, obwohl dies eigenständiges Object sein
  sollte
 
+geplant:
+- Basis-Objekt mit abgeleiteten Spezialversionen für Phonegap | Droidscript
+- layout independent so that it can be used eg.in DroidScript without webview
+
+
 */
 function KwdApp()	 {
+
+	// private members:
+	var remoteBase = "";
+	var localBase = ""; 
+
 	
 	// public properties
-	this.cache = new CachedWebContent({ 
-		remote : 'http://www.kuehne-webseiten.de/index.php?article_id=',
-		local : 'http://localhost/tk/kwd-redaxo-46/index.php?article_id='
-	 });
+	this.isDevice = false;
+	this.isDroidscript = false;
 	
+  	// for compatibility
+  	// "private method"
+  	function logthis(element) {
+  		kwd_log(element);
+  	};
+
 	//construct code
-	kwd_log('starting oop test');
+	// TODO: check whether one of the included frameworks has a var "app"!!!!!
+	
+    // are we running in native app or in a browser?
+    // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
+    // app.isDevice = false; preset inside object!    
+    if(document.URL.indexOf("droidscript") != -1) {
+    	this.isDroidscript = true;
+    }
+    else if(document.URL.indexOf("http://") == -1 
+        && document.URL.indexOf("https://") == -1
+        && document.URL.indexOf("/kwd-news/") == -1 //for local test    
+	) {
+		this.isDevice = true;
+    }
+
+	// set paths if possible
+	remoteBase = "http://www.kuehne-webdienste.de/";
+	// try to get from localStorage for all environments
+	var p = localStorage.getItem(kwd_storage_path);
+	if(p!=null) localBase = p; // p can still be empty
+	
+	if(this.isDevice) {
+	}
+	else if (this.isDroidscript) {
+		// code in download Test
+	}
+	else {
+		remoteBase = "http://localhost/tk/kwd-redaxo-46/";
+	}
+	
+	// more public members:
+	this.projects = new CachedWebContent({ // TODO: use set-functions of base paths
+		remote : remoteBase,
+		local : localBase,
+		key : kwd_storage_projects
+	});
+	this.news = new CachedWebContent({
+		remote : remoteBase,
+		local : localBase,
+		key : kwd_storage_news
+	});
+	this.offers = new CachedWebContent({
+		remote : remoteBase,
+		local : localBase,
+		key : kwd_storage_offers
+	});
+	
+
 
 	// public methods
-	this.testIt = function(key) {
+	
+	/*
+	 * setter for local path
+	 */
+	this.setRootPath = function(path) {
+		if(path.indexOf('/') != path.length-1) localBase = path + '/';
+		else localBase = path;
+	};
+	
+	/*
+	 * datasource: "projects"|"news"|"offers", if empty, you should return data of all the lists
+	 */
+	this.getSourceList = function(key,datasource) {
 		
 		// ugly code just for test
 		kwd_readProjects();
 		if (kwd_readProjects===null) {
-			kwd_log('no test data');
+			logthis('no test data');
 			return null;
 		}
-		else return new KwdIterator(kwd_projects,key);			
+		else return new KwdIterator(kwd_projects,key,"split");			
 	};
+	
+	/*
+	 * returns base path for data from web 
+	 * TODO: must receive the 'imgsrc' names including the "files/" --> change in kwd-redaxo project 
+	 */
+	this.getSourceBase = function() {
+		return remoteBase;
+	};
+	
+	/*
+	 * returns the save path for local files of the app
+	 * -checks for environment (phonegap|droidscript) 
+	 */
+	this.getRootPath = function() {
+		
+		if(!this.isDevice && !this.isDroidscript) {
+			logthis("getAppRootPath not available");
+		}
+		return localBase;
+	};
+	
+	/*
+	 * returns URL from id
+	 * - result depends on the base path set
+	 */
+	this.getUrlFromId = function(id) {	
+		return remoteBase + 'index.php?article_id='+id;
+	};
+
 }
 
 /*
@@ -77,35 +181,55 @@ eigenes Iterator-Konzept.
 
 Zunächst nur für mehrdimensionale Arrays konzipiert.
 */
-function KwdIterator(source, key) {
+function KwdIterator(source, key, options) {
 	// public properties
 
 	// private properties
 	var length;
 	// enthält Schlüsselwort um zu spezifizieren, was aus den Daten gewünscht ist
 	//(sozusagen Erwaiterung des Iterator-Konzepts)
-	var sourcekey; 
+	var sourcekey = ""; 
 	var data;
+	var splitentries = false;
 	var i = 0;
-	
+	var j = 0; // for split values in data entry
 	//kwd_log('iterator instance');
 	sourcekey = key;
 	data = source;
 	length = source.length;
-
+	
+	// split entries?
+	if(options && options=="split") {
+		splitentries = true;
+	}
+	
 	// public methods
 	this.next = function() {
 		var entry;
+		var parts;
+		var ret;
+		
 		// Liefere nächstes Element
 		// doppelte Sicherheit i<length?
 		if(i<length) {
-			if (key!='') entry = data[i][key];
+			if (sourcekey!="") entry = data[i][sourcekey];
 			else entry = data[i];
+			if(splitentries && entry.indexOf(',')!=-1) {
+				parts=entry.split(',');
+				if(j>=parts.length) {
+					// you must get a next entry here
+					i++;
+					if (sourcekey!="") entry = data[i][sourcekey];
+					else entry = data[i];					
+				}
+				else return parts[j++];
+			}
+			j=0;
 			i++;
-			return entry;
+			return entry;			
 		}
 		else return null;
-	}
+	};
 	this.hasNext = function() {
 		//kwd_log('length:'+length);
 		if (i<length) return true;
@@ -122,16 +246,6 @@ function KwdIterator(source, key) {
 	};
 }
 
-/*
-Iterator mit Features
-key: definiert einen Filter (entspricht array key von JSON-Daten von web, 
-mehrere keys oder Ausdrücke geplant
-*/
-/*
- *
- * function KwdSelector() {
-}
-*/
 
 /*
 im folgenden werden die Vererbungshierarchien festgelegt

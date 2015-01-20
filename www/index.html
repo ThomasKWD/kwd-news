@@ -1,5 +1,7 @@
 <!DOCTYPE html>
 <!--
+	the following is true to code fragments taken from the phonegap demo app:
+	
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
     distributed with this work for additional information
@@ -16,6 +18,9 @@
      KIND, either express or implied.  See the License for the
     specific language governing permissions and limitations
     under the License.
+    
+    ***
+    
 -->
 <html>
     <head>
@@ -40,8 +45,13 @@
         <script type="text/javascript" src="js/page3.js"></script>
         <script type="text/javascript" src="js/page21.js"></script>
         <script type="text/javascript" src="js/page4.js"></script>
-<script type="text/javascript" src="js/tacho.js"></script>
- 
+		<script type="text/javascript" src="js/tacho.js"></script>
+		<!--DroidScript START-->
+    	<script type='application/javascript' src="/android_asset/app.js"></script>
+		<script type='application/javascript'>
+			document.lives_in_WebView = true; // TODO: use kwd-object var
+		</script>
+		<!--DroidScript END-->
     </head>
     <body>
 
@@ -365,5 +375,9 @@
 			</div>		              
 		</div><!--page Einstellungen-->
 
+		<!--DroidScript START-->
+	    <script type='application/javascript' src='../KWD-News.js'></script>
+		<!--DroidScript END-->
+	
     </body>
 </html>

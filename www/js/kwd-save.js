@@ -11,6 +11,7 @@
 // global ----------------
 var appRootPath = ''; // ist Objekt (???)
 var downloadFileCounter = -1; // 0 symbolisiert "fertig", während -1 "noch nicht angefangen" bedeutet
+var downloadIterator = null; // contains iterator object, should be reset to null when download is finished
 
 //  ---------------- check filesystem
 
@@ -72,50 +73,24 @@ function onFileSystemError(evt) {
 }
 
 
-// ------------------ read test file
-function saveProjects() {
-	
-	// das erstmal nach save
-	window.requestFileSystem  = window.requestFileSystem || window.webkitRequestFileSystem;
-	window.requestFileSystem(window.PERSISTENT,0, onFileSystemSuccess, onFileSystemError);
-	kwd_log('after window.requestFileSystem');
-
-	// !! Assumes filePath is a valid path on the device
-	var fileTransfer = new FileTransfer();
-	var uri = encodeURI('http://www.kuehne-webdienste.de/files/apn-shot.jpg');
-	
-	// TODO: in new phongegap you must use function to create url 
-	var filePath = '/mnt/sdcard'; // valid for most android
-	
-	fileTransfer.download(
-	    uri,
-	    filePath,
-	    function(entry) {
-	        kwd_log("download complete: " + entry.fullPath);
-	    },
-	    function(error) {
-	        kwd_log("download error source " + error.source);
-	        kwd_log("download error target " + error.target);
-	        kwd_log("download error code" + error.code);
-	    }
-	);
-	
-}
-
 // rekursiv
 // verwendet z.Z. hard codiert bestimmte verkleinerte Form der Bilder
 // (image name  + Code (redaxo) )
 // Achtung!: wegen Nutzung als Callback keine function Parameter möglich (nur für initialen Aufrud nutzbar!)
 // TODO: für mehrere Datensätze durch übergeben der JSON-Struktur (z. B. kwd_projects)
 // TODO: mehrere Bildformate durch setzen einer var (global) und jeweils separaten Durchlauf des Daten-Array
+// features:
+// - handles isDoridscript as well
 // return: true: download gestartet, false: konnte Download nicht starten
 function _downloadNextFile() {
 
 	// ist counter!=, eine Zahl und path und Daten vorhanden?
-	if (isNaN(downloadFileCounter) || !appRootPath || !kwd_projects) return false;
+	if ((downloadIterator===null) || !appRootPath || !kwd_projects) return false;
 	
 	// -1 bedeutet Init
-	if (downloadFileCounter==-1) {
+	/*
+	 * 
+	 if (downloadFileCounter==-1) {
 		// TODO: prüfe auf richtige Ermittlung
 		var n = kwd_projects.length;
 		if (!n) return false;
@@ -127,58 +102,81 @@ function _downloadNextFile() {
 	// downcount hier! // dadurch auto. counter auf n-1
 	downloadFileCounter--;
 	if (downloadFileCounter<0) return false;
-	// filename ok bzw. vorhanden? //
-	// TODO: so nicht lauffähig, da imgsrc ,-getrennte Liste sein kann
-	filename = kwd_projects[downloadFileCounter]['imgsrc'];
-	// theoretisch kann imgsrc fehlen, aber im nächsten Entry vorhanden sein!!!, deshalb Aufruf, wenn nicht da
+	*/
+	
+	//get antry from it or stop if no more
+	if(!downloadIterator.hasNext()) return false;
+	filename = downloadIterator.next();
+	//kwd_projects[downloadFileCounter]['imgsrc'];
+	
+	// theoretisch kann imgsrc fehlen oder leer sein, aber im nächsten Entry vorhanden sein!!!, deshalb Aufruf, wenn nicht da
 	if (!filename) {
 		_downloadNextFile();		
 	}
 	else {
 		
-	    var fileTransfer = new FileTransfer();
-	    
-	    // hart codierte URL- und File-Benennung!
-	    // es wird nur Original-Image gespeichert :-)
-	    fileTransfer.download(
-	        'http://www.kuehne-webdienste.de/files/'+filename,
-	        appRootPath + filename,
-	        function(file) { // success
-	        	_downloadNextFile(); 
-	        },
-	        function(error) {
-	            kwd_log('download error source ' + error.source);
-	            kwd_log('download error target ' + error.target);
-	            kwd_log('upload error code: ' + error.code);
-	        }
-	    );
+		if(app.isDevice) {
+		    var fileTransfer = new FileTransfer();
+		    
+		    // hart codierte URL- und File-Benennung!
+		    // es wird nur Original-Image gespeichert :-)
+		    fileTransfer.download(
+		    	
+		        app.GetSourceBase() + filename,
+		        appRootPath + filename,  // does not work with thumbs -- TODO: funktion von app, die Name bereinigt!!!
+		        function(file) { // success
+		        	_downloadNextFile(); 
+		        },
+		        function(error) {
+		            kwd_log('download error source ' + error.source);
+		            kwd_log('download error target ' + error.target);
+		            kwd_log('upload error code: ' + error.code);
+		        }
+		    );	
+		}
+		else if(app.isDroidscript) { // double check --> so do nothing in browser mode
+			kwd_log("TODO: perform download this file: "+filename);
+		}
 	}
     
     return true;	
 }
 
+function startDownloadImages() {
+	kwd_getNewFileList(); // TODO: besser Objekt!
+	// direkter Downloadinit
+	downloadFileCounter = -1;
+	downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
+	_downloadNextFile();	
+}
 
 // prüft ob Pfad erzeugt werden muss
 // wenn Pfad in local storage, wird dieser als valid angesehen und kein requestfilesystem+dummy-file benötigt
 // TODO: nicht nur Projektbilder! -->
+// TODO: Abfrage ob LocalFileSystem etc. vorhanden, ansonsten ggf. Emulation
+// TODO: allgemeine Funktion im Daten-transfer oder app Objekt
 function downloadImages() {
 
-	kwd_getNewFileList(); // TODO: besser Objekt!
-	
-	if(appRootPath) {
-		// direkter Downloadinit
-		downloadFileCounter = -1;
-		_downloadNextFile(); // TODO: für mehrere Datensätze durch *kopieren* der JSON-Struktur (z. B. kwd_projects)
+	if(app.isDevice || app.isDroidscript) {
+
+		
+		// TODO: need a "WaitforRootPath callback" since we don't know when path is ready
+		
+		if(app.getRootPath()) { // TODO: app.GetRootPath() --> always easy in DroidScript, --> never in Browser, --> if correctly initalized in Phonegap
+			 startDownloadImages();
 		}
-	else {		
-		// downloadinit in callback
-	    window.requestFileSystem(
-	        LocalFileSystem.PERSISTENT,
-	        0,
-	        onRequestFileSystemSuccess,
-	        fail
-    	);	
+		else if(app.isDevice) {		
+			// downloadinit in callback
+		    window.requestFileSystem(
+		        LocalFileSystem.PERSISTENT,
+		        0,
+		        onRequestFileSystemSuccess,
+		        fail
+			);	
+		}
+		else kwd_log("TODO: implement approotpath for DroidScript!");
 	}
+	else kwd_log("no caching available");
 }
 function onRequestFileSystemSuccess(fileSystem) {
     kwd_log('onRequestFileSystemSuccess');
@@ -196,11 +194,13 @@ function onGetFileSuccess(fileEntry) {
     
 	appRootPath=path;
 	localStorage.setItem(kwd_storage_path,path);
-
-	downloadFileCounter = -1;
-	_downloadNextFile();	    // TODO: für mehrere Datensätze durch *kopieren* der JSON-Struktur (z. B. kwd_projects)
+	app.SetRootPath(path);
+	startDownloadImages();
 }
 
+/* TODO: veraltet!!
+ * 
+ */
 function showLinks() {
 	
 	var url='';

@@ -11,6 +11,7 @@
   * TODO: warum geht Fehlermeldung nicht?
   * TODO: alle synch Funktionen zusammenfassen (kwd-save)
   * TODO: alle local storage zusammenfassen und die storage-Befehle kapseln! (kwd-restore, ...)
+  * TODO: synch immer nur intern automatisch verwenden (bei Abruf der Daten wird entschieden, ob Internet-Verbindung nötig - Ausnahme: manueller Synch)
 */
 
 /*
@@ -98,7 +99,7 @@ function kwd_DownloadProjects (argument) {
       jsonp: 'jsonp_callback',
       //url: 'http://localhost/tk/kwd-news-data/jsonp.php',
       //url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
-      url: kwd_getUrlFromId(10),
+      url: app.getUrlFromId(10),
       timeout: 10000
       
     }).error(function(){
@@ -134,7 +135,7 @@ function kwd_DownloadNews (argument) {
       jsonp: 'jsonp_callback',
       //url: 'http://localhost/tk/kwd-news-data/jsonp.php',
       //url: 'http://localhost/tk/kwd3_r441/index.php?article_id=10',
-      url: 'http://www.kuehne-webseiten.de/index.php?article_id=25',
+      url: app.getUrlFromId(25),
       timeout: 10000
       
     }).error(function(){
@@ -159,7 +160,7 @@ function kwd_DownloadOffers (argument) {
       //url: 'http://www.kuehne-webseiten.de/index.php?article_id=25',
       //url: 'http://www.kuehne-webseiten.de/index.php?article_id=25',
       //url : 'http://localhost/tk/kwd-redaxo-46/index.php?article_id=45',
-      url : 'http://www.kuehne-webseiten.de/index.php?article_id=45',
+      url : app.getUrlFromId(25),
       timeout: 10000
       
     }).error(function(){

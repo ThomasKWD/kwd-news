@@ -4,6 +4,75 @@
  */
 var kwd_current_project = -1;
 
+/*
+ * writes the markup for the list of projects into the DOM 
+ * - uses the CachedWebContent object
+ * - no check of the source of the data
+ * - all images are given with full path (which is dependent of cache or not) - handled by the object data retrieved 
+ */
+function kwd_projects2list_oop() {
+
+	// first get the proper list of entries (Iterator Object!)
+	var projects = app.projects.getList();
+	
+	if(projects.hasNext()) {
+		
+		// vorher ggf. angezeigten Warnhinweis verstecken
+		$('#box-projects-info').css({'display':'none'});		
+		
+		var html = "";
+		html += "<ul id=list1 data-role=listview data-inset=true>";
+
+		var curimg = '';
+		var i=0;
+		var p = null;
+
+		while(projects.hasNext()) {
+			
+			p = projects.next();
+			kwd_log(p);
+			
+			html += "<li class=aproject>";
+			
+			// click handler über jquery geht irgendwie nicht
+			html += "<a href=#page-aproject onClick=\"kwd_current_project="+(i)+";\">";
+			
+			// da imgsrc jetzt auch eine Liste enthalten kann(!)
+			// nur erstes Bild herausfiltern (kommagetrennte Namen):
+			html += '<img style="width:80px" src="'+p['thumbsrc']+'" />';
+						
+			html += "<h3>"+kwd_projects[i]['name']+"</h3>";
+			
+			html += "<p>"+kwd_projects[i]['url']+"</p>"; 
+
+			html += "</a>";
+			
+			html += "</li>";
+		
+			i++;
+
+		}
+
+		
+	
+		html += "</ul>";
+		
+		$("#project-list").html(html);
+		$("#list1").listview();
+	}
+	else { // if no elements
+		// vorbereitetes Hinweisfenster sichtbar machen
+		// Text
+		$('#projects-info').html('Keine Daten für Anzeige vorhanden');
+		if (!kwd_update) $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
+		$('#projects-info').append('<br />'+navigator.connection.type);
+		// sichtbar
+		$('#box-projects-info').css({'display':'block'});
+	}
+
+}
+
+
 /*TODO:
  * - wenn path ok aber keine Bilder vorhanden sieht man nichts
  * (wie prüfen, ob Bilder im Cache??) 
@@ -76,7 +145,8 @@ function kwd_projects2list() {
 
 
 $( document ).on( "pagebeforeshow", "#page-projects", function() {
-	kwd_projects2list();
+	//kwd_projects2list();
+	kwd_projects2list_oop(); // test the new code 
 	$('#page-title').text("Referenzen, Auswahl");
 });
 
