@@ -14,7 +14,7 @@ function kwd_projects2list_oop() {
 
 	// first get the proper list of entries (Iterator Object!)
 	var projects = app.projects.getList();
-	
+
 	if(projects.hasNext()) {
 		
 		// vorher ggf. angezeigten Warnhinweis verstecken
@@ -25,9 +25,9 @@ function kwd_projects2list_oop() {
 
 		var curimg = '';
 		var i=0;
-		var p = null;
 
 		while(projects.hasNext()) {
+			
 			
 			p = projects.next();
 			kwd_log(p);

@@ -47,8 +47,13 @@ bestehenden Funktionen
 	 */
 	this.getList = function(key) {
 		if (!key) logthis("getList without key");
-		kwd_readProjects();		
-		return new KwdIterator(kwd_projects);
+		logthis("checking data source...");
+		kwd_readProjects();	
+		//logthis(kwd_projects);
+		console.log(kwd_projects);
+		test = new KwdIterator(kwd_projects);
+		kwd_log(test);
+		return test;
 	};
 
 	// construct code
