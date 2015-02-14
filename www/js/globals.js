@@ -72,12 +72,12 @@ function KwdApp()	 {
   	};
 
 	//construct code
-	// TODO: check whether one of the included frameworks has a var "app"!!!!!
-	
+		
     // are we running in native app or in a browser?
     // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
-    // app.isDevice = false; preset inside object!    
-    if(document.URL.indexOf("droidscript") != -1) {
+    // app.isDevice = false; preset inside object!
+    // DroidScript version 1.18 beta recognized  
+    if(document.URL.indexOf("droidscript") != -1 || document.URL.indexOf("Droid") != -1) {
     	this.isDroidscript = true;
     }
     else if(document.URL.indexOf("http://") == -1 
@@ -98,7 +98,8 @@ function KwdApp()	 {
 	else if (this.isDroidscript) {
 		// code in download Test
 	}
-	else {
+	// only if localhost is there 
+	else if (document.URL.indexOf("localhost") != -1) {
 		remoteBase = "http://localhost/tk/kwd-redaxo-46/";
 	}
 	

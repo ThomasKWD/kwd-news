@@ -17,6 +17,7 @@ bestehenden Funktionen
     
     - the caller doesn't need to know if data is from localStorage or file or Web URI 
     - must decide whether or how often cache must be updated
+    - the new instance should try to obtain data on construction.
 */    
 /*class*/function CachedWebContent(params) {
 
@@ -41,18 +42,40 @@ bestehenden Funktionen
 		return "test element";
 	};
 	
+	/* gets data from local storage
+	 * - can invoked manually
+	 * - sets data to null on error
+	 * returns true on success, false on error
+	 */
+	this.readStorage = function() {
+
+		strread = localStorage.getItem(storageKey);
+		if (strread==null) {
+			kwd_log('keine Projekte in Cache');
+			return false;
+		}
+		else {
+			data = JSON.parse(strread);
+			//kwd_log('Projekte geladen');
+			//kwd_log(kwd_projects);
+			//kwd_log("Anzahl Projects: "+kwd_projects.length);
+			return true;
+		}
+	};
+	
 	/*
 	 * returns a new Iterator object
 	 * - completes paths to file ressources if possible
-	 */
+	 * - before it retrieves the data, since this must be done by AJAX calls, the function must provide a wait algorithm or return empty list if no data
+	 * - key here is a selector e.g. all images bei "imagesrc" or all titles by "name" -- doesn't correspond to storageKey!!
+	 * 	 */
 	this.getList = function(key) {
-		if (!key) logthis("getList without key");
-		logthis("checking data source...");
-		kwd_readProjects();	
+		logthis("my storagekey:"+storageKey);
+		//kwd_readProjects();	
 		//logthis(kwd_projects);
-		console.log(kwd_projects);
-		test = new KwdIterator(kwd_projects);
-		kwd_log(test);
+		//console.log(kwd_projects);
+		var test = new KwdIterator(data,key);
+		//kwd_log(test);
 		return test;
 	};
 
@@ -60,6 +83,7 @@ bestehenden Funktionen
 	if(typeof params.remote != undefined) remoteBase = params.remote;
 	if(typeof params.local != undefined) localBase = params.local;
 	if(typeof params.key != undefined) storageKey = params.key;
+	kwd_log("storageKey: "+storageKey);
 }
 
 /*

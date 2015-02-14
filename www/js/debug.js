@@ -19,7 +19,7 @@ var kwd_debugscreen=false;
 function kwd_log(object) {
 	if (kwd_debug) {
 	
-		console.log(object);
+		console.log(object); // must not be used in DroidScript
 		if (kwd_debugscreen) {
 			$('#p-debug').append(object);
 			$('#p-debug').append('<br/>');
