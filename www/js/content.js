@@ -74,6 +74,7 @@ bestehenden Funktionen
 		//kwd_readProjects();	
 		//logthis(kwd_projects);
 		//console.log(kwd_projects);
+		if (!this.readStorage()) logthis("cannot read local data -"+storageKey) ;
 		var test = new KwdIterator(data,key);
 		//kwd_log(test);
 		return test;
