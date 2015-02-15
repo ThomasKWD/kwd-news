@@ -12,9 +12,13 @@ var kwd_current_project = -1;
  */
 function kwd_projects2list_oop() {
 
-	// first get the proper list of entries (Iterator Object!)
-	var projects = app.projects.getList();
+	try {
+		// first get the proper list of entries (Iterator Object!)
+		var projects = kwd.projects.getList();
+		kwd_log("len: "+projects.length);
 
+	kwd_log("iterator dump: "+JSON.stringify(projects, null, 4));
+	
 	if(projects.hasNext()) {
 		
 		// vorher ggf. angezeigten Warnhinweis verstecken
@@ -29,8 +33,8 @@ function kwd_projects2list_oop() {
 		while(projects.hasNext()) {
 			
 			
-			p = projects.next();
-			kwd_log(p);
+			var p = projects.next();
+			//kwd_log(p);
 			
 			html += "<li class=aproject>";
 			
@@ -39,11 +43,13 @@ function kwd_projects2list_oop() {
 			
 			// da imgsrc jetzt auch eine Liste enthalten kann(!)
 			// nur erstes Bild herausfiltern (kommagetrennte Namen):
-			html += '<img style="width:80px" src="'+p['thumbsrc']+'" />';
-						
-			html += "<h3>"+kwd_projects[i]['name']+"</h3>";
+			html += '<img style="width:80px" src="'+p['thumb']+'" />';
 			
-			html += "<p>"+kwd_projects[i]['url']+"</p>"; 
+			//kwd_log("wrote:"+p['thumbsrc']);
+						
+			html += "<h3>"+p['name']+"</h3>";
+			
+			html += "<p>"+p['url']+"</p>"; 
 
 			html += "</a>";
 			
@@ -52,8 +58,7 @@ function kwd_projects2list_oop() {
 			i++;
 
 		}
-
-		
+	
 	
 		html += "</ul>";
 		
@@ -69,6 +74,14 @@ function kwd_projects2list_oop() {
 		// sichtbar
 		$('#box-projects-info').css({'display':'block'});
 	}
+	
+	
+		} //try
+	catch(e) {
+		kwd_log("fehler loop: "+e.message);
+		alert(e.message);
+	}
+
 
 }
 

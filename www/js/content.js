@@ -7,6 +7,7 @@ wird 3teilig belassen, so dass kompatibel mit den
 bestehenden Funktionen
 
 - uses KwdIterator
+- specialized class for "CachedFileContent"
 */
 
 
@@ -27,6 +28,7 @@ bestehenden Funktionen
 	var remoteBase = "";
 	var localBase = "";
 	var storageKey = "";
+	var mode = "auto";  //auto|online|offline
 	
 	// construct code at the end of declaration!
 
@@ -42,6 +44,65 @@ bestehenden Funktionen
 		return "test element";
 	};
 	
+	/*
+	 * returns URL from id
+	 * - result depends on the base path set
+	 */
+	this.getUrlFromId = function(id) {	
+		return remoteBase + 'index.php?article_id='+id;
+	};
+
+	this.response = function(response) {
+	
+		if(response) {
+		
+			//kwd_log(response);
+			var strdata = JSON.stringify(response); 
+			localStorage.setItem(storageKey, strdata);	
+		}
+
+	};
+	
+	/* gets data from http source via Ajax
+	- need response callback function
+	- and error callback function
+	*/
+	this.download = function() {
+	
+		//$('#load-result').html('AKTUALSIEREN');
+		//kwd_log('starte aktualisieren');
+		
+		$(document).ajaxError(function(event, request, settings){
+	   		kwd_log("Error requesting page " + settings.url);
+	 	});
+	 
+	 // Abfrage ob Netzwerk-Kommunikation möglich (phonegap)
+		// TODO: Auswertung durch caller ermöglichen (Status weiterleiten, evtl. sogar exception handling)
+		
+		//networkState = navigator.connection.type;
+		//if (networkState == Connection.NONE) return null;
+	
+		// http://www.interaktionsdesigner.de/2008/08/28/jsonp-und-das-cross-server-scripting/
+		// http://remysharp.com/visual-jquery/
+		// for phonegap:
+		// http://samcroft.co.uk/2012/my-article-for-adobes-appliness-magazine-data-in-phonegap-apps/
+	
+	    $.ajax({
+	      dataType: 'jsonp',
+	      jsonp: 'jsonp_callback',
+	      url: this.getUrlFromId(10),
+	      timeout: 10000
+	      
+	    }).error(function(){
+			//$('#load-result').html("");
+			//$('#load-result').append("update error");		
+		}).complete(function(){
+			//console.log('update fertig');
+			//$('#load-result').html('fertig');
+		}).success(this.response);
+		
+	};
+	
 	/* gets data from local storage
 	 * - can invoked manually
 	 * - sets data to null on error
@@ -50,11 +111,13 @@ bestehenden Funktionen
 	this.readStorage = function() {
 
 		strread = localStorage.getItem(storageKey);
-		if (strread==null) {
-			kwd_log('keine Projekte in Cache');
+		if (!strread) {
+			logthis('keine Projekte in Cache');
+			this.download();
 			return false;
 		}
 		else {
+			//logthis("read "+storageKey+": "+strread);
 			data = JSON.parse(strread);
 			//kwd_log('Projekte geladen');
 			//kwd_log(kwd_projects);
@@ -63,6 +126,26 @@ bestehenden Funktionen
 		}
 	};
 	
+	/* produces urls for the files depending on 
+		source location ( possible local cached files) 
+		
+	*/
+	this.setFileSources = function () {
+		// TODO: add control for selecting source
+		// TODO: how to check whether an index name exists.
+		try {
+			var i;
+			for (i=0;i<data.length;i++) {
+				if(data[i]['thumbsrc']) {
+					data[i]['thumb']= remoteBase + data[i]['thumbsrc'];
+				}
+			}
+		}
+		catch(e) {
+			kwd_log('error in this.setFileSources');
+		}
+	}
+	
 	/*
 	 * returns a new Iterator object
 	 * - completes paths to file ressources if possible
@@ -70,13 +153,19 @@ bestehenden Funktionen
 	 * - key here is a selector e.g. all images bei "imagesrc" or all titles by "name" -- doesn't correspond to storageKey!!
 	 * 	 */
 	this.getList = function(key) {
-		logthis("my storagekey:"+storageKey);
+		//logthis("my storagekey:"+storageKey);
 		//kwd_readProjects();	
 		//logthis(kwd_projects);
 		//console.log(kwd_projects);
 		if (!this.readStorage()) logthis("cannot read local data -"+storageKey) ;
+		else {
+			// logthis("readstorage ok: "+data);
+		}
+		
+		this.setFileSources();
+		
 		var test = new KwdIterator(data,key);
-		//kwd_log(test);
+		//logthis("iterator: "+test);
 		return test;
 	};
 
@@ -84,7 +173,10 @@ bestehenden Funktionen
 	if(typeof params.remote != undefined) remoteBase = params.remote;
 	if(typeof params.local != undefined) localBase = params.local;
 	if(typeof params.key != undefined) storageKey = params.key;
-	kwd_log("storageKey: "+storageKey);
+	if(typeof params.mode != undefined) mode = params.key;
+	
+	//kwd_log("storageKey: "+storageKey);
+	
 }
 
 /*

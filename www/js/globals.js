@@ -82,6 +82,7 @@ function KwdApp()	 {
     }
     else if(document.URL.indexOf("http://") == -1 
         && document.URL.indexOf("https://") == -1
+        && document.URL.indexOf("sgit") == -1
         && document.URL.indexOf("/kwd-news/") == -1 //for local test    
 	) {
 		this.isDevice = true;
@@ -107,7 +108,8 @@ function KwdApp()	 {
 	this.projects = new CachedWebContent({ // TODO: use set-functions of base paths
 		remote : remoteBase,
 		local : localBase,
-		key : kwd_storage_projects
+		key : kwd_storage_projects,
+		mode : 'auto'
 	});
 	this.news = new CachedWebContent({
 		remote : remoteBase,
@@ -184,9 +186,9 @@ Zunächst nur für mehrdimensionale Arrays konzipiert.
 */
 function KwdIterator(source, key, options) {
 	// public properties
+	this.length = 0;
 
 	// private properties
-	var length;
 	// enthält Schlüsselwort um zu spezifizieren, was aus den Daten gewünscht ist
 	//(sozusagen Erwaiterung des Iterator-Konzepts)
 	var sourcekey = ""; 
@@ -194,10 +196,11 @@ function KwdIterator(source, key, options) {
 	var splitentries = false;
 	var i = 0;
 	var j = 0; // for split values in data entry
+	
 	//kwd_log('iterator instance');
 	sourcekey = key;
 	data = source;
-	length = source.length;
+	this.length = source.length;
 	
 	// split entries?
 	if(options && options=="split") {
@@ -206,15 +209,19 @@ function KwdIterator(source, key, options) {
 	
 	// public methods
 	this.next = function() {
-		var entry;
+		var entry = new Array();
 		var parts;
 		var ret;
-		
+	 
 		// Liefere nächstes Element
 		// doppelte Sicherheit i<length?
-		if(i<length) {
+		if(i<this.length) {
+		
+			try {
 			if (sourcekey!="") entry = data[i][sourcekey];
-			else entry = data[i];
+			else entry = data[i]; // access not possible - code does not work
+			//kwd_log("entry:"+entry);
+			//kwd_log ("data:"+data[i]);
 			if(splitentries && entry.indexOf(',')!=-1) {
 				parts=entry.split(',');
 				if(j>=parts.length) {
@@ -227,13 +234,20 @@ function KwdIterator(source, key, options) {
 			}
 			j=0;
 			i++;
-			return entry;			
+			//kwd_log(i);
+			//kwd_log("data len"+data.length);
+			}
+			catch(e) {
+				kwd_log("fehler .next() "+e.message);
+			}
+			//return entry;			
+			return data[i-1];
 		}
 		else return null;
 	};
 	this.hasNext = function() {
 		//kwd_log('length:'+length);
-		if (i<length) return true;
+		if (i<this.length) return true;
 		else return false;
 	};
 	// aus Performance-Gründen kann man mit dem gleichen Objekt von vorn beginnen

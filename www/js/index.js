@@ -45,9 +45,9 @@ $(document).ready(function() {
 	
 	kwd_debugscreen=true;// TODO: mache doch einen Schalter :-)
 		
-	app = new KwdApp(); // wird hier schon gebraucht
+	kwd = new KwdApp(); // wird hier schon gebraucht
 
-    if( app.isDevice ) {
+    if( kwd.isDevice ) {
     	kwd_log('Wird als Device erkannt.');
         document.addEventListener("deviceready", onDeviceReady, false); 
         kwd_log('app:added listener');
@@ -74,7 +74,7 @@ function onDeviceReady() {
     
     // STARTUP und SYSTEM INFO ---------------------------------------------------------------    
 
-	if(app.isDevice) {
+	if(kwd.isDevice) {
 		$('#info-platform').html(device.platform);
 		$('#info-os').html(device.version);		
 	}
@@ -95,7 +95,7 @@ function onDeviceReady() {
     // EVENT LISTENER ------------------------------------------------------------
     
 	// geht nicht auf ios (muss ich es extra abfragen oder wird es dort automatisch ignoriert??
-	if (app.isDevice) {
+	if (kwd.isDevice) {
 				
 		document.addEventListener("menubutton", onMenuButtonTouch, false);
 		document.addEventListener("backbutton", onBackButtonTouch, false);
