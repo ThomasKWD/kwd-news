@@ -14,12 +14,12 @@ function kwd_projects2list_oop() {
 
 	try {
 		// first get the proper list of entries (Iterator Object!)
-		var projects = kwd.projects.getList();
-		kwd_log("len: "+projects.length);
+		var projects = kwd.projects.getList(); // get null = no list available
+		//kwd_log("len: "+projects.length);
 
-	kwd_log("iterator dump: "+JSON.stringify(projects, null, 4));
+		//kwd_log("iterator dump: "+JSON.stringify(projects, null, 4));
 	
-	if(projects.hasNext()) {
+	if(projects!==null && projects.hasNext()) {
 		
 		// vorher ggf. angezeigten Warnhinweis verstecken
 		$('#box-projects-info').css({'display':'none'});		
@@ -27,7 +27,6 @@ function kwd_projects2list_oop() {
 		var html = "";
 		html += "<ul id=list1 data-role=listview data-inset=true>";
 
-		var curimg = '';
 		var i=0;
 
 		while(projects.hasNext()) {
@@ -44,12 +43,13 @@ function kwd_projects2list_oop() {
 			// da imgsrc jetzt auch eine Liste enthalten kann(!)
 			// nur erstes Bild herausfiltern (kommagetrennte Namen):
 			html += '<img style="width:80px" src="'+p['thumb']+'" />';
-			
+			//kwd_log(p['thumb']);
 			//kwd_log("wrote:"+p['thumbsrc']);
 						
 			html += "<h3>"+p['name']+"</h3>";
 			
-			html += "<p>"+p['url']+"</p>"; 
+			// für Listenausgabe Protokoll-Präfix abschneiden
+			html += "<p>"+p['url'].replace('http://','')+"</p>"; 
 
 			html += "</a>";
 			
@@ -70,7 +70,7 @@ function kwd_projects2list_oop() {
 		// Text
 		$('#projects-info').html('Keine Daten für Anzeige vorhanden');
 		if (!kwd_update) $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		$('#projects-info').append('<br />'+navigator.connection.type);
+		if (kwd.isDevice) $('#projects-info').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-projects-info').css({'display':'block'});
 	}

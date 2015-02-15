@@ -7,7 +7,11 @@ wird 3teilig belassen, so dass kompatibel mit den
 bestehenden Funktionen
 
 - uses KwdIterator
-- specialized class for "CachedFileContent"
+- specialized class for "CachedFileContent" planned
+
+  * TODO: synch immer nur intern automatisch verwenden (bei Abruf der Daten wird entschieden, ob Internet-Verbindung nötig - Ausnahme: manueller Synch)
+  * TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
+
 */
 
 
@@ -28,6 +32,7 @@ bestehenden Funktionen
 	var remoteBase = "";
 	var localBase = "";
 	var storageKey = "";
+	var sourceId = 0; // redaxo article_id for data
 	var mode = "auto";  //auto|online|offline
 	
 	// construct code at the end of declaration!
@@ -58,7 +63,8 @@ bestehenden Funktionen
 		
 			//kwd_log(response);
 			var strdata = JSON.stringify(response); 
-			localStorage.setItem(storageKey, strdata);	
+			localStorage.setItem(storageKey, strdata);
+			kwd_log('stored response locally - '+storageKey);	
 		}
 
 	};
@@ -75,7 +81,7 @@ bestehenden Funktionen
 		$(document).ajaxError(function(event, request, settings){
 	   		kwd_log("Error requesting page " + settings.url);
 	 	});
-	 
+	 	kwd_log('start download '+storageKey);
 	 // Abfrage ob Netzwerk-Kommunikation möglich (phonegap)
 		// TODO: Auswertung durch caller ermöglichen (Status weiterleiten, evtl. sogar exception handling)
 		
@@ -90,15 +96,17 @@ bestehenden Funktionen
 	    $.ajax({
 	      dataType: 'jsonp',
 	      jsonp: 'jsonp_callback',
-	      url: this.getUrlFromId(10),
+	      url: this.getUrlFromId(sourceId),
 	      timeout: 10000
 	      
 	    }).error(function(){
+	    	kwd_log("download -"+souceKey+"- timeout (Kein Internet oder falsche id)");
 			//$('#load-result').html("");
 			//$('#load-result').append("update error");		
 		}).complete(function(){
 			//console.log('update fertig');
 			//$('#load-result').html('fertig');
+	    	kwd_log("download -"+souceKey+"- ready");
 		}).success(this.response);
 		
 	};
@@ -133,18 +141,20 @@ bestehenden Funktionen
 	this.setFileSources = function () {
 		// TODO: add control for selecting source
 		// TODO: how to check whether an index name exists.
-		try {
-			var i;
-			for (i=0;i<data.length;i++) {
-				if(data[i]['thumbsrc']) {
-					data[i]['thumb']= remoteBase + data[i]['thumbsrc'];
+		if (data!=null) {
+			try {
+				var i;
+				for (i=0;i<data.length;i++) {
+					if(data[i]['thumbsrc']) {
+						data[i]['thumb']= remoteBase + data[i]['thumbsrc'];
+					}
 				}
 			}
+			catch(e) {
+				kwd_log('error in this.setFileSources');
+			}
 		}
-		catch(e) {
-			kwd_log('error in this.setFileSources');
-		}
-	}
+	};
 	
 	/*
 	 * returns a new Iterator object
@@ -164,9 +174,12 @@ bestehenden Funktionen
 		
 		this.setFileSources();
 		
-		var test = new KwdIterator(data,key);
-		//logthis("iterator: "+test);
-		return test;
+		if (data!=null) {
+			var test = new KwdIterator(data,key);
+			//logthis("iterator: "+test);
+			return test;
+		}
+		else return null;
 	};
 
 	// construct code
@@ -174,6 +187,7 @@ bestehenden Funktionen
 	if(typeof params.local != undefined) localBase = params.local;
 	if(typeof params.key != undefined) storageKey = params.key;
 	if(typeof params.mode != undefined) mode = params.key;
+	if(typeof params.id != undefined) sourceId = params.id;
 	
 	//kwd_log("storageKey: "+storageKey);
 	

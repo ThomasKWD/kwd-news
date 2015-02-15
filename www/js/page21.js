@@ -11,10 +11,8 @@ var kwd_current_news = -1;
  */
 function kwd_news2list() {
 
-	var path = kwd_getFilePath(kwd_storage_news);  // gibt nicht nur Ordner sondern gesamte URL zurück, an die dann filename angehangen wird!!
-	kwd_log('news image path: '+path);
-		
-	if (kwd_readNews()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
+	var news = kwd.news.getList(); // get null = no list available
+	if (news!= null && news.hasNext()) {	
 		
 		// vorher ggf. angezeigten Warnhinweis verstecken
 		$('#box-news-info').css({'display':'none'});		
@@ -22,11 +20,10 @@ function kwd_news2list() {
 		var html = "";
 		html += "<ul id=list2 data-role=listview data-inset=true>";
 
-		var curimg;
 		var i=0;
 		// TODO: for mit i verwenden da for in nicht die 
 		// richtige Reihenfolge garantiert
-		for(var entry in kwd_news) {
+		while(news.hasNext()) {
 			
 			curimg='';
 			html += "<li class=anews>";
@@ -34,19 +31,13 @@ function kwd_news2list() {
 			// click handler über jquery geht irgendwie nicht
 			html += "<a href=#page-anews onClick=\"kwd_current_news="+(i)+";\">"; // warum onClick??
 			
-			// da imgsrc jetzt auch eine Liste enthalten kann(!)
-			// nur erstes Bild herausfiltern (kommagetrennte Namen):
-			curimg = kwd_news[i]['imgsrc'];			
-			if (curimg.indexOf(',')!=-1) {
-				curimg = curimg.substr(0,curimg.indexOf(','));	
-			}
-			//html += '<img style="width:80px" src="'+path+curimg+'" />';
-			//html += '<img style="height:80px" src="'+path+kwd_news[i]['imgsrc']+'" />';
- // http://www.kuehne-webdienste.de/tbd-shot.jpg
+			var n = news.next();
 			
-			html += "<h3>"+kwd_news[i]['name']+"</h3>";
+			// TODO: if images desired, provide "thumbs" by web
+
+			html += "<h3>"+n['name']+"</h3>";
 			
-			html += "<p>"+kwd_news[i]['url']+"</p>"; 
+			//html += "<p>"+n['url']+"</p>"; 
 
 			html += "</a>";
 			
@@ -68,7 +59,7 @@ function kwd_news2list() {
 		// Text
 		$('#news-warning').html('Keine Daten für Anzeige vorhanden');
 		if (!kwd_update) $('#news-warning').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		$('#news-warning').append('<br />'+navigator.connection.type);
+		if(kwd.isDevice) $('#news-warning').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-news-info').css({'display':'block'});
 	}

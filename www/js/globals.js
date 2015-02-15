@@ -75,7 +75,7 @@ function KwdApp()	 {
 		
     // are we running in native app or in a browser?
     // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
-    // app.isDevice = false; preset inside object!
+    // kwd.isDevice = false; preset inside object!
     // DroidScript version 1.18 beta recognized  
     if(document.URL.indexOf("droidscript") != -1 || document.URL.indexOf("Droid") != -1) {
     	this.isDroidscript = true;
@@ -109,12 +109,14 @@ function KwdApp()	 {
 		remote : remoteBase,
 		local : localBase,
 		key : kwd_storage_projects,
-		mode : 'auto'
+		mode : 'auto',
+		id : 10
 	});
 	this.news = new CachedWebContent({
 		remote : remoteBase,
 		local : localBase,
-		key : kwd_storage_news
+		key : kwd_storage_news,
+		id : 25
 	});
 	this.offers = new CachedWebContent({
 		remote : remoteBase,

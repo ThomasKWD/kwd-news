@@ -215,12 +215,12 @@ function onDeviceReady() {
 	// UPDATE CONTENT-----------------------------------------------------------
 
 	appRootPath = kwd_getFilePath(); // Pfad in local storage?, nein= leerstring // eigentlich benötigt man Variable nicht oder nur lokal, wenn sowieso immer auf localStorage gearbeitet wird! 
-	kwd_DownloadProjects();//TODO: allgemeine Funktion mit Parameter
-	kwd_DownloadNews();
-	kwd_DownloadOffers();
+	//kwd_DownloadProjects();//TODO: allgemeine Funktion mit Parameter
+	//kwd_DownloadNews();
+	//kwd_DownloadOffers();
 		
 	// TEST OOP 
-	//it = app.getSourceList('thumbsrc');
+	//it = kwd.getSourceList('thumbsrc');
 	//kwd_log('check key:'+it.getKey());
 	//while(it.hasNext()) {
 		//kwd_log('next entry: '+it.next());
@@ -228,7 +228,7 @@ function onDeviceReady() {
 	
 	// SHOW
 	
-	if (app.isDevice) {
+	if (kwd.isDevice) {
 		// TODO: vielleicht sogar erst nach erstem 'pageonshow' event
 		// TODO: oder mit timeout;
         navigator.splashscreen.hide();		
@@ -247,7 +247,7 @@ function performBackAction() {
 	var current = $( ":mobile-pagecontainer" ).pagecontainer('getActivePage').attr('id');
 	
 	// TODO: is platform name consistent??? lieber teilstring suchen
-	if (current=="page-start" && app.isDevice) {
+	if (current=="page-start" && kwd.isDevice) {
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
 	}
 	else {
