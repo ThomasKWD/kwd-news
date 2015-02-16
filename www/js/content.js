@@ -156,6 +156,18 @@ bestehenden Funktionen
 		}
 	};
 	
+	/* returns a certain entry from data
+		- id is just the index up to now
+		- key selects a certain part of the item
+	*/
+	this.getItem = function(id,key="") {
+		if(data && data.length && data[id]) {
+			if(key!=="") return data[id][key];
+			else return data[id];
+		}
+		else return null;
+	};
+	
 	/*
 	 * returns a new Iterator object
 	 * - completes paths to file ressources if possible
