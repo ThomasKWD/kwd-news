@@ -114,10 +114,12 @@ function onDeviceReady() {
 		performBackAction();
 	});	
 	$('#doUpdate').click(function(){
-		//TODO: alle Updates hier!
-		kwd_DownloadProjects();
-		kwd_DownloadNews();
-		kwd_DownloadOffers();        		
+		// show progress indicator
+		kwd.projects.download();
+		kwd.news.download();
+		kwd.offers.download();
+		//TODO: alle Image Updates hier!
+		// hide progress indicator
 	});
 	$('#doQuit').click(function(){
 		navigator.app.exitApp(); // does work on Android + windowsphone // iOS and other Systems don't have an user invoked exit!
@@ -136,6 +138,7 @@ function onDeviceReady() {
 		alert('project');
 		kwd_log('project');
 	});
+	// update mode
 	$('#flip-6').change(function() {
 		//alert("update ="+$(this).val());
 		if($(this).val()=='off') {
@@ -170,6 +173,7 @@ function onDeviceReady() {
 		// localstorage gespeicherte Keys auflisten?
 		kwd_log("ClearCache Items: "+window.localStorage.length);
 		window.localStorage.clear();
+		// TODO: delete images
 		// test debug adjust - Code to change state of switch:		
 		// $("select#flip-debug").val ("off");
 		// $("select#flip-debug").flipswitch("refresh"); // na endlich		

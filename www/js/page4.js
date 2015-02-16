@@ -83,13 +83,18 @@ $( document ).on( "pagebeforeshow", "#page-anoffer", function() {
 		//get certain data entry
 		// TODO: the list above should produce an id value ...
 		//	 	for kwd_current_offer rather then index i
-		var c=kwd.offers.getItem(kwd_current_offer);
+		try {
+			var c=kwd.offers.getItem(kwd_current_offer);
 		if (c) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
-		//$("#page-anoffer h2").html(kwd_offers[kwd_current_offer]['name']);
-		$('#page-title').text(c['name']);
-		$("#offer-info").html(c['info']);
-		//$("#offer-info").append('<a href="'+kwd_offers[kwd_current_offer]['url']+'" target="_blank">'+kwd_offers[kwd_current_offer]['url']+'</a>');
-		$("#offer-url").attr("href", kwd_offers[kwd_current_offer]['url']);
+			//$("#page-anoffer h2").html(kwd_offers[kwd_current_offer]['name']);
+			$('#page-title').text(c['name']);
+			$("#offer-info").html(c['info']);
+			//$("#offer-info").append('<a href="'+kwd_offers[kwd_current_offer]['url']+'" target="_blank">'+kwd_offers[kwd_current_offer]['url']+'</a>');
+			$("#offer-url").attr("href", c['url']);
+		}
+		}
+		catch(e) {
+			kwd_log("error: "+e.message);
 		}
 	}
 });

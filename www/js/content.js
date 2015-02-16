@@ -8,9 +8,10 @@ bestehenden Funktionen
 
 - uses KwdIterator
 - specialized class for "CachedFileContent" planned
+- update-Versuch bei Construct (einfacher als auf Anzeige der Komponenten zu warten)
 
-  * TODO: synch immer nur intern automatisch verwenden (bei Abruf der Daten wird entschieden, ob Internet-Verbindung nötig - Ausnahme: manueller Synch)
-  * TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
+
+* TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
 
 */
 
@@ -34,6 +35,7 @@ bestehenden Funktionen
 	var storageKey = "";
 	var sourceId = 0; // redaxo article_id for data
 	var mode = "auto";  //auto|online|offline
+	var current = -1;   // current selected item value (index|id)
 	
 	// construct code at the end of declaration!
 
@@ -156,6 +158,15 @@ bestehenden Funktionen
 		}
 	};
 	
+	/* sets the current item for output
+		- can be index or id
+		- value -1 means no selection
+		- useful for access with getItem
+	*/
+	this.seCurrent = function(id) {
+		
+	};
+	
 	/* returns a certain entry from data
 		- id is just the index up to now
 		- key selects a certain part of the item
@@ -201,8 +212,8 @@ bestehenden Funktionen
 	if(typeof params.mode != undefined) mode = params.key;
 	if(typeof params.id != undefined) sourceId = params.id;
 	
-	//kwd_log("storageKey: "+storageKey);
-	
+	// update on construct just is easier
+	this.download();
 }
 
 /*

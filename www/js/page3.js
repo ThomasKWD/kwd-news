@@ -12,7 +12,7 @@ var kwd_current_project = -1;
  */
 function kwd_projects2list_oop() {
 
-	try {
+	
 		// first get the proper list of entries (Iterator Object!)
 		var projects = kwd.projects.getList(); // get null = no list available
 		//kwd_log("len: "+projects.length);
@@ -74,14 +74,6 @@ function kwd_projects2list_oop() {
 		// sichtbar
 		$('#box-projects-info').css({'display':'block'});
 	}
-	
-	
-		} //try
-	catch(e) {
-		kwd_log("fehler loop: "+e.message);
-		alert(e.message);
-	}
-
 
 }
 

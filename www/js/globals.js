@@ -42,8 +42,8 @@ const kwd_storage_thumbs = 'thumbs';       // Liste alternativer Dateien (Vorsch
 kwd_update=true;
 
 /*
-Entwurf eines kwd Object, das globale Strukturen
-kapselt, alles was bisher "herumschwirrte",
+"kwd Object", das globale Strukturen
+kapselt
 
  sogar debug, obwohl dies eigenständiges Object sein
  sollte
@@ -51,7 +51,7 @@ kapselt, alles was bisher "herumschwirrte",
 geplant:
 - Basis-Objekt mit abgeleiteten Spezialversionen für Phonegap | Droidscript
 - layout independent so that it can be used eg.in DroidScript without webview
-
+- auto update bei construct der Daten-Komponenten
 
 */
 function KwdApp()	 {
