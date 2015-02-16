@@ -121,7 +121,8 @@ function KwdApp()	 {
 	this.offers = new CachedWebContent({
 		remote : remoteBase,
 		local : localBase,
-		key : kwd_storage_offers
+		key : kwd_storage_offers,
+		id : 45
 	});
 	
 
