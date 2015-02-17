@@ -90,5 +90,12 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		$('#page-title').text(p['name']);
 		$("#project-info").html(p['info']);
 		$("#project-url").attr("href", p['url']);
+	
+		var i = 0;
+		var html = '';
+		for(i=0;i<p['images'].length;i++) {
+			html += '<img src="'+p['images'][i]+'" /> ';
+		}
+		$("#project-images").html(html);
 	}
 });

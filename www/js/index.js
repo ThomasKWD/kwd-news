@@ -285,9 +285,11 @@ function onMenuButtonTouch() {
 }
 function onOnline() {
 	$("#online-status").html(navigator.connection.type);	
+	//kwd.setOnlineStatus(true);
 }
 function onOffline() {
 	$("#online-status").html('OFFLINE');
+	//kwd.setOnlineStatus(false);
 }
 function onPause() {
 	if(window.geoWatchId || window.geoInterval) {

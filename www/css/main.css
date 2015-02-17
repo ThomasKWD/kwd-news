@@ -111,6 +111,10 @@ body {
 	width:325px;
 	height:250px;
 }
+
+#project-images img {
+	width:100%;
+}
 /* Code für Entwicklung wird mit
 debug oder develope gekennzeichnet
 und bei Bedarf ausgeblendet

@@ -1,6 +1,7 @@
 // globales Objekt
 // app = null;
 // Globale Datenstrukturen für Inhalte ---------------------------------------
+// TODO: löschen, wenn Objects fertig
 var kwd_projects = null;
 var kwd_news = null;
 var kwd_offers = null;
@@ -13,27 +14,13 @@ var kwd_thumbs = '';
 const kwd_storage_projects = 'projects';   // JSON-String der Projektdaten
 const kwd_storage_news = 'news';           // JSON-String der Newsdaten
 const kwd_storage_offers = 'offers';       // JSON-String der Angebotsdaten
-const kwd_storage_path = 'path';           // Pfad auf Device für Dateien
-
-/*	files ist in der aktuellen Planung ein Array, das nach dem Programmstart
-	oder einem erneuten Synch mit dem Web aus den dynamischen Content-Daten (kwd_projects etc.)
-	gewonnen wird.
-	Dateiname wird aus der Liste gelöscht, wenn Herunterladen *nicht* erfolgreich
-	Anhand der Liste mit Lücken kann beim nächsten Anfragen entschieden werden ob versucht wird, Datei aus
-	Web anzufordern oder aber aus Cache.
-	im local-storage soll Liste erfolgreich heruntergeladener Dateien abgelegt werden (wegen Performance)
-	beim nächsten Download werden nur Dateien in Liste berücksichtigt.
-	Bei Anzeigefehler muss Datei aus Liste gelöscht werden !!
-	
-	Im ersten Test nur für Download-Liste verwendet.
-	files werden im filesystem des Device unter ihrem ursprünglichen Namen gespeichert.
-*/
+const kwd_storage_path = 'path';           // Pfad auf Device für Dateien -- wird noch gebraucht?????????
 const kwd_storage_files = 'files';         // Liste der Dateien // TODO: auch als JSON?(dann mit Status-Infos)
 
 /*	siehe unter kwd_storage_files parallel für thumbs
 	thumbs werden im filesystem des Device mit prefix "thumb-" gespeichert.
 */
-const kwd_storage_thumbs = 'thumbs';       // Liste alternativer Dateien (Vorschaubilder)
+const kwd_storage_thumbs = 'thumbs';       // Liste alternativer Dateien (Vorschaubilder) -- TODO: als veraltet betrachten
 
 /*
  * globale Schalter
@@ -49,6 +36,7 @@ kapselt
  sollte
 
 geplant:
+- alle path-relevanten Dinge (localBase) nur noch innerhalb KwdCachedFiles
 - Basis-Objekt mit abgeleiteten Spezialversionen für Phonegap | Droidscript
 - layout independent so that it can be used eg.in DroidScript without webview
 - auto update bei construct der Daten-Komponenten
@@ -58,7 +46,6 @@ function KwdApp()	 {
 
 	// private members:
 	var remoteBase = "";
-	var localBase = ""; 
 
 	
 	// public properties
@@ -90,9 +77,6 @@ function KwdApp()	 {
 
 	// set paths if possible
 	remoteBase = "http://www.kuehne-webdienste.de/";
-	// try to get from localStorage for all environments
-	var p = localStorage.getItem(kwd_storage_path);
-	if(p!=null) localBase = p; // p can still be empty
 	
 	if(this.isDevice) {
 	}
@@ -106,37 +90,53 @@ function KwdApp()	 {
 	}
 	
 	// more public members:
+	var dev = 'browser';
+	if (this.isDevice) dev = 'phonegap';
+	if (this.isDroidscript) dev = 'droidscript';
+	
+	// ein einzelnes File-Objekt:
+	// TODO: teste ob alle CachedWebContent dann mit der gleichen Instanz arbeiten!!
+	// wenn nicht, muss in CachedWebContent kwd.chachedFiles verwendet werden :-(
+	this.cachedFiles = new CachedFiles({
+		remote : remoteBase,
+		key : kwd_storage_files,
+		path : kwd_storage_path,
+		mode : 'auto',
+		device : dev
+	});
+
+
+	// TODO: da alle diese Parameter auch nochmal für Files gebraucht werden,
+	//		Einrichtung eines "KwdInfo"-Objekts?
 	this.projects = new CachedWebContent({ // TODO: use set-functions of base paths
 		remote : remoteBase,
-		local : localBase,
 		key : kwd_storage_projects,
 		mode : 'auto',
-		id : 10
+		id : 10,
+		device : dev,
+		files : this.cachedFiles
 	});
 	this.news = new CachedWebContent({
 		remote : remoteBase,
-		local : localBase,
 		key : kwd_storage_news,
-		id : 25
+		mode : 'auto',
+		id : 25,
+		device : dev,
+		files : this.cachedFiles
 	});
 	this.offers = new CachedWebContent({
 		remote : remoteBase,
-		local : localBase,
 		key : kwd_storage_offers,
-		id : 45
+		mode : 'auto',
+		id : 45,
+		device : dev,
+		files : this.cachedFiles
 	});
-	
 
+		
+	
 
 	// public methods
-	
-	/*
-	 * setter for local path
-	 */
-	this.setRootPath = function(path) {
-		if(path.indexOf('/') != path.length-1) localBase = path + '/';
-		else localBase = path;
-	};
 	
 	/*
 	 * datasource: "projects"|"news"|"offers", if empty, you should return data of all the lists
