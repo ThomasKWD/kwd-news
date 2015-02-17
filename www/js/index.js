@@ -2,29 +2,8 @@
 alle Deviceready Funktionen
 und Event Handler
 
-für Code-Fragmente aus dem Phonegap-Example gilt:
 
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
-
-		***
- */
-
-/* ich nehme an, dass das Verwenden der Klasse app dazu dient,
+* ich nehme an, dass das Verwenden der Klasse app dazu dient,
  * diesen Code zu ignorieren, falls er im Browser gestartet wird.
  * 
  * interessante Struktur aber unnötig für diesen einfachen Fall
@@ -52,8 +31,6 @@ $(document).ready(function() {
         document.addEventListener("deviceready", onDeviceReady, false); 
         kwd_log('app:added listener');
     } else {
-    	kwd_log('Achtung!: im BROWSER-Modus zur Zeit alle Daten-Requests an *localhost*');
-    	// TODO: localhost sollte nicht verwendet werden, wenn isDroidscript 
         onDeviceReady();
     }
 });
@@ -181,33 +158,58 @@ function onDeviceReady() {
 	// TODO: wie besser die Klick-handler dort deklarieren, wo sie gebraucht werden (Seite)
 	//    oder zusammenfassen als function?
 	$('#project-share').click(function() {
-		// kwd_current_project muss gesetzt sein
-		//alert ('project:'+kwd_current_project);
-		// welche Parameter angenommen werden, hängt von der Ziel-App zum Teilen ab
-		// zum Test nur URL auf die Seite im Web
-		//    diese wird aus der article-url gewonnen
-		if (kwd_projects) {
-			if (kwd_current_project > -1) {
-				//var u = kwd_projects[kwd_current_project]['article_id'];
-				// wenn kwd_projects oder article_id fehlerhaft ist Hauptteil der Adresse immer noch gültig :-)
-				var u = 'http://www.kuehne-webdienste.de/index.php?article_id='+kwd_projects[kwd_current_project]['article_id'];
-				//alert (u);
-				var name = kwd_projects[kwd_current_project]['name'];
+		// - URL auf die Seite im Web
+		// - diese wird aus der article-url gewonnen
+		// - nur isDevice
+		// TODO: function für die drei share-varianten, da auch andere Seiten (Listen) evtl. einen "Share"-Button erhalten
+		var shareok = false;
+		if(kwd.isDevice) {
+			var p = kwd.projects.getItem();
+			if (p!=null) {
+				var u = kwd.projects.getUrlFromId(p['article_id']);
+				var name = p['name'];
 				if (!name) name= '';
 				window.plugins.socialsharing.share("Schauen Sie sich diese interessante Seite an!", "KÜHNE-Webdienste.de "+name, null,u);
+				shareok=true;
 			}
 		}
+		if (!shareok) alert ("Teilen in diesem Kontext nicht möglich");
 	}); 
 	$('#news-share').click(function() {
-		if (kwd_news) {
-			if (kwd_current_news > -1) {
-				//TODO: prüfen ob url gesetzt, nur wenn nicht dann id nehmen (dies am besten in function, da min. 4 mal gebraucht)
-				var u = 'http://www.kuehne-webdienste.de/index.php?article_id='+kwd_news[kwd_current_news]['article_id'];
-				var name = kwd_news[kwd_current_news]['name'];
+		// - URL auf die Seite im Web
+		// - diese wird aus der article-url gewonnen
+		// - nur isDevice
+		// TODO: function für die drei share-varianten
+		var shareok = false;
+		if(kwd.isDevice) {
+			var n = kwd.news.getItem();
+			if (n!=null) {
+				var u = kwd.news.getUrlFromId(n['article_id']);
+				var name = n['name'];
 				if (!name) name= '';
 				window.plugins.socialsharing.share("Schauen Sie sich diese interessante Seite an!", "KÜHNE-Webdienste.de "+name, null,u);
+				shareok=true;
 			}
-		}		
+		}
+		if (!shareok) alert ("Teilen in diesem Kontext nicht möglich");
+	});
+	$('#offer-share').click(function() {
+		// - URL auf die Seite im Web
+		// - diese wird aus der article-url gewonnen
+		// - nur isDevice
+		// TODO: function für die drei share-varianten
+		var shareok = false;
+		if(kwd.isDevice) {
+			var o = kwd.projects.getItem();
+			if (o!=null) {
+				var u = kwd.projects.getUrlFromId(o['article_id']);
+				var name = o['name'];
+				if (!name) name= '';
+				window.plugins.socialsharing.share("Schauen Sie sich diese interessante Seite an!", "KÜHNE-Webdienste.de "+name, null,u);
+				shareok=true;
+			}
+		}
+		if (!shareok) alert ("Teilen in diesem Kontext nicht möglich");
 	});
 
 	// Intervall-Modus voreinstellen

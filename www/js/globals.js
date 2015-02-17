@@ -102,6 +102,7 @@ function KwdApp()	 {
 	// only if localhost is there 
 	else if (document.URL.indexOf("localhost") != -1) {
 		remoteBase = "http://localhost/tk/kwd-redaxo-46/";
+		logthis("found http locahost: "+remoteBase);
 	}
 	
 	// more public members:

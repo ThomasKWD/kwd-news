@@ -54,6 +54,7 @@ bestehenden Funktionen
 	/*
 	 * returns URL from id
 	 * - result depends on the base path set
+	 * - TODO: special code for mages
 	 */
 	this.getUrlFromId = function(id) {	
 		return remoteBase + 'index.php?article_id='+id;
@@ -108,8 +109,8 @@ bestehenden Funktionen
 		}).complete(function(){
 			//console.log('update fertig');
 			//$('#load-result').html('fertig');
-	    	kwd_log("download -"+souceKey+"- ready");
-		}).success(this.response);
+	    	kwd_log("download -"+storageKey+"- ready");
+		}).success(this.r8esponse);
 		
 	};
 	
@@ -163,18 +164,31 @@ bestehenden Funktionen
 		- value -1 means no selection
 		- useful for access with getItem
 	*/
-	this.seCurrent = function(id) {
-		
+	this.setCurrent = function(id) {
+		current = id;
 	};
 	
 	/* returns a certain entry from data
 		- id is just the index up to now
+		- if id not given, use var 'current'
 		- key selects a certain part of the item
 	*/
 	this.getItem = function(id,key) {
-		if(data && data.length && data[id]) {
-			if(key) return data[id][key];
-			else return data[id];
+		
+		var i = current;
+		
+		if (id != undefined) {
+			i = id;
+		}
+		else {
+			logthis("current in getItem:"+current);
+			// wenn current aber -1, null zurück!!
+			if(current == -1) return null;
+		}				
+		
+		if(data && data.length && data[i]) {
+			if(key) return data[i][key];
+			else return data[i];
 		}
 		else return null;
 	};
@@ -213,6 +227,8 @@ bestehenden Funktionen
 	if(typeof params.id != undefined) sourceId = params.id;
 	
 	// update on construct just is easier
+	// Problem: App waits on statup in case no internet connection
+	// TODO: check connection status and call method from kwd object
 	this.download();
 }
 

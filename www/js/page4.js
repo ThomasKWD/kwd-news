@@ -2,10 +2,9 @@
  * enthält Scripte für ANGEBOTE-Seite und Unterseiten
  * 
  */
-var kwd_current_offer = -1;
-
 function kwd_offers2list() {
 
+	// TODO: as long as we use kust one element ('name'), we could use kwd.offers.getList('name')
 	var offers = kwd.offers.getList(); // get null == no list available
 		//kwd_log("len: "+offers.length);
 
@@ -28,7 +27,7 @@ function kwd_offers2list() {
 			html += "<li class=anoffer>";
 			
 			// click handler über jquery geht irgendwie nicht
-			html += "<a href=#page-anoffer onClick=\"kwd_current_offer="+(i)+";\">"; //TODO: use id instead of i
+			html += "<a href=#page-anoffer onClick=\"kwd.offers.setCurrent("+(i)+");\">"; //TODO: use id instead of i
 			
 			// currently no image displayed 
 			// da imgsrc jetzt auch eine Liste enthalten kann(!)
@@ -78,23 +77,10 @@ $( document ).on( "pagebeforeshow", "#page-offers", function() {
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-anoffer", function() {
-	// der Einfachheit halber Select des Contents über Variable
-	if (kwd_current_offer!=-1) {
-		//get certain data entry
-		// TODO: the list above should produce an id value ...
-		//	 	for kwd_current_offer rather then index i
-		try {
-			var c=kwd.offers.getItem(kwd_current_offer);
-		if (c) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
-			//$("#page-anoffer h2").html(kwd_offers[kwd_current_offer]['name']);
-			$('#page-title').text(c['name']);
-			$("#offer-info").html(c['info']);
-			//$("#offer-info").append('<a href="'+kwd_offers[kwd_current_offer]['url']+'" target="_blank">'+kwd_offers[kwd_current_offer]['url']+'</a>');
-			$("#offer-url").attr("href", c['url']);
-		}
-		}
-		catch(e) {
-			kwd_log("error: "+e.message);
-		}
+	
+	var o = kwd.offers.getItem();
+	if (o != null) {
+		$('#page-title').text(o['name']);
+		$("#offer-info").html(o['info']);
 	}
 });

@@ -2,11 +2,8 @@
  * enthält Scripte für NEWS-Seite und Unterseiten
  * 
  */
-var kwd_current_news = -1;
 
 /*TODO:
- * - wenn path ok aber keine Bilder vorhanden sieht man nichts
- * (wie prüfen, ob Bilder im Cache??) 
  * - wenn keine Projekte in local storage gefunden *nicht* noch einmal update starten, sondern nur Hinweis auf offline!! 
  */
 function kwd_news2list() {
@@ -29,7 +26,7 @@ function kwd_news2list() {
 			html += "<li class=anews>";
 			
 			// click handler über jquery geht irgendwie nicht
-			html += "<a href=#page-anews onClick=\"kwd_current_news="+(i)+";\">"; // warum onClick??
+			html += "<a href=#page-anews onClick=\"kwd.news.setCurrent("+(i)+");\">"; // warum onClick??
 			
 			var n = news.next();
 			
@@ -75,12 +72,15 @@ $( document ).on( "pagebeforeshow", "#page-news", function() {
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-anews", function() {
 	// der Einfachheit halber Select des Contents über Variable
-	if (kwd_current_news!=-1 && kwd_readNews()) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
+	// TODO: durch getItem wird bestimmt ob current -1!!!
+	n=kwd.news.getItem(); // n==null means current=-1(no current available!)
+	if (n!==null) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
 		//$("#page-anews h2").html(kwd_news[kwd_current_news]['name']);
-		$('#page-title').text(kwd_news[kwd_current_news]['name']);
-		$("#news-info").html(kwd_news[kwd_current_news]['info']);
-		kwd_log(kwd_news[kwd_current_news]['info']);
+		$('#page-title').text(n['name']);
+		$("#news-info").html(n['info']);
+		//no url up to now (share link is handled elsewhere!)
 		//$("#news-info").append('<a href="'+kwd_news[kwd_current_news]['url']+'" target="_blank">'+kwd_news[kwd_current_news]['url']+'</a>');
-		$("#news-url").attr("href", kwd_news[kwd_current_news]['url']);
+		// TODO: share link code HIER setzen, statt in index.js
 	}
+	else { kwd_log("current news item not available");}
 });
