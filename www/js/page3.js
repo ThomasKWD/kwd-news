@@ -36,11 +36,9 @@ function kwd_projects2list_oop() {
 			
 			html += "<li class=aproject>";
 			
-			// click handler über jquery geht irgendwie nicht
+			// click handler über jquery geht in diesem Fall irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd.projects.setCurrent("+(i)+");\">";
 			
-			// da imgsrc jetzt auch eine Liste enthalten kann(!)
-			// nur erstes Bild herausfiltern (kommagetrennte Namen):
 			html += '<img style="width:80px" src="'+p['thumb']+'" />';
 			//kwd_log(p['thumb']);
 			//kwd_log("wrote:"+p['thumbsrc']);

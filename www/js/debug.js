@@ -7,7 +7,6 @@
  * Außerdem wird die Unterscheidung zwischen Browser-Ansicht und App-Ansicht verwaltet. (siehe auch onDeviceReady )
  * TODO: html mit css debug/develope durch js aus/einblenden
 
-"""###
 */
 
 // Globale Schalter

@@ -33,14 +33,13 @@ bestehenden Funktionen
 	var remoteBase = "";
 	var storageKey = "";
 	var sourceId = 0; // redaxo article_id for data
-	var mode = "auto";  //auto|online|offline
+	var updatemode = "auto";  //auto|online|offline
 	var current = -1;   // current selected item value (index|id)
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
 	var files;  // object -- what if object ist not initialized properly??
 	
 	// construct code at the end of declaration!
 
-  	// public methods
 	
 
   	// for compatibility "private method"
@@ -48,6 +47,23 @@ bestehenden Funktionen
   		kwd_log(element);
   	};
 
+  	// public methods
+  	
+  	/* sets and/or returns value of update mode
+  	 * values: auto|offline|online
+  	 * - this function works different to the equivalent in 'CachedFiles'
+  	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
+  	 */
+  	this.updateMode = function(mode) {
+  		
+  		// TODO: what happens when mode==undefined??
+  		if(mode) {
+  			updatemode = mode;
+  		}
+  		
+  		return updatemode;
+  	};
+  	
 	this.getElementByIndex = function(index) {
 		return "test element";
 	};
@@ -93,7 +109,7 @@ bestehenden Funktionen
 	*/
 	this.download = function() {
 		
-		if(mode!='offline' && this.checkConnection()) { // this prevents waiting when offline
+		if(this.updateMode()!='offline' && this.checkConnection()) { // this prevents waiting when offline
 		
 			//$('#load-result').html('AKTUALSIEREN');
 			//kwd_log('starte aktualisieren');
@@ -157,7 +173,6 @@ bestehenden Funktionen
 	
 	/* produces urls for the files depending on 
 		source location ( possible local cached files) 
-		
 	*/
 	this.setThumbSources = function () {
 		// TODO: add control for selecting source + check if online offline
@@ -257,7 +272,7 @@ bestehenden Funktionen
 			// logthis("readstorage ok: "+data);
 		}
 		
-		this.setThumbSources();
+		this.setThumbSources(); // caching mechanism will be started by this
 		
 		if (data!=null) {
 			var test = new KwdIterator(data,key);
@@ -268,9 +283,10 @@ bestehenden Funktionen
 	};
 
 	// construct code
+	
 	if(typeof params.remote != undefined) remoteBase = params.remote;
 	if(typeof params.key != undefined) storageKey = params.key;
-	if(typeof params.mode != undefined) mode = params.mode; // TODO: where this var is used??
+	if(typeof params.mode != undefined) this.updateMode(params.mode); // TODO: where this var is used??
 	if(typeof params.id != undefined) sourceId = params.id;
 	if(typeof params.isDevice != undefined) device = params.device;
 	if(typeof params.files != undefined) files = params.files;
@@ -287,9 +303,12 @@ bestehenden Funktionen
 
 	- unabhängig von KwdCachedContent, da einfach Liste für alle files
 	- erzeugt, prüft und/oder speichert auch den aktuellen lokalen Pfad (localBase)
-	- files werden mit ganzem Pfad gespeichert, der separat gespeicherte Pfad ist für neu hinzugefügte
+	- files in 'list' werden mit ganzem Pfad gespeichert, der separat gespeicherte Pfad ist für neu hinzugefügte, der 'name' wird aber ohne Pfad gespeichert
+	- list['local'] enthält Namen mit Pfad aus 'remoteBase', falls Caching nicht möglich
+	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
 	- 'mode': offline(=only files already saved)|online(=files only directly from web)|auto(=first save file id needed, then display from local)
 	- TODO: bei Zwangs-Löschen des Cache sollte auch der Pfad neu *erzeugt* werden
+	- TODO: auch im 'browser'-Modus alle Cache-Funktionen aktiv, nur das speichern selbst wird nicht ausgeführt
 */
 function CachedFiles(params) {
 	
@@ -298,12 +317,32 @@ function CachedFiles(params) {
 	var remoteBase = '';
 	var storagePath = '';
 	var storageFiles = '';
-	var updateMode = "auto";  //auto|online|offline
+	var updatemode = "auto";  //auto|online|offline
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
+	var list = new Array();   // sub-elements: 'name' + 'local'
 
 	function logthis(element) {
 		kwd_log(element);
 	}
+
+  	/* sets and/or returns value of update mode
+  	 * values: auto|offline|online
+  	 * - WARNING!: updatemode is always reset to 'online' in curtain environments
+  	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
+  	 */
+  	this.updateMode = function(mode) {
+  		
+		// decide according to device
+		//if (device=='browser') updatemode = 'online'; // this code can be changed for testing!
+		{
+	  		// TODO: what happens when mode==undefined??
+	  		if(mode) updatemode = mode;
+  		}
+  		
+  		return updatemode;
+  	};
+  	
+
 	
 	/* returns current save path
 	 * - should also be used by methods of this object
@@ -311,11 +350,11 @@ function CachedFiles(params) {
 	 */
 	this.getLocalBase = function() {
 		
-		if (updateMode!='online') {
+		if (this.updateMode()!='online') {
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
-					if(p.indexOf('/') != path.length-1) p += '/';
+					if(p.lastIndexOf('/') != path.length-1) p += '/';
 					localBase = p; 
 					return localBase;		
 				}
@@ -327,6 +366,24 @@ function CachedFiles(params) {
 			}			
 		}
 		return remoteBase;
+	};
+	
+	/* returns ready to use local filepath
+	 * - the given 'filename' may be converted to make a valid filename
+	 */
+	this.getLocalPath = function(filename) {
+		
+		return remoteBase + filename;	
+	};
+	
+	/* stores the files list (e.g. in localStorage)
+	 * 
+	 */
+	this.saveFileList = function() {
+		
+		var strwrite = JSON.stringify(list);
+		if (strwrite) localStorage.setItem(kwd_storage_files,strwrite);
+		logthis("files:"+strwrite);
 	};
 	
 	/* adds a new file to the list
@@ -354,27 +411,57 @@ function CachedFiles(params) {
 	
 	/* get a file uri for display
 	 * - manages the list internally
-	 * - the user of the object mostly only needs this method
-	 * - name can also be a script or another complicated string
-	 * - TODO: check what happens when complicated string accours!
+	 * - the user needs this method only (most cases)
+	 * - 'name': file without path, can also be a script or another complicated string
+	 * - TODO: check what happens when complicated string occurs!
 	 */
 	this.getCached = function(name) {
-		if(updateMode=='online') {
-			return this.getLocalBase() + name;
+		
+		// try to load (assumes that filelist already loaded when not empty)
+		if (list.length<1) {
+			var strread = localStorage.getItem(kwd_storage_files);
+			if(strread) {
+				logthis("got files");
+				logthis(strread);
+				list = JSON.parse(strread);
+				logthis(list);
+			}
 		}
-		else {
-			logthis("Caching in getFile not yet implemented");
+		
+		// find name in list
+		var i,j;
+		var entry = '';
+		for (i=0,j=list.length;i<j;i++) {
+			if (list[i]['name']==name) {
+				entry = list[i]['local'];
+				break;
+			}
 		}
+		
+		// nicht in Liste, dann hinzufügen
+		if(entry=='') {
+			logthis("schon wieder neues Element");
+			var a = new Object();
+			a['name'] = name;
+			// TODO: local name must be converted before use
+			a['local'] = this.getLocalPath(name);
+			//logthis(a); // is array??? // geht angeblich nicht  
+			list.push(a);
+			this.saveFileList();
+			entry = a['local']; 
+		}
+		
+		if(this.updateMode()=='online') {
+			return remoteBase + name;
+		}
+		else return entry;
 	};
 	
 	// construct code
 	if(typeof params.remote != undefined) remoteBase = params.remote;
-	if(remoteBase.indexOf('/') != remoteBase.length-1) remoteBase += '/';
+	if(remoteBase.lastIndexOf('/') != remoteBase.length-1) remoteBase += '/';
 	if(typeof params.key != undefined) storageFiles = params.key;
 	if(typeof params.key != undefined) storagePath = params.path;
-	if(typeof params.mode != undefined) updateMode = params.mode; 
+	if(typeof params.mode != undefined) this.updateMode(params.mode); 
 	if(typeof params.isDevice != undefined) device = params.device;
-
-	// decide according to device
-	if (device=='browser') updateMode = 'online';
 }

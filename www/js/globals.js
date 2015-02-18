@@ -7,6 +7,7 @@ var kwd_news = null;
 var kwd_offers = null;
 var kwd_files = '';
 var kwd_thumbs = '';
+
 /*
  * Konstanten für local-storage
  * der Einfachheit halber global
@@ -16,11 +17,11 @@ const kwd_storage_news = 'news';           // JSON-String der Newsdaten
 const kwd_storage_offers = 'offers';       // JSON-String der Angebotsdaten
 const kwd_storage_path = 'path';           // Pfad auf Device für Dateien -- wird noch gebraucht?????????
 const kwd_storage_files = 'files';         // Liste der Dateien // TODO: auch als JSON?(dann mit Status-Infos)
-
 /*	siehe unter kwd_storage_files parallel für thumbs
 	thumbs werden im filesystem des Device mit prefix "thumb-" gespeichert.
 */
 const kwd_storage_thumbs = 'thumbs';       // Liste alternativer Dateien (Vorschaubilder) -- TODO: als veraltet betrachten
+const kwd_storage_update = 'update';
 
 /*
  * globale Schalter
@@ -45,9 +46,12 @@ geplant:
 function KwdApp()	 {
 
 	// private members:
-	var remoteBase = "";
-
 	
+	var remoteBase = "";
+	
+	// wird gespeichert (auch in localStorage) und an enthaltene Objekte weitergegeben:
+	var updatemode = 'auto'; 
+
 	// public properties
 	this.isDevice = false;
 	this.isDroidscript = false;
@@ -58,85 +62,41 @@ function KwdApp()	 {
   		kwd_log(element);
   	};
 
-	//construct code
-		
-    // are we running in native app or in a browser?
-    // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
-    // kwd.isDevice = false; preset inside object!
-    // DroidScript version 1.18 beta recognized  
-    if(document.URL.indexOf("droidscript") != -1 || document.URL.indexOf("Droid") != -1) {
-    	this.isDroidscript = true;
-    }
-    else if(document.URL.indexOf("http://") == -1 
-        && document.URL.indexOf("https://") == -1
-        && document.URL.indexOf("sgit") == -1
-        && document.URL.indexOf("/kwd-news/") == -1 //for local test    
-	) {
-		this.isDevice = true;
-    }
-
-	// set paths if possible
-	remoteBase = "http://www.kuehne-webdienste.de/";
-	
-	if(this.isDevice) {
-	}
-	else if (this.isDroidscript) {
-		// code in download Test
-	}
-	// only if localhost is there 
-	else if (document.URL.indexOf("localhost") != -1) {
-		remoteBase = "http://localhost/tk/kwd-redaxo-46/";
-		logthis("found http locahost: "+remoteBase);
-	}
-	
-	// more public members:
-	var dev = 'browser';
-	if (this.isDevice) dev = 'phonegap';
-	if (this.isDroidscript) dev = 'droidscript';
-	
-	// ein einzelnes File-Objekt:
-	// TODO: teste ob alle CachedWebContent dann mit der gleichen Instanz arbeiten!!
-	// wenn nicht, muss in CachedWebContent kwd.chachedFiles verwendet werden :-(
-	this.cachedFiles = new CachedFiles({
-		remote : remoteBase,
-		key : kwd_storage_files,
-		path : kwd_storage_path,
-		mode : 'auto',
-		device : dev
-	});
-
-
-	// TODO: da alle diese Parameter auch nochmal für Files gebraucht werden,
-	//		Einrichtung eines "KwdInfo"-Objekts?
-	this.projects = new CachedWebContent({ // TODO: use set-functions of base paths
-		remote : remoteBase,
-		key : kwd_storage_projects,
-		mode : 'auto',
-		id : 10,
-		device : dev,
-		files : this.cachedFiles
-	});
-	this.news = new CachedWebContent({
-		remote : remoteBase,
-		key : kwd_storage_news,
-		mode : 'auto',
-		id : 25,
-		device : dev,
-		files : this.cachedFiles
-	});
-	this.offers = new CachedWebContent({
-		remote : remoteBase,
-		key : kwd_storage_offers,
-		mode : 'auto',
-		id : 45,
-		device : dev,
-		files : this.cachedFiles
-	});
-
-		
-	
-
 	// public methods
+	
+	/* sets and/or gets the current update mode
+	 * - saves mode, if new is given ('mode')
+	 * - loads mode for return value
+	 * - (typical "setter-getter-combi-method" :-)
+	 * - 'mode': auto|online|offline
+	 */
+	this.updateMode = function(mode) {
+		if(mode) {
+			
+			if (mode=='auto' || mode=='online' || mode=='offline') {
+				try {
+					updatemode = mode;
+					localStorage.setItem(kwd_storage_update, updatemode);
+					// inform member objects:
+					this.projects.updateMode(updatemode);
+					this.news.updateMode(updatemode);
+					this.offers.updateMode(updatemode);
+					this.cachedFiles.updateMode(updatemode);
+				}
+				catch(e) {
+					logthis("error setting value in KwdApp::updateMode: "+e.message);
+				}
+			}
+			else logthis("invalid value for updateMode:"+mode);
+		}
+		else {
+			
+			var strread = localStorage.getItem(kwd_storage_update);
+			if (strread!==null) updatemode = strread;
+		}
+		
+		return updatemode;
+	};
 	
 	/*
 	 * datasource: "projects"|"news"|"offers", if empty, you should return data of all the lists
@@ -180,6 +140,89 @@ function KwdApp()	 {
 		return remoteBase + 'index.php?article_id='+id;
 	};
 
+
+	//construct code
+		
+    // are we running in native app or in a browser?
+    // das device-Objekt hier nicht nehmen, da evtl. noch nicht aktiv!
+    // kwd.isDevice = false; preset inside object!
+    // DroidScript version 1.18 beta recognized  
+    if(document.URL.indexOf("droidscript") != -1 || document.URL.indexOf("Droid") != -1) {
+    	this.isDroidscript = true;
+    }
+    else if(document.URL.indexOf("http://") == -1 
+        && document.URL.indexOf("https://") == -1
+        && document.URL.indexOf("sgit") == -1
+        && document.URL.indexOf("/kwd-news/") == -1 //for local test    
+	) {
+		this.isDevice = true;
+    }
+
+	// set paths if possible
+	remoteBase = "http://www.kuehne-webdienste.de/";
+	
+	if(this.isDevice) {
+	}
+	else if (this.isDroidscript) {
+		// code in download Test
+	}
+	// only if localhost is there 
+	else if (document.URL.indexOf("localhost") != -1) {
+		remoteBase = "http://localhost/tk/kwd-redaxo-46/";
+		logthis("found http locahost: "+remoteBase);
+	}
+	
+	
+	// more public members:
+	var dev = 'browser';
+	if (this.isDevice) dev = 'phonegap';
+	if (this.isDroidscript) dev = 'droidscript';
+
+	// get update mode (if previously saved)
+	// gets the updatemode (possibly from localStorage or other external memory),
+	// WARNING!: You must not call the function this.updateMode with a parameter value which would lead to access undefined objects!
+	// TODO: throw an error on the issue above
+	updatemode = this.updateMode();
+	
+	
+	// ein einzelnes File-Objekt:
+	// TODO: teste ob alle CachedWebContent dann mit der gleichen Instanz arbeiten!!
+	// wenn nicht, muss in CachedWebContent kwd.chachedFiles verwendet werden :-(
+	this.cachedFiles = new CachedFiles({
+		remote : remoteBase,
+		key : kwd_storage_files,
+		path : kwd_storage_path,
+		mode : updatemode,
+		device : dev
+	});
+
+
+	// TODO: da alle diese Parameter auch nochmal für Files gebraucht werden,
+	//		Einrichtung eines "KwdInfo"-Objekts?
+	this.projects = new CachedWebContent({ // TODO: use set-functions of base paths
+		remote : remoteBase,
+		key : kwd_storage_projects,
+		mode : updatemode,
+		id : 10,
+		device : dev,
+		files : this.cachedFiles
+	});
+	this.news = new CachedWebContent({
+		remote : remoteBase,
+		key : kwd_storage_news,
+		mode : updatemode,
+		id : 25,
+		device : dev,
+		files : this.cachedFiles
+	});
+	this.offers = new CachedWebContent({
+		remote : remoteBase,
+		key : kwd_storage_offers,
+		mode : updatemode,
+		id : 45,
+		device : dev,
+		files : this.cachedFiles
+	});
 }
 
 /*
