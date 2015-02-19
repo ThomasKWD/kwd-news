@@ -5,6 +5,7 @@
 function kwd_offers2list() {
 
 	// TODO: as long as we use kust one element ('name'), we could use kwd.offers.getList('name')
+	// WARNING!: getList(): code parameter first, then key!
 	var offers = kwd.offers.getList(); // get null == no list available
 		//kwd_log("len: "+offers.length);
 
@@ -63,7 +64,7 @@ function kwd_offers2list() {
 		// vorbereitetes Hinweisfenster aktualisieren
 		$('#offers-info').html('Keine Daten für Anzeige vorhanden');
 		if (!kwd_update) $('#offers-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		$('#offers-info').append('<br />'+navigator.connection.type);		
+		if(kwd.isDevice) $('#offers-info').append('<br />'+navigator.connection.type);		
 		$('#box-offers-info').css({'display':'block'}); // sichtbar
 	}
 

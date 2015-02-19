@@ -12,9 +12,20 @@
 function kwd_projects2list_oop() {
 
 	
+		// sets the code to be done as string
+		// ###id### and ###uri### are placeholders to be filled with the proper id (current element in list) and source of file
+		// the code then will be eval'd
+		// this function is for
+		// - set the image source *when the download is finished*, so the rest of the layout doesn't have to wait for the files
+		// - have no layout dependend code inside data structures
+		// TODO: accomplish this with anonymous  callback function value		
+		var code = '$("#projectlist###id###").attr("src",###uri###);';           				
+
 		// first get the proper list of entries (Iterator Object!)
-		var projects = kwd.projects.getList(); // get null = no list available
+		var projects = kwd.projects.getList(code); // get null = no list available
 		//kwd_log("len: "+projects.length);
+		
+
 
 		//kwd_log("iterator dump: "+JSON.stringify(projects, null, 4));
 	
@@ -34,15 +45,22 @@ function kwd_projects2list_oop() {
 			var p = projects.next();
 			//kwd_log(p);
 			
-			html += "<li class=aproject>";
+			html += '<li class="aproject">';
 			
 			// click handler über jquery geht in diesem Fall irgendwie nicht
 			html += "<a href=#page-aproject onClick=\"kwd.projects.setCurrent("+(i)+");\">";
+			// you need a call-back or a add function
+			// otherwise you must use the jquery code inside your data objects
+			/*
+			 
+			 kwd.cachedFiles.addFile(p['thumb'],function(){
+				$('#projectlist'+i).attr('src',link);           				
+			});
+			*/
+			//kwd.cachedFiles.addFile(p['thumb'],projectsimagecallback);
+			html += '<img  id="projectlist'+i+'" style="width:80px" src="'+p['thumb']+'" />';
 			
-			html += '<img style="width:80px" src="'+p['thumb']+'" />';
-			//kwd_log(p['thumb']);
-			//kwd_log("wrote:"+p['thumbsrc']);
-						
+			
 			html += "<h3>"+p['name']+"</h3>";
 			
 			// für Listenausgabe Protokoll-Präfix abschneiden
@@ -53,7 +71,6 @@ function kwd_projects2list_oop() {
 			html += "</li>";
 		
 			i++;
-
 		}
 	
 	
@@ -82,7 +99,8 @@ $( document ).on( "pagebeforeshow", "#page-projects", function() {
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-aproject", function() {
-	var p = kwd.projects.getItem(); // item is preselected by setCurrent
+	var code = '$("#projectlist###id###").attr("src",###uri###);';           				
+	var p = kwd.projects.getItem(code); // item is preselected by setCurrent
 	if (p!=null) {
 		// TODO: code for images
 		$('#page-title').text(p['name']);
@@ -92,7 +110,7 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		var i = 0;
 		var html = '';
 		for(i=0;i<p['images'].length;i++) {
-			html += '<img src="'+p['images'][i]+'" /> ';
+			html += '<img id="projectimage'+i+'"src="'+p['images'][i]+'" /> ';
 		}
 		$("#project-images").html(html);
 	}

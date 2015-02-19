@@ -30,8 +30,6 @@ function onDirError(e) {
 	kwd_log(JSON.stringify(e));
 }
 
-//function window.requestFileSystem called in index.js
-
 function onFileSystemSuccess(fileSystem) {
 	kwd_log('onFileSystemSuccess');
 	kwd_log(fileSystem.name);

@@ -8,6 +8,7 @@
  */
 function kwd_news2list() {
 
+	// WARNING!: getList(): code parameter first, then key!
 	var news = kwd.news.getList(); // get null = no list available
 	if (news!= null && news.hasNext()) {	
 		

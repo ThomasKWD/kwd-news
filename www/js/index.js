@@ -111,7 +111,18 @@ function onDeviceReady() {
 		showLinks();           				
 	});
 	$('#doTest3').click(function(){
-		alert("test to put a new src to an image by javascript (is image loaded by this????)");           				
+		
+		var teststring = '$("#testbild").attr("src","http://localhost/tk/kwd-redaxo-46/files/me-shot.jpg");';
+		eval(teststring);
+		kwd_log("eval works as expected.");
+
+		var strread = localStorage.getItem(kwd_storage_files);
+		if(strread) {
+			kwd_log("test files array:");
+			kwd_log(JSON.parse(strread));
+		}
+		           				
+		// $('#testbild').attr('src','http://localhost/tk/kwd-redaxo-46/files/me-shot.jpg');           				
 	});
 	$('#data-rel-forward').click(function(){
 		window.history.go(1); // try to go forward history				           				
