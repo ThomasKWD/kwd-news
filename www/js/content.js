@@ -37,7 +37,7 @@ bestehenden Funktionen
 	var current = -1;   // current selected item value (index|id)
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
 	var onloadcode = '';
-	
+	var globalplaceholderfile = 'spacer.gif';
 	// construct code at the end of declaration!
 
 	
@@ -78,6 +78,11 @@ bestehenden Funktionen
 	 */
 	this.getUrlFromId = function(id) {	
 		return remoteBase + 'index.php?article_id='+id;
+	};
+	
+	this.placeHolderFile = function(newfile) {
+		if(newfile) globalplaceholderfile = newfile;
+		return globalplaceholderfile;
 	};
 	
 	/* returns whether internet connection is probably existing
@@ -193,15 +198,19 @@ bestehenden Funktionen
 
 	
 	/* produces urls for the files depending on 
-		source location ( possible local cached files) 
+		source location ( possible local cached files)
+		- function assumes that only 0 or 1 thumbsrc can exist
+		- if thumbsrc does not exist or is empty, the global placeholder file url will be used
+		  (because the caller may use ['thumb'] and did not check if he has a thumb ) 
 	*/
 	this.setThumbSources = function () {
-		// TODO: add control for selecting source + check if online offline
-		// TODO: how to check whether an index name exists.
 		if (data!=null) {
 			try {
 				var i;
 				for (i=0;i<data.length;i++) {
+					// preset with default:
+					data[i]['thumb']= this.placeHolderFile();
+
 					if(data[i]['thumbsrc']) {
 						// parse the code for callback and give it to the files object
 						var c = this.onLoadCode();
@@ -212,7 +221,8 @@ bestehenden Funktionen
 						else logthis("no code for thumb in id:"+i);
 						// getCached may return a *remote* url because the file-download is started and still in progress!
 						// ...although the file will eventually be cached
-						data[i]['thumb']= files.getCached(data[i]['thumbsrc'],c);
+						var s = files.getCached(data[i]['thumbsrc'],c); // returns '' when caching
+						if(s) data[i]['thumb'] = s; // double secure
 					}
 				}
 			}
@@ -240,6 +250,8 @@ bestehenden Funktionen
 		// explode and list images:
 		var images = new Array();
 		
+		// TODO: do *nothing* in case a imgsrc is empty!
+		
 		if (data[id]['imgsrc'].indexOf(',')!=-1) {
 			images = data[id]['imgsrc'].split(',');
 		}
@@ -254,7 +266,14 @@ bestehenden Funktionen
 				c = c.replace('###id###',i);
 				// the other placeholder is not parsed here!
 			}
-			images[i] = files.getCached('files/'+images[i],c); // adds 'files/', TODO: should be provided by web data
+			// only if string
+			if(images[i]) {
+				images[i] = files.getCached('files/'+images[i],c); // adds 'files/', TODO: should be provided by web data
+			}
+			// else set default
+			else {
+				images[i] = this.placeHolderFile();
+			}
 		}
 		
 		data[id]['images'] = images; // copy array
@@ -342,12 +361,12 @@ bestehenden Funktionen
 	
 	// construct code
 	
-	if(typeof params.remote != undefined) remoteBase = params.remote;
-	if(typeof params.key != undefined) storageKey = params.key;
-	if(typeof params.mode != undefined) this.updateMode(params.mode); // TODO: where this var is used??
-	if(typeof params.id != undefined) sourceId = params.id;
-	if(typeof params.isDevice != undefined) device = params.device;
-	if(typeof params.files != undefined) files = params.files;
-	
+	if(params.remote) remoteBase = params.remote;
+	if(params.key) storageKey = params.key;
+	if(params.mode) this.updateMode(params.mode); // TODO: where this var is used??
+	if(params.id) sourceId = params.id;
+	if(params.isDevice) device = params.device;
+	if(params.files) files = params.files;
+	if(params.placeholder) this.placeHolderFile(params.placeholder);	
 }
 

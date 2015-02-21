@@ -221,7 +221,8 @@ function KwdApp()	 {
 		mode : updatemode,
 		id : 10,
 		device : dev,
-		files : this.cachedFiles
+		files : this.cachedFiles,
+		placeholder : 'res/placeholder.png'
 	});
 	this.news = new CachedWebContent({
 		remote : remoteBase,
@@ -229,7 +230,8 @@ function KwdApp()	 {
 		mode : updatemode,
 		id : 25,
 		device : dev,
-		files : this.cachedFiles
+		files : this.cachedFiles,
+		placeholder : 'res/placeholder.png'
 	});
 	this.offers = new CachedWebContent({
 		remote : remoteBase,
@@ -237,7 +239,8 @@ function KwdApp()	 {
 		mode : updatemode,
 		id : 45,
 		device : dev,
-		files : this.cachedFiles
+		files : this.cachedFiles,
+		placeholder : 'res/placeholder.png'
 	});
 }
 

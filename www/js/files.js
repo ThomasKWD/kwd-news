@@ -40,6 +40,7 @@ function CachedFiles(params) {
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
 	var list = new Array();   // sub-elements: 'name' + 'local'
 	var downloadCounter = -1;
+	var moreDownloads = 0; // counts in addition to downloadCounter since the "startDownload" my be called to frequently
 	var lastDownloaded = -1;
 	//var downloadIterator = null;
 
@@ -82,16 +83,24 @@ function CachedFiles(params) {
 	}
 	
 	// rekursiv
-	// Achtung!: wegen Nutzung als Callback keine function Parameter möglich (nur für initialen Aufrud nutzbar!)
 	// features:
-	// - handles isDoridscript as well
+	// - handles 'moreDownloads', when end of list is reached
+	// - sets ready downloads to 'status'=='cache'
 	// return: true: download gestartet, false: konnte Download nicht starten
+	// TODO: better download queue
 	function _downloadNextFile() {
 		
 		// first correct the status of the last downloaded!
 		if(lastDownloaded!=-1) {
 			list[lastDownloaded]['status']['cache'];
 			lastDownloaded=-1;
+			
+			try {
+				eval(list[lastDownloaded]['code']);
+			}
+			catch(e) {
+				logthis("error eval file ("+list[lastDownloaded]['code']+") : "+e.message);
+			}
 			
 		}
 	
@@ -111,21 +120,27 @@ function CachedFiles(params) {
 		
 		// downcount hier! // dadurch auto. counter auf n-1
 		downloadFileCounter--;
-		if (downloadFileCounter<0) return false;
+		if (downloadFileCounter<0) {
+			// check for more downloads and restart cycle
+			if (moreDownloads>0) {
+				moreDownloads--;
+				_downloadNextFile();
+			}
+			return false;
+		}
 		
 		// invoke download only if required by keyword 'download'
 		if(list[n]['status']=='download') {
 						
 		    // change status
 		    list[n]['status']='progress';
-		    //TODO: you must save the index (id) of the last downloaded item!
 		    
 		    var fileTransfer = new FileTransfer();
 		   	lastDownloaded = n;
 		    fileTransfer.download(
 		    	
 		        list[n]['remote'],
-		        list[n]['local'],  // does not work with thumbs -- TODO: funktion von app, die Name bereinigt!!!
+		        list[n]['local'], 
 		        function(file) { // success
 		        	_downloadNextFile(); 
 		        },
@@ -146,12 +161,17 @@ function CachedFiles(params) {
 	
 	/* prepares downloading all of list 
 	 * - TODO: check if access to list!!!
+	 * - TODO: how to prevent many downloads at a time with several different updated lists??? 
 	 */
-	function startDownloadImages() {
-		downloadCounter = -1;
-		//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
-		_downloadNextFile();	
-	}
+	this.startDownload = function(id) {
+		moreDownloads++;
+		
+		if(moreDownloads<=1) {
+			downloadCounter = -1;
+			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
+			_downloadNextFile();			
+		}
+	};
   	
   	//////////////     public methods
   	
@@ -181,20 +201,19 @@ function CachedFiles(params) {
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
-					return localBase;		
+					return localBase;
+					logthis("got path: "+p);		
 				}
 				else {
 					if(device=='phonegap') {
 
-					    window.requestFileSystem(
-					        LocalFileSystem.PERSISTENT,
-					        0,
-					        onRequestFileSystemSuccess,
-					        fail
-						);
-						
-						// special content to prevent multiple times to start requestFileSystem
-						localBase='processing';	
+						localBase = cordova.file.cacheDirectory;
+						if(localBase) {
+							if(localBase.lastIndexOf('/')!=localBase.length-1) localBase += '/';
+							localStorage(kwd_storage_path,localBase);
+							logthis("found path: "+localBase);
+							return localBase;							
+						}
 					}
 					else if(device=='droidscript') {
 						// this code is easy
@@ -218,13 +237,13 @@ function CachedFiles(params) {
 	 */
 	this.getLocalPath = function(filename) {
 		
-		var f = filename.replace('index.php',''); // to make name shorter
-		f = f.replace(/rex_img_/g,'');  // to make name shorter
-		f = f.replace(/[\/\?=&%$!\*#]/g,'_');
-		//logthis("ersetzt: "+f);
 		var checkpath = this.getLocalBase();
 		if(checkpath == remoteBase) return remoteBase + filename;
 		else {
+			var f = filename.replace('index.php',''); // to make name shorter
+			f = f.replace(/rex_img_/g,'');  // to make name shorter
+			f = f.replace(/[\/\?=&%$!\*#]/g,'_');
+			//logthis("ersetzt: "+f);
 			// do try download here? (localBase available but local file not yet)
 			return checkpath + f;
 		}	
@@ -242,15 +261,6 @@ function CachedFiles(params) {
 		}
 	};
 	
-	/* adds a new file to the list
-	 * - list will be saved after adding
-	 * - filename can also contain a script uri
-	 * - local name will be generated
-	 */
-	this.add = function (filename) {
-		
-	};
-	
 	/* removes file from the list
 	 * - list will be saved after removing
 	 * 
@@ -266,15 +276,22 @@ function CachedFiles(params) {
 	};
 	
 	/* get a file uri for display
+	 * - returns empty string if file not yet in cache 
 	 * - manages the list internally
 	 * - the user needs this method only (most cases)
 	 * - 'name': file without path, can also be a script or another complicated string
 	 * - 'code': contains javascript code as a string, this will be eval'd by the download-complete-callback
-	 * - TODO: check what happens when complicated string occurs!
+	 * - returns local path only if file is already in cache,
+	 * - returns default image if file is not (yet) in cache
+	 * - in 'browser' mode, ['local'] is set to 'remote' and ['status'] is set to 'cache'
+	 * - TODO: bei isDevice bekommt caller zunächst local-name ohne Pfad :-(, müsste aber remote-Pfad oder Ersatzbild, solange keine Download fertig
 	 */
 	this.getCached = function(name,code) {
 		
+		if (!name) return '';
+		
 		// try to load (assumes that filelist already loaded when not empty)
+		// thus is called only once when app runs
 		if (list.length<1) {
 			var strread = null;
 			//TODO: enable:  // strread = localStorage.getItem(kwd_storage_files);
@@ -297,37 +314,44 @@ function CachedFiles(params) {
 			}
 		}
 		
-		// determine whether not in list or just empty
+		// not  yet in list
 		if(i==j) { // means no entry found in list
 			var a = new Object();
 			a['name'] = name;
 			a['remote'] = remoteBase + name;
-			// TODO: local name must be converted before use
-			a['local'] = this.getLocalPath(name);
-			a['status'] = 'download';
-			
+			a['local'] = this.getLocalPath(name); 
+
 			list.push(a); // hopefully always as next entry at the end!
 			this.saveFileList();
+
+			if(a['remote']==a['local']) {
+				list[i]['status'] = 'na'; 
+			}			
+			else {
+				list[i]['status'] = 'download';
+				this.startDownload();			
+			}
 		}
-		else {
-		}
-		// do always
-		
 		
 		// here list[i] is always valid
-		try {
-			var c = code;
-			if(c) { // not empty?
-				c = c.replace('###uri###',list[i]['local']);
-			}
-			list[i]['code'] = c;
-			entry = list[i]['local'];
-		}
-		catch(e) {
-			logthis('getCached: '+e.message);
-		}
 		
-		return entry;
+		// when use eval?
+		var c = code;
+		if(c) { // not empty?
+			c = c.replace('###uri###',list[i]['local']);
+		}
+		list[i]['code'] = c;
+		
+		if(list[i]['status'] == 'cache' || list[i]['status'] == 'na') {
+			try {
+				eval(list[i]['code']);
+			}
+			catch(e) {
+				logthis("error eval file ("+list[i]['code']+") : "+e.message);
+			}
+			return list[i]['local'];
+		}
+		else return '';
 	};
 	
 	

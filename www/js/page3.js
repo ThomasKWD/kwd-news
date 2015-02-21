@@ -19,7 +19,7 @@ function kwd_projects2list_oop() {
 		// - set the image source *when the download is finished*, so the rest of the layout doesn't have to wait for the files
 		// - have no layout dependend code inside data structures
 		// TODO: accomplish this with anonymous  callback function value		
-		var code = '$("#projectlist###id###").attr("src",###uri###);';           				
+		var code = '$("#projectlist###id###").attr("src","###uri###");';           				
 
 		// first get the proper list of entries (Iterator Object!)
 		var projects = kwd.projects.getList(code); // get null = no list available
@@ -59,7 +59,6 @@ function kwd_projects2list_oop() {
 			*/
 			//kwd.cachedFiles.addFile(p['thumb'],projectsimagecallback);
 			html += '<img  id="projectlist'+i+'" style="width:80px" src="'+p['thumb']+'" />';
-			
 			
 			html += "<h3>"+p['name']+"</h3>";
 			

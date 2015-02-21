@@ -34,7 +34,7 @@
 	<preference name="splash-screen-duration" value="6000"/>
 	<preference name="splashscreen" value="res/sommerfeld.jpg"/>
 	<preference name="AndroidPersistentFileLocation" value="Internal" />
-	
+
     <icon src="kwd.png" />
 <!--
 	    <icon src="res/icon/android/icon-36-ldpi.png"   gap:platform="android"    gap:density="ldpi" />
