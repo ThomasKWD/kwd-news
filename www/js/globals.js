@@ -1,7 +1,15 @@
-// globales Objekt
-// app = null;
-// Globale Datenstrukturen für Inhalte ---------------------------------------
-// TODO: löschen, wenn Objects fertig
+/*
+ * 
+ globales Objekt
+ app = null;
+ Globale Datenstrukturen für App-Steuerung und Verwaltung
+ 
+ - content data are objects *contained* by this global object
+ - init function is for splitting constuction-time and init-time (due to content data sturctures vs. slow "ondeviceready") 
+*/
+
+
+// TODO alle löschen wenn objects laufen:
 var kwd_projects = null;
 var kwd_news = null;
 var kwd_offers = null;
@@ -72,7 +80,7 @@ function KwdApp()	 {
 	 */
 	this.updateMode = function(mode) {
 		if(mode) {
-			
+			throw("KwdApp::updateMode: mode defined");
 			if (mode=='auto' || mode=='online' || mode=='offline') {
 				try {
 					updatemode = mode;
@@ -124,12 +132,18 @@ function KwdApp()	 {
 	 * returns the save path for local files of the app
 	 * -checks for environment (phonegap|droidscript) 
 	 */
-	this.getRootPath = function() {
+	this.getLocalBase = function() {
 		
-		if(!this.isDevice && !this.isDroidscript) {
-			logthis("getAppRootPath not available");
-		}
 		return localBase;
+	};
+	
+	/*
+	 * inits data of members
+	 */
+	this.init = function() {
+		this.projects.init();
+		this.news.init();
+		this.offers.init();
 	};
 	
 	/*
@@ -139,6 +153,8 @@ function KwdApp()	 {
 	this.getUrlFromId = function(id) {	
 		return remoteBase + 'index.php?article_id='+id;
 	};
+	
+	
 
 
 	//construct code

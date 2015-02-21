@@ -3,9 +3,18 @@
     Liste(n) für heruntergeladene oder noch zu ladende Dateien
 
 	- unabhängig von KwdCachedContent, da einfach Liste für alle files
-	- erzeugt, prüft und/oder speichert auch den aktuellen lokalen Pfad (localBase)
+	- erzeugt, prüft und/oder speichert auch den aktuellen lokalen Pfad (localBase) --> NEU: erzeugen nicht mehr so kompliziert!!
 	- files in 'list' werden mit ganzem Pfad gespeichert, der separat gespeicherte Pfad ist für neu hinzugefügte, der 'name' wird aber ohne Pfad gespeichert
 	- list['local'] enthält leeren String, wenn noch nicht heruntergeladen oder Pfad aus 'remoteBase', falls Caching nicht möglich
+	- geplant: Ausführung von Downloads *unabhängig* vno Anzeige-Funktion der Daten (WebContent):
+		alle möglicherweise benötigten Downloads werden im Hintergrund gestartet, unabhängig von bereits aufgerufenen
+		Seiten mit Content,
+		da insgesamt nicht sooo viel Content, und es nicht schadet, *alle* files im Projekt vorzuhalten.
+		(Außerdem könnte das "Vorhalten" später durch dosiertes laden der WebContent-Daten sein (z.B. nur projects))
+		Finden und erkennen der files könnte ähnlich wie bei "colorbox" oder anderen Galerien, das eigene Auswerten des 
+		Codes in Hg. sein. --> der Code setzt einfach nur bestimmte Standard-Syntax 
+		Nachteil: Data-functions nicht komplett unabhängig von HTMl-spezifischen Aufgaben
+		(könnte man mit abgeleiteter Klasse oder Call-Back-Funktionen lösen)
 	
 	Struktur: Array mit folgenden Unterelementen in jedem Element:
 	['name']  : url online aber ohne remoteBase
@@ -164,6 +173,7 @@ function CachedFiles(params) {
 	/* returns current save path
 	 * - should also be used by methods of this object
 	 * - tries to create path if not saved
+	 * TODO: due to new phonegap file you don't need dummy.html anymore 
 	 */
 	this.getLocalBase = function() {
 		
@@ -171,8 +181,6 @@ function CachedFiles(params) {
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
-					if(p.lastIndexOf('/') != path.length-1) p += '/';
-					localBase = p; 
 					return localBase;		
 				}
 				else {

@@ -45,7 +45,6 @@ function onDeviceReady() {
  		$('.debug').css( {'display':'none'});
  		$('.develope').css( {'display':'none'});
  	}
-    kwd_log('onDeviceReady');
     if(window.isDroidscript==true) {
     	kwd_log("isDroidScript enabled.");
     }
@@ -55,7 +54,8 @@ function onDeviceReady() {
 
 	if(kwd.isDevice) {
 		$('#info-platform').html(device.platform);
-		$('#info-os').html(device.version);		
+		$('#info-os').html(device.version);	
+		$('#info-model').text(device.model);	
 	}
 
 	if (navigator.connection && navigator.connection.type) {
@@ -112,15 +112,16 @@ function onDeviceReady() {
 	});
 	$('#doTest3').click(function(){
 		
-		var teststring = '$("#testbild").attr("src","http://localhost/tk/kwd-redaxo-46/files/me-shot.jpg");';
-		eval(teststring);
-		kwd_log("eval works as expected.");
+		//var teststring = '$("#testbild").attr("src","http://www.kuehne-webdienste.de/files/me-shot.jpg");';
+		//eval(teststring);
+		//kwd_log("eval works as expected.");
 
 		var strread = localStorage.getItem(kwd_storage_files);
 		if(strread) {
 			kwd_log("test files array:");
 			kwd_log(JSON.parse(strread));
 		}
+		else ("no files array found");
 		           				
 		// $('#testbild').attr('src','http://localhost/tk/kwd-redaxo-46/files/me-shot.jpg');           				
 	});
@@ -237,26 +238,15 @@ function onDeviceReady() {
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
 	// UPDATE CONTENT-----------------------------------------------------------
-
-	//TODO: deprecated:
-	appRootPath = kwd_getFilePath(); // Pfad in local storage?, nein= leerstring // eigentlich benötigt man Variable nicht oder nur lokal, wenn sowieso immer auf localStorage gearbeitet wird! 
-	//kwd_DownloadProjects();//TODO: allgemeine Funktion mit Parameter
-	//kwd_DownloadNews();
-	//kwd_DownloadOffers();
-		
+	
 	// set update (settings) switch
 	if(kwd.updateMode()=='offline')  {
 		$("#flip-6").val('off'); // so easy :-)
 		kwd_log("set update mode == OFFLINE");
 	}
 	kwd_log(kwd.updateMode());
-		
-	// TEST OOP 
-	//it = kwd.getSourceList('thumbsrc');
-	//kwd_log('check key:'+it.getKey());
-	//while(it.hasNext()) {
-		//kwd_log('next entry: '+it.next());
-	//}
+
+	kwd.init(); // for preloading text data		
 	
 	// SHOW
 	

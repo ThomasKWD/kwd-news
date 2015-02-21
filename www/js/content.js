@@ -9,7 +9,7 @@ bestehenden Funktionen
 - uses KwdIterator
 - specialized class for "CachedFileContent" planned
 - update-Versuch bei Construct (einfacher als auf Anzeige der Komponenten zu warten)
-
+- wait cycle only if NO local data AND display required AND (possible slow) connection enabled 
 
 * TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
 
@@ -46,6 +46,9 @@ bestehenden Funktionen
   	function logthis(element) {
   		kwd_log(element);
   	};
+  	
+  	// public members
+  	this.semaDownload = 'ready'; // ready|progress|complete|success|error
 
   	// public methods
   	
@@ -98,12 +101,16 @@ bestehenden Funktionen
 			//kwd_log(response);
 			var strdata = JSON.stringify(response); 
 			localStorage.setItem(storageKey, strdata);
-			kwd_log('stored response locally - '+storageKey);	
+			//kwd_log('stored response locally - '+storageKey);
+			this.semaDownload = 'success';	
+			
+			// insert callback to do what you need
 		}
 
 	};
 	
 	/* gets data from http source via Ajax
+	- returns true on download
 	- need response callback function
 	- and error callback function
 	*/
@@ -128,7 +135,8 @@ bestehenden Funktionen
 			// http://remysharp.com/visual-jquery/
 			// for phonegap:
 			// http://samcroft.co.uk/2012/my-article-for-adobes-appliness-magazine-data-in-phonegap-apps/
-		
+			this.semaDownload = 'progress';
+			
 		    $.ajax({
 		      dataType: 'jsonp',
 		      jsonp: 'jsonp_callback',
@@ -136,13 +144,16 @@ bestehenden Funktionen
 		      timeout: 10000
 		      
 		    }).error(function(){
-		    	logthis("download -"+storageKey+"- timeout (Kein Internet oder falsche id)");
+		    	//logthis("download -"+storageKey+"- timeout (Kein Internet oder falsche id)");
 				//$('#load-result').html("");
-				//$('#load-result').append("update error");		
+				//$('#load-result').append("update error");
+				this.semaDownload='error';		
 			}).complete(function(){
 				//console.log('update fertig');
 				//$('#load-result').html('fertig');
-		    	logthis("download "+storageKey+" complete.");
+		    	//logthis("download "+storageKey+" complete.");
+		    	this.semaDownload='complete';
+		    	
 			}).success(this.response);
 		} // this.checkConnection
 		else kwd_log("no download due to OFFLINE");
@@ -152,6 +163,7 @@ bestehenden Funktionen
 	 * - can invoked manually
 	 * - sets data to null on error
 	 * returns true on success, false on error
+	 * TODO: in aktueller Fassung doch ein *wait* bei Download erforderlich!!!
 	 */
 	this.readStorage = function() {
 
@@ -256,6 +268,8 @@ bestehenden Funktionen
 		- if id not given, use var 'current'
 		- key selects a certain part of the item
 		- prepares image urls for output (generate sub array 'images') depending on caching status
+		
+		TODO: check data restore + download!!
 	*/
 	this.getItem = function(code,id,key) {
 		
@@ -272,14 +286,18 @@ bestehenden Funktionen
 			if(current == -1) return null;
 		}				
 		
+		if(!this.readStorage()) logthis("no localStorage in getItem");
+		
+		// even if nothing in localstorage, data can be set and usable
 		if(data && data.length && data[i]) {
 			
 			this.setImageSources(i);
-
+	
 			if(key) return data[i][key];
 			else return data[i];
 		}
-		else return null;
+		
+		return null;
 	};
 	
 			           				
@@ -313,6 +331,15 @@ bestehenden Funktionen
 		else return null;
 	};
 
+	// update on construct just is easier
+	// Problem: App waits on statup in case no internet connection
+	// TODO: check connection status and call method from kwd object
+	// TODO: in tatsächlicher App bisher (fast) niemals ausgeführt, da event 'deviceready'
+	// 	viel später triggert und bis dahin connection==OFFLINE gefunden wird.
+	this.init = function() {
+		this.download();
+	};
+	
 	// construct code
 	
 	if(typeof params.remote != undefined) remoteBase = params.remote;
@@ -322,9 +349,5 @@ bestehenden Funktionen
 	if(typeof params.isDevice != undefined) device = params.device;
 	if(typeof params.files != undefined) files = params.files;
 	
-	// update on construct just is easier
-	// Problem: App waits on statup in case no internet connection
-	// TODO: check connection status and call method from kwd object
-	this.download();
 }
 
