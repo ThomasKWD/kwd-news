@@ -210,7 +210,7 @@ function CachedFiles(params) {
 						localBase = cordova.file.cacheDirectory;
 						if(localBase) {
 							if(localBase.lastIndexOf('/')!=localBase.length-1) localBase += '/';
-							localStorage(kwd_storage_path,localBase);
+							localStorage.setItem(kwd_storage_path,localBase);
 							logthis("found path: "+localBase);
 							return localBase;							
 						}
