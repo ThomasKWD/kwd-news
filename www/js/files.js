@@ -215,14 +215,11 @@ function CachedFiles(params) {
 							return localBase;							
 						}
 					}
-					else if(device=='droidscript') {
-						// this code is easy
-					}
 				}
 				
 			}
 			else {
-				if (localBase!='processing') return localBase;
+				return localBase;
 			}			
 		}
 		return remoteBase;
@@ -351,6 +348,7 @@ function CachedFiles(params) {
 			}
 			return list[i]['local'];
 		}
+		
 		else return '';
 	};
 	

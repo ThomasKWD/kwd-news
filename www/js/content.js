@@ -219,7 +219,7 @@ bestehenden Funktionen
 							// the other placeholder is not parsed here!
 						}
 						else logthis("no code for thumb in id:"+i);
-						// getCached may return a *remote* url because the file-download is started and still in progress!
+						// getCached may return an empty string because the file-download is started and still in progress!
 						// ...although the file will eventually be cached
 						var s = files.getCached(data[i]['thumbsrc'],c); // returns '' when caching
 						if(s) data[i]['thumb'] = s; // double secure
