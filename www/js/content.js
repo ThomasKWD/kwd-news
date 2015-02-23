@@ -11,8 +11,10 @@ bestehenden Funktionen
 - update-Versuch bei Construct (einfacher als auf Anzeige der Komponenten zu warten)
 - wait cycle only if NO local data AND display required AND (possible slow) connection enabled 
 
+* TODO: warum wird placeholder nicht von anfang an angezeigt???
+* TODO: warum Bilder Großansicht plötzlich weg??
 * TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
-
+* 
 */
 
 
@@ -249,9 +251,7 @@ bestehenden Funktionen
 		
 		// explode and list images:
 		var images = new Array();
-		
-		// TODO: do *nothing* in case a imgsrc is empty!
-		
+				
 		if (data[id]['imgsrc'].indexOf(',')!=-1) {
 			images = data[id]['imgsrc'].split(',');
 		}
@@ -259,8 +259,6 @@ bestehenden Funktionen
 		
 		var i;
 		for(i=0;i<images.length;i++) {
-			// TODO: change code dependend on caching
-			// TODO: it must be indicated in 'files', when entries are required but not yet downloaded
 			var c = this.onLoadCode();
 			if(c) { // not empty?
 				c = c.replace('###id###',i);

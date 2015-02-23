@@ -24,8 +24,11 @@
 	             'download' : soll so bald wie möglich heruntergeladen werden
 	             'cache' : wurde erfolgreich heruntergeladen
 	             
+	TODO:
+	- warum hängt download, kann man es überhaupt mit den privaten Funktionen schreiben??
+	- was passiert im OFFLINE mode der App?
+	- bei Programmstart oder bei ONLINE/AUTO müsste überprüft werden ob Downloads ausstehen!!!
 	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
-	- 'mode': offline(=only files already saved)|online(=files only directly from web)|auto(=first save file id needed, then display from local)
 	- TODO: bei Zwangs-Löschen des Cache sollte auch der Pfad neu *erzeugt* werden
 	- TODO: auch im 'browser'-Modus alle Cache-Funktionen aktiv, nur das speichern selbst wird nicht ausgeführt
 */
@@ -90,6 +93,8 @@ function CachedFiles(params) {
 	// TODO: better download queue
 	function _downloadNextFile() {
 		
+		var n; //==downloadCounter, just for easier writing and reading 
+				
 		// first correct the status of the last downloaded!
 		if(lastDownloaded!=-1) {
 			list[lastDownloaded]['status']['cache'];
@@ -111,16 +116,17 @@ function CachedFiles(params) {
 		 // -1 bedeutet Init
 		 if (downloadCounter==-1) {
 			// TODO: prüfe auf richtige Ermittlung
-			var n = kwd_projects.length;
+			n = kwd_projects.length;
 			if (!n) return false;
 			 
-			kwd_log("size of kwd_projects:"+n);
-			downloadFileCounter = n;
+			downloadCounter = n;
 		}
+		else n = downloadCounter;
 		
 		// downcount hier! // dadurch auto. counter auf n-1
-		downloadFileCounter--;
-		if (downloadFileCounter<0) {
+		downloadCounter--;
+		if (downloadCounter<0) {
+			downloadCounter = -1; // double security
 			// check for more downloads and restart cycle
 			if (moreDownloads>0) {
 				moreDownloads--;
@@ -129,12 +135,13 @@ function CachedFiles(params) {
 			return false;
 		}
 		
+		// TODO: kann n hier überhaupt verwendet werden??????
 		// invoke download only if required by keyword 'download'
 		if(list[n]['status']=='download') {
 						
 		    // change status
 		    list[n]['status']='progress';
-		    
+		    kwd_log('starting file download to:'+list[n]['local']);
 		    var fileTransfer = new FileTransfer();
 		   	lastDownloaded = n;
 		    fileTransfer.download(
@@ -145,9 +152,9 @@ function CachedFiles(params) {
 		        	_downloadNextFile(); 
 		        },
 		        function(error) {
-		            kwd_log('download error source ' + error.source);
-		            kwd_log('download error target ' + error.target);
-		            kwd_log('upload error code: ' + error.code);
+		            kwd_log('filetransfer error source ' + error.source);
+		            kwd_log('filetransfer error target ' + error.target);
+		            kwd_log('filetransfer error code: ' + error.code);
 		        }
 		    );	
 		}
@@ -161,7 +168,6 @@ function CachedFiles(params) {
 	
 	/* prepares downloading all of list 
 	 * - TODO: check if access to list!!!
-	 * - TODO: how to prevent many downloads at a time with several different updated lists??? 
 	 */
 	this.startDownload = function(id) {
 		moreDownloads++;
@@ -225,7 +231,8 @@ function CachedFiles(params) {
 		return remoteBase;
 	};
 	
-	/* returns ready to use local filepath
+	/* returns ready to use local filepath or a remote path if caching is not possible
+	 * 
 	 * - the given 'filename' may be converted to make a valid filename
 	 * - this does nothing to download a file, just creating the name
 	 * - /?=&%$!*#
@@ -273,7 +280,9 @@ function CachedFiles(params) {
 	};
 	
 	/* get a file uri for display
-	 * - returns empty string if file not yet in cache 
+	 * - returns empty string if file not yet in cache
+	 * - returns valid remote url when a) no caching (browser) or b) download failed
+	 * 
 	 * - manages the list internally
 	 * - the user needs this method only (most cases)
 	 * - 'name': file without path, can also be a script or another complicated string
