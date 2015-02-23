@@ -92,13 +92,18 @@ function kwd_projects2list_oop() {
 
 
 $( document ).on( "pagebeforeshow", "#page-projects", function() {
-	kwd_projects2list_oop(); // new code 
+	// display only when projects loaded
+	// if load not possible, on timeout kwd_project2list_oop will eventually called in any case
+	// kwd.projects.load() also invokes update, but you have to call it just once in the app,
+	// you can also call kwd.projects.update() seperately and then the code given in load will be used if set
+	// TODO: progress indicator inside
+	kwd.projects.load(kwd_projects2list_oop);
 	$('#page-title').text("Referenzen, Auswahl");
 });
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-aproject", function() {
-	var code = '$("#projectlist###id###").attr("src",###uri###);';           				
+	var code = '$("#projectlist###id###").attr("src","###uri###");';           				
 	var p = kwd.projects.getItem(code); // item is preselected by setCurrent
 	if (p!=null) {
 		// TODO: code for images

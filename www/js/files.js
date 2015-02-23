@@ -127,10 +127,12 @@ function CachedFiles(params) {
 			 
 			downloadCounter = n;
 		}
-		else n = downloadCounter;
-		
-		// downcount hier! // dadurch auto. counter auf n-1
-		downloadCounter--;
+		else {
+			// downcount hier! // dadurch auto. counter auf n-1
+			downloadCounter--;
+			n = downloadCounter;
+		}
+				
 		if (downloadCounter<0) {
 			downloadCounter = -1; // double security
 			// check for more downloads and restart cycle
@@ -179,6 +181,7 @@ function CachedFiles(params) {
 		
 		if(moreDownloads<=1) {
 			downloadCounter = -1;
+			lastDownloaded = -1; // double security
 			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
 			_downloadNextFile();			
 		}
@@ -294,8 +297,9 @@ function CachedFiles(params) {
 	 * - 'code': contains javascript code as a string, this will be eval'd by the download-complete-callback
 	 * - returns local path only if file is already in cache,
 	 * - returns default image if file is not (yet) in cache
-	 * - in 'browser' mode, ['local'] is set to 'remote' and ['status'] is set to 'cache'
+	 * - in 'browser' mode, ['local'] is set to 'remote' and ['status'] is set to 'na'
 	 * - TODO: bei isDevice bekommt caller zunächst local-name ohne Pfad :-(, müsste aber remote-Pfad oder Ersatzbild, solange keine Download fertig
+	 * - TODO: download von getCached trennen, sonst placeholder nicht gesetzt
 	 */
 	this.getCached = function(name,code) {
 		

@@ -3,9 +3,7 @@
  * 
  */
 
-/*TODO:
- * - wenn keine Projekte in local storage gefunden *nicht* noch einmal update starten, sondern nur Hinweis auf offline!! 
- */
+// getList or getItem could also be delivered  by function parameter (see CachedContent object)
 function kwd_news2list() {
 
 	// WARNING!: getList(): code parameter first, then key!
@@ -66,7 +64,7 @@ function kwd_news2list() {
 
 
 $( document ).on( "pagebeforeshow", "#page-news", function() {
-	kwd_news2list();
+	kwd.news.load(kwd_news2list);
 	$('#page-title').text("News");
 });
 

@@ -40,6 +40,10 @@ bestehenden Funktionen
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
 	var onloadcode = '';
 	var globalplaceholderfile = 'spacer.gif';
+	var onloadcontentfunction;
+	
+	var that = this;
+	
 	// construct code at the end of declaration!
 
 	
@@ -49,8 +53,6 @@ bestehenden Funktionen
   		kwd_log(element);
   	};
   	
-  	// public members
-  	this.semaDownload = 'ready'; // ready|progress|complete|success|error
 
   	// public methods
   	
@@ -87,6 +89,23 @@ bestehenden Funktionen
 		return globalplaceholderfile;
 	};
 	
+	/* calls callback function to display content
+	 * 
+	 */
+	this.display = function() {
+		// call display function!;
+		if(onloadcontentfunction) {
+			 try {
+				if(typeof onloadcontentfunction !== 'function') logthis("javascript says is no function");
+				if(onloadcontentfunction) onloadcontentfunction.call();
+			}
+			catch(e) {
+				logthis("error calling or inside onloadcontentfunction: "+e.message);
+			}					
+		}
+		else logthis("no callback set in display()");
+	};
+
 	/* returns whether internet connection is probably existing
 	 * - only inside phonegap there can be returned 'false' since connection plugin is used
 	 * - TODO: add special code for DroidScript
@@ -101,17 +120,19 @@ bestehenden Funktionen
 		}
 	};
 
+	/* store data of AJAX download
+	 * - invokes display as well
+	 * - should work if localStorage does not work
+	 */
 	this.response = function(response) {
 	
 		if(response) {
 		
-			//kwd_log(response);
 			var strdata = JSON.stringify(response); 
 			localStorage.setItem(storageKey, strdata);
-			//kwd_log('stored response locally - '+storageKey);
-			this.semaDownload = 'success';	
 			
-			// insert callback to do what you need
+			// use that in callback
+			that.display(); // update also invokes the display callback code
 		}
 
 	};
@@ -142,7 +163,6 @@ bestehenden Funktionen
 			// http://remysharp.com/visual-jquery/
 			// for phonegap:
 			// http://samcroft.co.uk/2012/my-article-for-adobes-appliness-magazine-data-in-phonegap-apps/
-			this.semaDownload = 'progress';
 			
 		    $.ajax({
 		      dataType: 'jsonp',
@@ -154,12 +174,10 @@ bestehenden Funktionen
 		    	//logthis("download -"+storageKey+"- timeout (Kein Internet oder falsche id)");
 				//$('#load-result').html("");
 				//$('#load-result').append("update error");
-				this.semaDownload='error';		
 			}).complete(function(){
 				//console.log('update fertig');
 				//$('#load-result').html('fertig');
 		    	//logthis("download "+storageKey+" complete.");
-		    	this.semaDownload='complete';
 		    	
 			}).success(this.response);
 		} // this.checkConnection
@@ -320,6 +338,7 @@ bestehenden Funktionen
 	 * - completes paths to file ressources if possible
 	 * - before it retrieves the data, since this must be done by AJAX calls, the function must provide a wait algorithm or return empty list if no data
 	 * - key here is a selector e.g. all images bei "imagesrc" or all titles by "name" -- doesn't correspond to storageKey!!
+	 * TODO: no code, perform function!
 	 * 	 */
 	this.getList = function(code,key) {
 		
@@ -329,7 +348,7 @@ bestehenden Funktionen
 		//kwd_readProjects();	
 		//logthis(kwd_projects);
 		//console.log(kwd_projects);
-		if (!this.readStorage()) logthis("cannot read local data -"+storageKey) ;
+		if (!this.readStorage()) logthis("no localStorage in getList() "+storageKey) ;
 		else {
 			// logthis("readstorage ok: "+data);
 		}
@@ -350,10 +369,32 @@ bestehenden Funktionen
 	// TODO: in tatsächlicher App bisher (fast) niemals ausgeführt, da event 'deviceready'
 	// 	viel später triggert und bis dahin connection==OFFLINE gefunden wird.
 	this.init = function() {
-		this.download();
+		//this.download();
+		//logthis("no init in 'projects'");
+	};
+	
+	/* updates the content from localStorage or remote if needed and executes callback set by this.load()
+	 * 
+	 */
+	this.update = function() {
+		if(this.readStorage()) {
+			this.display();
+		}
+		else {
+			this.download();
+		}
+	};
+	
+	/* saves callback to be run when projects available or timeout
+	 * WARNING!: does NOT correspond to onlinecode
+	 */
+	this.load = function(funcvalue) {
+		onloadcontentfunction = funcvalue;
+		this.update();
 	};
 	
 	// construct code
+	// (download or update is not done by construct)
 	
 	if(params.remote) remoteBase = params.remote;
 	if(params.key) storageKey = params.key;
