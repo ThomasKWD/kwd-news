@@ -170,7 +170,7 @@ function CachedFiles(params) {
 	}
 	
 	/* prepares downloading all of list 
-	 * - TODO: check if access to list!!!
+	 * - TODO: check if access to list!!!9
 	 */
 	this.startDownload = function(id) {
 		moreDownloads++;
@@ -219,7 +219,7 @@ function CachedFiles(params) {
 						localBase = cordova.file.cacheDirectory;
 						if(localBase) {
 							if(localBase.lastIndexOf('/')!=localBase.length-1) localBase += '/';
-							localStorage.setItem(kwd_storage_path,localBase);
+							localStorage.setItem(storagePath,localBase);
 							logthis("found path: "+localBase);
 							return localBase;							
 						}
@@ -370,7 +370,7 @@ function CachedFiles(params) {
 	if(typeof params.remote != undefined) remoteBase = params.remote;
 	if(remoteBase.lastIndexOf('/') != remoteBase.length-1) remoteBase += '/';
 	if(typeof params.key != undefined) storageFiles = params.key;
-	if(typeof params.key != undefined) storagePath = params.path;
+	if(typeof params.path != undefined) storagePath = params.path;
 	if(typeof params.mode != undefined) this.updateMode(params.mode); 
-	if(typeof params.isDevice != undefined) device = params.device;
+	if(typeof params.device != undefined) device = params.device;
 }
