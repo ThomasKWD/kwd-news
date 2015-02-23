@@ -82,10 +82,9 @@ function CachedFiles(params) {
 		if (localBase == remoteBase) return false;
 		if(localBase.length<4) {
 			kwd_log("localBase problem");
-			kwd_log("localBase:"+localBase);
-			kwd_log("remoteBase:"+remoteBase);
+			kwd_log("localBase: "+localBase);
+			kwd_log("remoteBase: "+remoteBase);
 			kwd_log("downloadCounter:"+downloadCounter);
-			throw("localBase empty problem");
 			return false;
 		}
 		 // -1 bedeutet Init
@@ -106,7 +105,7 @@ function CachedFiles(params) {
 			// check for more downloads and restart cycle
 			if (moreDownloads>0) {
 				moreDownloads--;
-				_downloadNextFile();
+				that.downloadNextFile();
 			}
 			return false;
 		}
@@ -189,6 +188,7 @@ function CachedFiles(params) {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
 					logthis("got path: "+p);		
+					localBase = p;
 					return localBase;
 				}
 				else {
@@ -228,10 +228,8 @@ function CachedFiles(params) {
 			var f = filename.replace('index.php',''); // to make name shorter
 			f = f.replace(/rex_img_/g,'');  // to make name shorter
 			f = f.replace(/[\/\?=&%$!\*#]/g,'_');
-			//logthis("ersetzt: "+f);
-			// do try download here? (localBase available but local file not yet)
 			return checkpath + f;
-		}	
+		}
 	};
 	
 	/* stores the files list (e.g. in localStorage)
@@ -307,7 +305,8 @@ function CachedFiles(params) {
 			var a = new Object();
 			a['name'] = name;
 			a['remote'] = remoteBase + name;
-			a['local'] = this.getLocalPath(name); 
+			a['local'] = this.getLocalPath(name);
+			logthis('new set local path: '+a['local']);
 
 			list.push(a); // hopefully always as next entry at the end!
 			this.saveFileList();

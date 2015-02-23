@@ -95,13 +95,8 @@ bestehenden Funktionen
 	this.display = function() {
 		// call display function!;
 		if(onloadcontentfunction) {
-			 try {
-				if(typeof onloadcontentfunction !== 'function') logthis("javascript says is no function");
-				if(onloadcontentfunction) onloadcontentfunction.call();
-			}
-			catch(e) {
-				logthis("error calling or inside onloadcontentfunction: "+e.message);
-			}					
+			if(typeof onloadcontentfunction !== 'function') logthis("javascript says is no function");
+			onloadcontentfunction.call();
 		}
 		else logthis("no callback set in display()");
 	};
