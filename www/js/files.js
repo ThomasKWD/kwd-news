@@ -47,51 +47,19 @@ function CachedFiles(params) {
 	var lastDownloaded = -1;
 	//var downloadIterator = null;
 
+	var that = this;
+	
 	function logthis(element) {
 		kwd_log(element);
 	}
-
-  	/* sets and/or returns value of update mode
-  	 * values: auto|offline|online
-  	 * - WARNING!: updatemode is always reset to 'online' in curtain environments
-  	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
-  	 */
-  	
-  	//////////////     filesystem functions 
-  	
-	/* access filesystem and make dummy file to retrieve a proper path
-	 * 
-	 */
-	function onRequestFileSystemSuccess(fileSystem) {
-	    kwd_log('onRequestFileSystemSuccess');
-	    fileSystem.root.getFile(
-	        'dummy.html',
-	        {create: true, exclusive: false},
-	        onGetFileSuccess,
-	        fail
-	    );
-	}
-	function onGetFileSuccess(fileEntry) {
-	    kwd_log('onGetFileSuccess!');
-	    var path = fileEntry.toURL().replace('dummy.html', '');
-	    fileEntry.remove();
-	    
-	    if(path.lastIndexOf('/')!=path.length-1) path += '/';
-		localBase=path;
-		localStorage.setItem(kwd_storage_path,path);
-		startDownloadImages();
-	}
-  	function fail(evt) {
-	    kwd_log(evt.target.error.code);
-	}
-	
+ 	
 	// rekursiv
 	// features:
 	// - handles 'moreDownloads', when end of list is reached
 	// - sets ready downloads to 'status'=='cache'
 	// return: true: download gestartet, false: konnte Download nicht starten
 	// TODO: better download queue
-	function _downloadNextFile() {
+	this.downloadNextFile = function() {
 		
 		var n; //==downloadCounter, just for easier writing and reading 
 				
@@ -156,7 +124,7 @@ function CachedFiles(params) {
 		        list[n]['remote'],
 		        list[n]['local'], 
 		        function(file) { // success
-		        	_downloadNextFile(); 
+		        	that.downloadNextFile(); 
 		        },
 		        function(error) {
 		            kwd_log('filetransfer error source ' + error.source);
@@ -166,12 +134,12 @@ function CachedFiles(params) {
 		    );	
 		}
 		else {
-			_downloadNextFile();		
+			that.downloadNextFile();		
 		}
 
 	    
 	    return true;	
-	}
+	};
 	
 	/* prepares downloading all of list 
 	 * - TODO: check if access to list!!!9
@@ -183,14 +151,19 @@ function CachedFiles(params) {
 			downloadCounter = -1;
 			lastDownloaded = -1; // double security
 			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
-			_downloadNextFile();			
+			this.downloadNextFile();			
 		}
 	};
   	
   	//////////////     public methods
   	
   	
-  	this.updateMode = function(mode) {
+  	/* sets and/or returns value of update mode
+  	 * values: auto|offline|online
+  	 * - WARNING!: updatemode is always reset to 'online' in curtain environments
+  	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
+  	 */
+   	this.updateMode = function(mode) {
   		
 		// decide according to device
 		//if (device=='browser') updatemode = 'online'; // this code can be changed for testing!
