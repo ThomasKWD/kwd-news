@@ -207,31 +207,27 @@ bestehenden Funktionen
 	*/
 	this.setThumbSources = function () {
 		if (data!=null) {
-			try {
-				var i;
-				for (i=0;i<data.length;i++) {
-					// preset with default:
-					data[i]['thumb']= this.placeHolderFile();
+			var i;
+			for (i=0;i<data.length;i++) {
+				// preset with default:
+				data[i]['thumb']= this.placeHolderFile();
 
-					if(data[i]['thumbsrc']) {
-						// parse the code for callback and give it to the files object
-						var c = this.onLoadCode();
-						if(c) { // not empty?
-							c = c.replace('###id###',i);
-							// the other placeholder is not parsed here!
-						}
-						else logthis("no code for thumb in id:"+i);
-						// getCached may return an empty string because the file-download is started and still in progress!
-						// ...although the file will eventually be cached
-						var s = files.getCached(data[i]['thumbsrc'],c); // returns '' when caching
-						if(s) data[i]['thumb'] = s; // double secure
+				if(data[i]['thumbsrc']) {
+					// parse the code for callback and give it to the files object
+					var c = this.onLoadCode();
+					if(c) { // not empty?
+						c = c.replace('###id###',i);
+						// the other placeholder is not parsed here!
 					}
+					else logthis("no code for thumb in id:"+i);
+					// getCached may return an empty string because the file-download is started and still in progress!
+					// ...although the file will eventually be cached
+					var s = files.getCached(data[i]['thumbsrc'],c); // returns '' when caching
+					if(s) data[i]['thumb'] = s; // double secure
 				}
 			}
-			catch(e) {
-				kwd_log('error in this.setThumbSources:'+e.message);
-			}
 		}
+		
 	};
 	
 	/* sets the current item for output

@@ -110,9 +110,13 @@ function CachedFiles(params) {
 		}
 	
 		// ist counter!=, eine Zahl und path und Daten vorhanden?
-		// check if this.getLocalBase is possible
-		if (this.getLocalBase() == remoteBase) return false;
-		
+		// make sure that localBase is set since get.localBase is not valid here -- or use that = this 
+		if (localBase == remoteBase) return false;
+		if(localBase.length<4) {
+			kwd_log("localBase problem");
+			throw("localBase empty problem");
+			return false;
+		}
 		 // -1 bedeutet Init
 		 if (downloadCounter==-1) {
 			// TODO: prüfe auf richtige Ermittlung
@@ -135,7 +139,6 @@ function CachedFiles(params) {
 			return false;
 		}
 		
-		// TODO: kann n hier überhaupt verwendet werden??????
 		// invoke download only if required by keyword 'download'
 		if(list[n]['status']=='download') {
 						
