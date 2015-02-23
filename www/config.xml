@@ -27,7 +27,7 @@
 	<gap:plugin name="nl.x-services.plugins.socialsharing" version="4.3.8" />
 	    
     <preference name="phonegap-version" value="3.6.3" />
-    <preference name="orientation"      value="portrait" />
+    <!--<preference name="orientation"      value="portrait" />-->
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
 	<preference name="splash-screen-duration" value="6000"/>

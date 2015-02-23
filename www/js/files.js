@@ -114,13 +114,15 @@ function CachedFiles(params) {
 		if (localBase == remoteBase) return false;
 		if(localBase.length<4) {
 			kwd_log("localBase problem");
+			kwd_log("localBase:"+localBase);
+			kwd_log("remoteBase:"+remoteBase);
+			kwd_log("downloadCounter:"+downloadCounter);
 			throw("localBase empty problem");
 			return false;
 		}
 		 // -1 bedeutet Init
-		 if (downloadCounter==-1) {
-			// TODO: prüfe auf richtige Ermittlung
-			n = kwd_projects.length;
+		if (downloadCounter==-1) {
+			n = list.length;
 			if (!n) return false;
 			 
 			downloadCounter = n;
@@ -210,8 +212,8 @@ function CachedFiles(params) {
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
-					return localBase;
 					logthis("got path: "+p);		
+					return localBase;
 				}
 				else {
 					if(device=='phonegap') {
