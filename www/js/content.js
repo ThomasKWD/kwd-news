@@ -359,7 +359,7 @@ bestehenden Funktionen
 	if(params.key) storageKey = params.key;
 	if(params.mode) this.updateMode(params.mode); // TODO: where this var is used??
 	if(params.id) sourceId = params.id;
-	if(params.isDevice) device = params.device;
+	if(params.device) device = params.device;
 	if(params.files) files = params.files;
 	if(params.placeholder) this.placeHolderFile(params.placeholder);	
 }
