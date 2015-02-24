@@ -2,7 +2,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "de.kuehne-webdienste.kwd-news"
-        version   = "0.1.20"
+        version   = "0.1.21"
         versionCode = "1" >
     <name>KÜHNE-Webdienste</name>
 
