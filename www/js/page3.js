@@ -58,6 +58,8 @@ function kwd_projects2list_oop() {
 			});
 			*/
 			//kwd.cachedFiles.addFile(p['thumb'],projectsimagecallback);
+			//p['thumb'] is usually == placeholder image until file is cached
+			//unless file already in cache
 			html += '<img  id="projectlist'+i+'" style="width:80px" src="'+p['thumb']+'" />';
 			
 			html += "<h3>"+p['name']+"</h3>";

@@ -2,7 +2,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "de.kuehne-webdienste.kwd-news"
-        version   = "0.1.23"
+        version   = "0.1.24"
         versionCode = "1" >
     <name>KÜHNE-Webdienste</name>
 
@@ -26,7 +26,7 @@
 	<gap:plugin name="nl.x-services.plugins.socialsharing" version="4.3.8" />
 	    
     <preference name="phonegap-version" value="3.6.3" />
-    <preference name="orientation" value="landscape" />
+    <preference name="orientation" value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
 	<preference name="splash-screen-duration" value="6000"/>

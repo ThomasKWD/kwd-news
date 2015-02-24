@@ -61,7 +61,7 @@ function CachedFiles(params) {
 				
 		// first correct the status of the last downloaded!
 		if(lastDownloaded!=-1) {
-			list[lastDownloaded]['status']['cache'];
+			list[lastDownloaded]['status']['cache']; // TODO: do this in result callback!!
 			lastDownloaded=-1;
 			
 			try {
@@ -124,19 +124,20 @@ function CachedFiles(params) {
 		        list[n]['local'], 
 		        function(file) { // success
 		        	try {
-		        	kwd_log("hurra download complete: "+file.toURL());
-		        	// geht nicht: that.downloadNextFile();
-		        	$('#testbild').attr('src',file.toURL());
-		       
+		        		kwd_log('pure name of success file: '+file.name);
+		        		$('#testbild').attr('src',file.toURL());
+			        	that.downloadNextFile();		       
 		        	}
 		        	catch(test) {
 		        		kwd_log('catch: '+test.message);
 		        	} 
+		        	
 		        },
 		        function(error) {
 		            kwd_log('filetransfer error source ' + error.source);
 		            kwd_log('filetransfer error target ' + error.target);
 		            kwd_log('filetransfer error code: ' + error.code);
+		            that.downloadNextFile();
 		        }
 		    );	
 		}
