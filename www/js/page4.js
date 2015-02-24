@@ -72,7 +72,7 @@ function kwd_offers2list() {
 
 
 $( document ).on( "pagebeforeshow", "#page-offers", function() {
-	kwd_offers2list();
+	kwd.offers.load(kwd_offers2list);
 	$('#page-title').text("Leistungen");
 });
 

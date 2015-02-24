@@ -94,11 +94,11 @@ function CachedFiles(params) {
 			 
 			downloadCounter = n;
 		}
-		else {
-			// downcount hier! // dadurch auto. counter auf n-1
-			downloadCounter--;
-			n = downloadCounter;
-		}
+		
+		// downcount hier! // dadurch auto. counter auf n-1
+		downloadCounter--;
+		n = downloadCounter;
+		
 				
 		if (downloadCounter<0) {
 			downloadCounter = -1; // double security
@@ -110,14 +110,16 @@ function CachedFiles(params) {
 			return false;
 		}
 		
+		kwd_log("download access to array: "+list[n]['status']);
 		// invoke download only if required by keyword 'download'
 		if(list[n]['status']=='download') {
 						
 		    // change status
 		    list[n]['status']='progress';
 		    kwd_log('starting file download to:'+list[n]['local']);
-		    var fileTransfer = new FileTransfer();
 		   	lastDownloaded = n;
+		    var fileTransfer = new FileTransfer();
+
 		    fileTransfer.download(
 		    	
 		        list[n]['remote'],
@@ -132,6 +134,7 @@ function CachedFiles(params) {
 		        }
 		    );	
 		}
+		// more elements in list possible
 		else {
 			that.downloadNextFile();		
 		}
@@ -150,7 +153,7 @@ function CachedFiles(params) {
 			downloadCounter = -1;
 			lastDownloaded = -1; // double security
 			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
-			this.downloadNextFile();			
+			this.downloadNextFile();
 		}
 	};
   	
