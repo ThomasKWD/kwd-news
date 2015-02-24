@@ -40,8 +40,6 @@ function CachedFiles(params) {
 	var list = new Array();   // sub-elements: 'name' + 'local'
 	var downloadCounter = -1;
 	var moreDownloads = 0; // counts in addition to downloadCounter since the "startDownload" my be called to frequently
-	var lastDownloaded = -1;
-	//var downloadIterator = null;
 
 	var that = this;
 	
@@ -53,25 +51,13 @@ function CachedFiles(params) {
 	// features:
 	// - handles 'moreDownloads', when end of list is reached
 	// - sets ready downloads to 'status'=='cache'
+	// - code MUST NOT be called twice at the same time
 	// return: true: download gestartet, false: konnte Download nicht starten
 	// TODO: better download queue
 	this.downloadNextFile = function() {
 		
 		var n; //==downloadCounter, just for easier writing and reading 
 				
-		// first correct the status of the last downloaded!
-		if(lastDownloaded!=-1) {
-			list[lastDownloaded]['status']['cache']; // TODO: do this in result callback!!
-			lastDownloaded=-1;
-			
-			try {
-				eval(list[lastDownloaded]['code']);
-			}
-			catch(e) {
-				logthis("error eval file ("+list[lastDownloaded]['code']+") : "+e.message);
-			}
-			
-		}
 	
 		// ist counter!=, eine Zahl und path und Daten vorhanden?
 		// make sure that localBase is set since get.localBase is not valid here -- or use that = this 
@@ -115,7 +101,6 @@ function CachedFiles(params) {
 		    kwd_log('starting file download to: '+list[n]['local']);
 		    kwd_log('(name): '+list[n]['name']);
 		    
-		   	lastDownloaded = n;
 		    var fileTransfer = new FileTransfer();
 
 		    fileTransfer.download(
@@ -124,8 +109,23 @@ function CachedFiles(params) {
 		        list[n]['local'], 
 		        function(file) { // success
 		        	try {
-		        		kwd_log('pure name of success file: '+file.name);
+		        		//kwd_log('pure name of success file: '+file.name);
 		        		$('#testbild').attr('src',file.toURL());
+		        		
+		        		// cannot save index easily (or where??)
+		        		/*var i = 0;
+		        		var j = list.length;
+		        		for(i;i<j;i++) {
+		        			if (list[i]['name'] == file.name
+		        		}
+		        		*/
+		        		kwd_log("index of file: "+downloadCounter);
+		        		if(downloadCounter>=0 && downloadCounter<list.length) { // double security in debug state
+							// first correct the status of the last downloaded!
+							list[downloadCounter]['status'] = ['cache']; 
+							eval(list[downloadCounter]['code']); // TODO: nice new callback
+						}
+						that.saveFileList();
 			        	that.downloadNextFile();		       
 		        	}
 		        	catch(test) {
@@ -158,7 +158,6 @@ function CachedFiles(params) {
 		
 		if(moreDownloads<=1) {
 			downloadCounter = -1;
-			lastDownloaded = -1; // double security
 			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
 			this.downloadNextFile();
 		}
