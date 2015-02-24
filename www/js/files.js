@@ -11,10 +11,6 @@
 		Seiten mit Content,
 		da insgesamt nicht sooo viel Content, und es nicht schadet, *alle* files im Projekt vorzuhalten.
 		(Außerdem könnte das "Vorhalten" später durch dosiertes laden der WebContent-Daten sein (z.B. nur projects))
-		Finden und erkennen der files könnte ähnlich wie bei "colorbox" oder anderen Galerien, das eigene Auswerten des 
-		Codes in Hg. sein. --> der Code setzt einfach nur bestimmte Standard-Syntax 
-		Nachteil: Data-functions nicht komplett unabhängig von HTMl-spezifischen Aufgaben
-		(könnte man mit abgeleiteter Klasse oder Call-Back-Funktionen lösen)
 	
 	Struktur: Array mit folgenden Unterelementen in jedem Element:
 	['name']  : url online aber ohne remoteBase
@@ -25,7 +21,7 @@
 	             'cache' : wurde erfolgreich heruntergeladen
 	             
 	TODO:
-	- warum hängt download, kann man es überhaupt mit den privaten Funktionen schreiben??
+	- 1. download wird vorbereitet, startet aber nicht richtig. 
 	- was passiert im OFFLINE mode der App?
 	- bei Programmstart oder bei ONLINE/AUTO müsste überprüft werden ob Downloads ausstehen!!!
 	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
@@ -116,7 +112,9 @@ function CachedFiles(params) {
 						
 		    // change status
 		    list[n]['status']='progress';
-		    kwd_log('starting file download to:'+list[n]['local']);
+		    kwd_log('starting file download to: '+list[n]['local']);
+		    kwd_log('(name): '+list[n]['name']);
+		    
 		   	lastDownloaded = n;
 		    var fileTransfer = new FileTransfer();
 
@@ -125,6 +123,7 @@ function CachedFiles(params) {
 		        list[n]['remote'],
 		        list[n]['local'], 
 		        function(file) { // success
+		        	kwd_log("hurra download complete");
 		        	that.downloadNextFile(); 
 		        },
 		        function(error) {
