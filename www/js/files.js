@@ -123,8 +123,15 @@ function CachedFiles(params) {
 		        list[n]['remote'],
 		        list[n]['local'], 
 		        function(file) { // success
+		        	try {
 		        	kwd_log("hurra download complete: "+file.toURL());
-		        	that.downloadNextFile(); 
+		        	// geht nicht: that.downloadNextFile();
+		        	$('#testbild').attr('src',file.toURL());
+		       
+		        	}
+		        	catch(test) {
+		        		kwd_log('catch: '+test.message);
+		        	} 
 		        },
 		        function(error) {
 		            kwd_log('filetransfer error source ' + error.source);
