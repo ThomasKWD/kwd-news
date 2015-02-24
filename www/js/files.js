@@ -123,7 +123,7 @@ function CachedFiles(params) {
 		        list[n]['remote'],
 		        list[n]['local'], 
 		        function(file) { // success
-		        	kwd_log("hurra download complete");
+		        	kwd_log("hurra download complete: "+file.toUrl());
 		        	that.downloadNextFile(); 
 		        },
 		        function(error) {
