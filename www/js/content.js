@@ -8,8 +8,7 @@ bestehenden Funktionen
 
 - uses KwdIterator
 - specialized class for "CachedFileContent" planned
-- update-Versuch bei Construct (einfacher als auf Anzeige der Komponenten zu warten)
-- wait cycle only if NO local data AND display required AND (possible slow) connection enabled 
+- display with callback, so waiting for update is no problem
 
 * TODO: warum wird placeholder nicht von anfang an angezeigt???
 * TODO: warum Bilder Großansicht plötzlich weg??
@@ -60,6 +59,7 @@ bestehenden Funktionen
   	 * values: auto|offline|online
   	 * - this function works different to the equivalent in 'CachedFiles'
   	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
+	 * WARNING!: this is the user set update mode --> don't use it to determin whether connection is available
   	 */
   	this.updateMode = function(mode) {
   		
@@ -190,7 +190,6 @@ bestehenden Funktionen
 		strread = localStorage.getItem(storageKey);
 		if (!strread) {
 			logthis('keine Projekte in Cache');
-			this.download();
 			return false;
 		}
 		else {
@@ -295,7 +294,7 @@ bestehenden Funktionen
 		- key selects a certain part of the item
 		- prepares image urls for output (generate sub array 'images') depending on caching status
 		
-		TODO: check data restore + download!!
+		TODO: make callback system like for list
 	*/
 	this.getItem = function(code,id,key) {
 		
@@ -312,7 +311,8 @@ bestehenden Funktionen
 			if(current == -1) return null;
 		}				
 		
-		if(!this.readStorage()) logthis("no localStorage in getItem");
+		if(!this.readStorage()) logthis("no localStorage in getItem"); // WARNING!: only works because getList has started at least once before
+		
 		
 		// even if nothing in localstorage, data can be set and usable
 		if(data && data.length && data[i]) {
@@ -324,38 +324,6 @@ bestehenden Funktionen
 		}
 		
 		return null;
-	};
-	
-			           				
-
-	/*
-	 * returns a new Iterator object
-	 * - completes paths to file ressources if possible
-	 * - before it retrieves the data, since this must be done by AJAX calls, the function must provide a wait algorithm or return empty list if no data
-	 * - key here is a selector e.g. all images bei "imagesrc" or all titles by "name" -- doesn't correspond to storageKey!!
-	 * TODO: no code, perform function!
-	 * 	 */
-	this.getList = function(code,key) {
-		
-		this.onLoadCode(code);
-
-		//logthis("my storagekey:"+storageKey);
-		//kwd_readProjects();	
-		//logthis(kwd_projects);
-		//console.log(kwd_projects);
-		if (!this.readStorage()) logthis("no localStorage in getList() "+storageKey) ;
-		else {
-			// logthis("readstorage ok: "+data);
-		}
-		
-		this.setThumbSources(); // caching mechanism will be started by this
-		
-		if (data!=null) {
-			var test = new KwdIterator(data,key);
-			//logthis("iterator: "+test);
-			return test;
-		}
-		else return null;
 	};
 
 	// update on construct just is easier
@@ -388,6 +356,31 @@ bestehenden Funktionen
 		this.update();
 	};
 	
+	/*
+	 * returns a new Iterator object
+	 * - completes paths to file ressources if possible
+	 * - this normally does not load or download any data
+	 * - if 'data' is (still) == null here, it means loading has failed
+	 * - key here is a selector e.g. all images bei "imagesrc" or all titles by "name" -- doesn't correspond to storageKey!!
+	 * TODO: no code, perform function!
+	 * 	 */
+	this.getList = function(code,key) {
+		
+		this.onLoadCode(code);  // TODO: better store this code in the structure of 'data'
+		
+		if (data!=null) {
+			this.setThumbSources(); // caching mechanism will be started by this
+			var test = new KwdIterator(data,key);
+			//logthis("iterator: "+test);
+			return test;
+		}
+		else {
+			logthis("no data for "+storageKey);
+			return null;
+		}
+	};
+
+
 	// construct code
 	// (download or update is not done by construct)
 	

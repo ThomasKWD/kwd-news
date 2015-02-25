@@ -21,7 +21,7 @@
 	             'cache' : wurde erfolgreich heruntergeladen
 	             
 	TODO:
-	- 1. download wird vorbereitet, startet aber nicht richtig. 
+	- warum wird download *immer* gestartet?
 	- was passiert im OFFLINE mode der App?
 	- bei Programmstart oder bei ONLINE/AUTO müsste überprüft werden ob Downloads ausstehen!!!
 	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
@@ -149,6 +149,20 @@ function CachedFiles(params) {
 	    
 	    return true;	
 	};
+
+	/* returns whether internet connection is probably existing
+	 * - only inside phonegap there can be returned 'false' since connection plugin is used
+	 * - TODO: add special code for DroidScript
+	 */
+	this.checkConnection  = function() {
+		if(device != 'phonegap') return true; // status quo
+		else {
+			if(navigator.connection && navigator.connection.type) {
+				if (navigator.connection.type == Connection.NONE) return false;
+				else return true;	// TODO: check what Connection.UNKNOWN means!! 
+			}			
+		}
+	};
 	
 	/* prepares downloading all of list 
 	 * - TODO: check if access to list!!!9
@@ -156,11 +170,13 @@ function CachedFiles(params) {
 	this.startDownload = function(id) {
 		moreDownloads++;
 		
-		if(moreDownloads<=1) {
-			downloadCounter = -1;
-			//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
-			this.downloadNextFile();
-		}
+		if(this.updateMode()!='offline' && this.checkConnection()) {
+			if(moreDownloads<=1) {
+				downloadCounter = -1;
+				//downloadIterator = app.getSourceList('imgsrc'); // determines the file list used
+				this.downloadNextFile();
+			}
+		}else logthis("no download files due to offline");
 	};
   	
   	//////////////     public methods
@@ -170,6 +186,7 @@ function CachedFiles(params) {
   	 * values: auto|offline|online
   	 * - WARNING!: updatemode is always reset to 'online' in curtain environments
   	 * - the value of parameter 'mode' is not checked since this is done by the caller (I hope so) 
+	 * WARNING!: this is the user set update mode --> don't use it to determin whether connection is available
   	 */
    	this.updateMode = function(mode) {
   		
@@ -192,7 +209,7 @@ function CachedFiles(params) {
 	 */
 	this.getLocalBase = function() {
 		
-		if (this.updateMode()!='online') {
+		if (this.updateMode()!='online') { // 'online' means force to eget data from remote source
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
@@ -325,7 +342,8 @@ function CachedFiles(params) {
 			}			
 			else {
 				list[i]['status'] = 'download';
-				this.startDownload();			
+				//TODO: don't start download when offline
+				this.startDownload(); 			
 			}
 		}
 		

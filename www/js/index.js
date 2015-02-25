@@ -254,7 +254,17 @@ function onDeviceReady() {
 		// TODO: vielleicht sogar erst nach erstem 'pageonshow' event
 		// TODO: oder mit timeout;
         navigator.splashscreen.hide();		
-	} 
+	}
+	
+	// TESTS
+	
+	v = new PrivateStatic();
+	kwd_log(v.static());
+	kwd_log(v.static(1));
+	kwd_log(v.static());
+	kwd_log(v.static(2));
+	kwd_log(v.static());
+	kwd_log(v.privatemember());
 }
 
 

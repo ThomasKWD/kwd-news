@@ -84,7 +84,7 @@ function kwd_projects2list_oop() {
 		// vorbereitetes Hinweisfenster sichtbar machen
 		// Text
 		$('#projects-info').html('Keine Daten für Anzeige vorhanden');
-		if (!kwd_update) $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
+		if (kwd.updateMode()=='offline') $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
 		if (kwd.isDevice) $('#projects-info').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-projects-info').css({'display':'block'});
@@ -112,6 +112,7 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		$('#page-title').text(p['name']);
 		$("#project-info").html(p['info']);
 		$("#project-url").attr("href", p['url']);
+		$("#project-url").text(p['url'].replace('http://',''));
 	
 		var i = 0;
 		var html = '';

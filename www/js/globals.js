@@ -77,10 +77,11 @@ function KwdApp()	 {
 	 * - loads mode for return value
 	 * - (typical "setter-getter-combi-method" :-)
 	 * - 'mode': auto|online|offline
+	 * WARNING!: this is the user set update mode --> don't use it to determin whether connection is available
 	 */
 	this.updateMode = function(mode) {
 		if(mode) {
-			throw("KwdApp::updateMode: mode defined");
+			//throw("KwdApp::updateMode: mode defined");
 			if (mode=='auto' || mode=='online' || mode=='offline') {
 				try {
 					updatemode = mode;
@@ -324,6 +325,25 @@ function KwdIterator(source, key, options) {
 	//helper(mostly for debug)
 	this.getKey = function() {
 		return sourcekey;
+	};
+}
+
+
+// test object
+function PrivateStatic() {
+
+	// private member
+	var amember = 0;
+	
+	this.static = function(newvalue) {
+		if (newvalue) arguments.callee.test = newvalue;
+		return (arguments.callee.test);
+	};
+	
+	this.privatemember = function(newvalue) {
+		if(newvalue) myvalue = newvalue;
+		if(newvalue) amember = newvalue;
+		return (arguments.callee.test);		
 	};
 }
 
