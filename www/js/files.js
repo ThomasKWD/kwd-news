@@ -92,14 +92,14 @@ function CachedFiles(params) {
 			return false;
 		}
 		
-		kwd_log("download access to array: "+list[n]['status']);
+		//kwd_log("download access to array: "+list[n]['status']);
 		// invoke download only if required by keyword 'download'
 		if(list[n]['status']=='download') {
 						
 		    // change status
 		    list[n]['status']='progress';
-		    kwd_log('starting file download to: '+list[n]['local']);
-		    kwd_log('(name): '+list[n]['name']);
+		    //kwd_log('starting file download to: '+list[n]['local']);
+		    //kwd_log('(name): '+list[n]['name']);
 		    
 		    var fileTransfer = new FileTransfer();
 
@@ -129,7 +129,7 @@ function CachedFiles(params) {
 			        	that.downloadNextFile();		       
 		        	}
 		        	catch(test) {
-		        		kwd_log('catch: '+test.message);
+		        		kwd_log('catch in download callback: '+test.message);
 		        	} 
 		        	
 		        },
@@ -289,7 +289,7 @@ function CachedFiles(params) {
 		// thus is called only once when app runs
 		if (list.length<1) {
 			var strread = null;
-			//TODO: enable:  // strread = localStorage.getItem(kwd_storage_files);
+			strread = localStorage.getItem(kwd_storage_files);
 			if(strread) {
 				logthis("got files");
 				//logthis(strread);
@@ -339,6 +339,7 @@ function CachedFiles(params) {
 		list[i]['code'] = c;
 		
 		if(list[i]['status'] == 'cache' || list[i]['status'] == 'na') {
+			logthis("get file "+list[i]['name']+" from cache");
 			try {
 				eval(list[i]['code']);
 			}
