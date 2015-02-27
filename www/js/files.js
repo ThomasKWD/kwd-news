@@ -21,11 +21,11 @@
 	             'cache' : wurde erfolgreich heruntergeladen
 	             
 	TODO:
-	- warum wird download *immer* gestartet?
+	- warum wird download *immer* gestartet wenn Verbindung? (kann ja, soll aber vorher schon gecachte Datei anzeigen)
 	- was passiert im OFFLINE mode der App?
 	- bei Programmstart oder bei ONLINE/AUTO müsste überprüft werden ob Downloads ausstehen!!!
 	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
-	- TODO: bei Zwangs-Löschen des Cache sollte auch der Pfad neu *erzeugt* werden
+	- TODO: bei Zwangs-Löschen des Cache sollten Bilder gelöscht und auch der Pfad neu *erzeugt* werden
 	- TODO: auch im 'browser'-Modus alle Cache-Funktionen aktiv, nur das speichern selbst wird nicht ausgeführt
 */
 function CachedFiles(params) {
@@ -110,7 +110,7 @@ function CachedFiles(params) {
 		        function(file) { // success
 		        	try {
 		        		//kwd_log('pure name of success file: '+file.name);
-		        		$('#testbild').attr('src',file.toURL());
+		        		//$('#testbild').attr('src',file.toURL());
 		        		
 		        		// cannot save index easily (or where??)
 		        		/*var i = 0;
@@ -295,8 +295,6 @@ function CachedFiles(params) {
 	 * - returns local path only if file is already in cache,
 	 * - returns default image if file is not (yet) in cache
 	 * - in 'browser' mode, ['local'] is set to 'remote' and ['status'] is set to 'na'
-	 * - TODO: bei isDevice bekommt caller zunächst local-name ohne Pfad :-(, müsste aber remote-Pfad oder Ersatzbild, solange keine Download fertig
-	 * - TODO: download von getCached trennen, sonst placeholder nicht gesetzt
 	 */
 	this.getCached = function(name,code) {
 		

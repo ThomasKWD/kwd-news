@@ -10,9 +10,13 @@ bestehenden Funktionen
 - specialized class for "CachedFileContent" planned
 - display with callback, so waiting for update is no problem
 
-* TODO: warum wird placeholder nicht von anfang an angezeigt???
-* TODO: warum Bilder Großansicht plötzlich weg??
-* TODO: wenn localStorage UND Internetverbindung nicht vorhanden, Handling, dass Seite leer angezeigt wird (z.B. einfach leere Liste), außerdem warten auf download
+* TODO: warum wird placeholder nicht von anfang an angezeigt??? (zum Test mal anderes Bild!)
+* TODO: kein Download bei Verbindung (gleich Inhalte)
+* TODO: wenn localStorage UND Internetverbindung nicht vorhanden,
+* müsste getList und getitem null oder leere Liste zurückgeben
+* und dann AUCH code ausgeführt werden, der bei .load() definiert wurde,
+* damit Warnhinweise verarbeitet werden  können 
+* 
 * 
 */
 

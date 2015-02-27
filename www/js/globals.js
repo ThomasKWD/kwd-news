@@ -56,6 +56,7 @@ function KwdApp()	 {
 	// private members:
 	
 	var remoteBase = "";
+	var myplaceholder = 'kwd.png'; // TODO: weißes Bild mit kleinem "k" in der Mitte
 	
 	// wird gespeichert (auch in localStorage) und an enthaltene Objekte weitergegeben:
 	var updatemode = 'auto'; 
@@ -223,7 +224,7 @@ function KwdApp()	 {
 		id : 10,
 		device : dev,
 		files : this.cachedFiles,
-		placeholder : 'res/placeholder.png'
+		placeholder : myplaceholder
 	});
 	this.news = new CachedWebContent({
 		remote : remoteBase,
@@ -232,7 +233,7 @@ function KwdApp()	 {
 		id : 25,
 		device : dev,
 		files : this.cachedFiles,
-		placeholder : 'res/placeholder.png'
+		placeholder : myplaceholder
 	});
 	this.offers = new CachedWebContent({
 		remote : remoteBase,
@@ -241,7 +242,7 @@ function KwdApp()	 {
 		id : 45,
 		device : dev,
 		files : this.cachedFiles,
-		placeholder : 'res/placeholder.png'
+		placeholder : myplaceholder
 	});
 }
 
