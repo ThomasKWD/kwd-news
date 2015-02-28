@@ -103,9 +103,11 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 	var code = '$("#projectimage###id###").attr("src","###uri###");';           				
 	var p = kwd.projects.getItem(code); // item is preselected by setCurrent
 	if (p!=null) {
-		// TODO: code for images
 		$('#page-title').text(p['name']);
-		$("#project-info").html(p['info']);
+		// change all <a> into <span> (TODO: remove all tags)
+		var ntext = p['info'].replace(/<a/g,'<span');
+		ntext = ntext.replace(/<\/a/g,'</span');
+		$("#project-info").html(ntext);
 		$("#project-url").attr("href", p['url']); // mehrere wegen Tests
 		$("#project-url").text(p['url'].replace('http://',''));
 	

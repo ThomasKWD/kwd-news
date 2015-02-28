@@ -51,12 +51,6 @@ function kwd_news2list() {
 		$("#list2").listview();
 	}
 	else {
-		// vorbereitetes Hinweisfenster sichtbar machen
-		// Text
-		// TODO: alles außer display:block in index.js
-		$('#news-warning').html('Keine Daten für Anzeige vorhanden');
-		if (!kwd_update) $('#news-warning').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		if(kwd.isDevice) $('#news-warning').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-news-info').css({'display':'block'});
 	}
@@ -77,7 +71,10 @@ $( document ).on( "pagebeforeshow", "#page-anews", function() {
 	if (n!==null) {	// immer laden, da seit dem letzten Laden eine Aktualisierung gewesen sein könnte.
 		//$("#page-anews h2").html(kwd_news[kwd_current_news]['name']);
 		$('#page-title').text(n['name']);
-		$("#news-info").html(n['info']);
+		// change all <a> into <span> (TODO: remove all tags)
+		var ntext = n['info'].replace(/<a/g,'<span');
+		ntext = ntext.replace(/<\/a/g,'</span');
+		$("#news-info").html(ntext);
 		//no url up to now (share link is handled elsewhere!)
 		//$("#news-info").append('<a href="'+kwd_news[kwd_current_news]['url']+'" target="_blank">'+kwd_news[kwd_current_news]['url']+'</a>');
 		// TODO: share link code HIER setzen, statt in index.js

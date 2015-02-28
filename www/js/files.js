@@ -297,9 +297,11 @@ function CachedFiles(params) {
 		logthis("remove() does nothing");
 	};
 	
-	/* deletes all files from the filesystem, then removes the list itself
-	 * - only works when files data available
+	/* deletes all files from the filesystem
+	 * - only works when files data (list) available
 	 * - tries to load again data if needed
+	 * - does not clear the list, just sets ['status'] to 'download'
+	 * TODO: maybe it is not possible to remove??
 	 */
 	this.removeAll = function() {
 		
@@ -312,12 +314,13 @@ function CachedFiles(params) {
 					//logthis("im cache: "+e['name']);
 					// check could be outside loop - but is inside for testing purposes
 					if(device=='phonegap') {
+						e['status'] = 'download'; // TODO: can not work, since 'e' does not change 'list'
 						var file = window.resolveLocalFileSystemURL(
 							e['local'],
 							function(fileEntry) { // success callback
-								kwd_log('success get file for remove');
-							    fileEntry.remove(function() {
-							      console.log('File removed.');
+								kwd_log('success get file for remove: '+fileEntry.name);
+							    fileEntry.remove(function(f) {
+							      kwd_log('File removed.'+f.name);
 							    },
 								function(error) {
 									kwd_log('error in remove file, code:'+error.code);

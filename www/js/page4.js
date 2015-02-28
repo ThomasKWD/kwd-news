@@ -61,10 +61,6 @@ function kwd_offers2list() {
 		$("#list3").listview();
 	}
 	else {
-		// vorbereitetes Hinweisfenster aktualisieren
-		$('#offers-info').html('Keine Daten für Anzeige vorhanden');
-		if (!kwd_update) $('#offers-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		if(kwd.isDevice) $('#offers-info').append('<br />'+navigator.connection.type);		
 		$('#box-offers-info').css({'display':'block'}); // sichtbar
 	}
 
@@ -82,6 +78,9 @@ $( document ).on( "pagebeforeshow", "#page-anoffer", function() {
 	var o = kwd.offers.getItem();
 	if (o != null) {
 		$('#page-title').text(o['name']);
-		$("#offer-info").html(o['info']);
+		// change all <a> into <span> (TODO: remove all tags)
+		var ntext = o['info'].replace(/<a/g,'<span');
+		ntext = ntext.replace(/<\/a/g,'</span');
+		$("#offer-info").html(ntext);
 	}
 });
