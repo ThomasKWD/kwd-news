@@ -53,6 +53,7 @@ function kwd_news2list() {
 	else {
 		// vorbereitetes Hinweisfenster sichtbar machen
 		// Text
+		// TODO: alles außer display:block in index.js
 		$('#news-warning').html('Keine Daten für Anzeige vorhanden');
 		if (!kwd_update) $('#news-warning').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
 		if(kwd.isDevice) $('#news-warning').append('<br />'+navigator.connection.type);

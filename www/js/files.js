@@ -258,6 +258,25 @@ function CachedFiles(params) {
 		}
 	};
 	
+	/* loads file list *if not yet loaded* and if available
+	 * returns true if loading was successful  or list already there
+	 */
+	this.requireFileList = function() {
+		if (list.length<1) {
+			var strread = null;
+			strread = localStorage.getItem(kwd_storage_files);
+			if(strread) {
+				logthis("got files");
+				//logthis(strread);
+				list = JSON.parse(strread);
+				//logthis(list);
+			}
+		}
+		
+		if(list.length) return true;
+		else return false;
+	};
+
 	/* stores the files list (e.g. in localStorage)
 	 * 
 	 */
@@ -275,13 +294,44 @@ function CachedFiles(params) {
 	 * 
 	 */
 	this.remove = function(filename) {
-		
+		logthis("remove() does nothing");
 	};
 	
 	/* deletes all files from the filesystem, then removes the list itself
-	*/
+	 * - only works when files data available
+	 * - tries to load again data if needed
+	 */
 	this.removeAll = function() {
 		
+		logthis("check removeAll");
+		if(this.requireFileList()) {
+			var it = new KwdIterator(list);
+			while(it.hasNext()) {
+				var e = it.next();
+				if(e['status']=='cache') {
+					//logthis("im cache: "+e['name']);
+					// check could be outside loop - but is inside for testing purposes
+					if(device=='phonegap') {
+						var file = window.resolveLocalFileSystemURL(
+							e['local'],
+							function(fileEntry) { // success callback
+								kwd_log('success get file for remove');
+							    fileEntry.remove(function() {
+							      console.log('File removed.');
+							    },
+								function(error) {
+									kwd_log('error in remove file, code:'+error.code);
+									kwd_log('error in remove file, message:'+error.message);
+								});														
+							},
+							function(error) {
+								kwd_log('error in resolve file url, code:'+error.code);
+								kwd_log('error in resolve file url, message:'+error.message);		        
+							});
+					}
+				}
+			}
+		}
 	};
 	
 	/* get a file uri for display
@@ -302,16 +352,7 @@ function CachedFiles(params) {
 		
 		// try to load (assumes that filelist already loaded when not empty)
 		// thus is called only once when app runs
-		if (list.length<1) {
-			var strread = null;
-			strread = localStorage.getItem(kwd_storage_files);
-			if(strread) {
-				logthis("got files");
-				//logthis(strread);
-				list = JSON.parse(strread);
-				//logthis(list);
-			}
-		}
+		this.requireFileList(); // loads list only if not yet loaded can still be empty after this (if load failed)
 		
 		// find name in list
 		var i;

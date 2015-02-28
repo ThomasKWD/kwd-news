@@ -11,7 +11,6 @@ bestehenden Funktionen
 - display with callback, so waiting for update is no problem
 
 * TODO: warum wird placeholder nicht von anfang an angezeigt??? (zum Test mal anderes Bild!)
-* TODO: kein Download bei Verbindung (gleich Inhalte)
 * TODO: wenn localStorage UND Internetverbindung nicht vorhanden,
 * müsste getList und getitem null oder leere Liste zurückgeben
 * und dann AUCH code ausgeführt werden, der bei .load() definiert wurde,
@@ -140,10 +139,11 @@ bestehenden Funktionen
 	- returns true on download
 	- need response callback function
 	- and error callback function
+	- start download even if updateMode = offline (due to user invoked download)
 	*/
 	this.download = function() {
 		
-		if(this.updateMode()!='offline' && this.checkConnection()) { // this prevents waiting when offline
+		if(this.checkConnection()) { // this prevents waiting when offline
 		
 			//$('#load-result').html('AKTUALSIEREN');
 			//kwd_log('starte aktualisieren');
@@ -348,7 +348,7 @@ bestehenden Funktionen
 			this.display();
 		}
 		else {
-			this.download();
+			if (this.updateMode()!='offline') this.download();
 		}
 	};
 	

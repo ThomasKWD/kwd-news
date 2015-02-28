@@ -33,6 +33,16 @@ $('.ext-link').each.bind(iaEvent, function() {
 });
  */
 
+/* sets info depending on updateMode and situation (connection)
+ * - must not be called before document ready and deviceready 
+ */
+function setDataInfo() {
+
+	if(kwd.updateMode()=='offline') $('.data-warning').html('Bitte setzen Sie in den <a href="#page-einstellungen">Einstellungen</a> Aktualisieren auf "Auto" oder wählen "Jetzt Aktualisieren"');
+	else $('.data-warning').text('Bitte warten Sie einen Moment, oder überprüfen Sie Ihre Internetverbindung! (Daten müssen einmal heruntergeladen werden, um offline lesbar zu sein.)');
+	
+	if (kwd.isDevice) $('.data-warning').append('<br />'+navigator.connection.type);
+}
 
 /*
  * TODO: isDevice als Parameter?
@@ -114,6 +124,7 @@ function onDeviceReady() {
 		kwd.projects.download();
 		kwd.news.download();
 		kwd.offers.download();
+		//TODO: was passiert bei click VOR erstem Anzeigeversuch? (Da dann Callback-function noch nicht gesetzt)
 		//TODO: alle Image Updates hier!
 		// hide progress indicator
 	});
@@ -155,12 +166,14 @@ function onDeviceReady() {
 		if($(this).val()=='off') {
 			kwd_update=false;
 			kwd.updateMode('offline');
+			setDataInfo();
 			$('#options-info').html("Bei Aktualisieren \"Nie\" ist diese App komplett offline. Es können nur bereits gespeicherte Inhalte angezeigt werden.");
 			$('#box-options-info').css( {'display':'block'});
 		}
 		else {
 			kwd_update=true;
 			kwd.updateMode('auto');
+			setDataInfo();
 			$('#options-info').html("Bei Aktualisieren \"Auto\" werden Inhalte im Hintergrund aktualisiert, falls eine Verbindung zum Internet besteht.");
 			$('#box-options-info').css( {'display':'block'});
 			//TODO: gleich Daten-Update aufrufen??
@@ -185,11 +198,12 @@ function onDeviceReady() {
 
 		// localstorage gespeicherte Keys auflisten?
 		kwd_log("ClearCache Items: "+window.localStorage.length);
+		// TODO: delete images before text data!
+		kwd.cachedFiles.removeAll();
+		// save and set mode, because it will be cleared as well bei localStorage.clear() 
+		var tempmode = kwd.updateMode();
 		window.localStorage.clear();
-		// TODO: delete images
-		// test debug adjust - Code to change state of switch:		
-		// $("select#flip-debug").val ("off");
-		// $("select#flip-debug").flipswitch("refresh"); // na endlich		
+		kwd.updateMode(tempmode);
 	});
 	// calling external link (does not work without JS):
 	$('.externallink').click(function() {
@@ -272,7 +286,9 @@ function onDeviceReady() {
 		kwd_log("set update mode == OFFLINE");
 	}
 	kwd_log(kwd.updateMode());
-
+	// initial set
+	setDataInfo();
+	
 	kwd.init(); // for preloading text data		
 	
 	// SHOW
@@ -339,10 +355,12 @@ function onMenuButtonTouch() {
 function onOnline() {
 	$("#online-status").html(navigator.connection.type);	
 	//kwd.setOnlineStatus(true); -- set updateMode instead
+	setDataInfo();
 }
 function onOffline() {
 	$("#online-status").html('OFFLINE');
 	//kwd.setOnlineStatus(false);
+	setDataInfo();
 }
 function onPause() {
 	if(window.geoWatchId || window.geoInterval) {

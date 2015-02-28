@@ -81,11 +81,6 @@ function kwd_projects2list_oop() {
 		$("#list1").listview();
 	}
 	else { // if no elements
-		// vorbereitetes Hinweisfenster sichtbar machen
-		// Text
-		$('#projects-info').html('Keine Daten für Anzeige vorhanden');
-		if (kwd.updateMode()=='offline') $('#projects-info').append('<br />Bitte setzen Sie in den Einstellungen Aktualisieren auf "Auto"');
-		if (kwd.isDevice) $('#projects-info').append('<br />'+navigator.connection.type);
 		// sichtbar
 		$('#box-projects-info').css({'display':'block'});
 	}
