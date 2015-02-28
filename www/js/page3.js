@@ -105,7 +105,7 @@ $( document ).on( "pagebeforeshow", "#page-projects", function() {
 
 // TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-aproject", function() {
-	var code = '$("#projectlist###id###").attr("src","###uri###");';           				
+	var code = '$("#projectimage###id###").attr("src","###uri###");';           				
 	var p = kwd.projects.getItem(code); // item is preselected by setCurrent
 	if (p!=null) {
 		// TODO: code for images
