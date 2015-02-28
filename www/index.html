@@ -197,8 +197,7 @@
 				
 				
 				<div data-role="controlgroup"> 
-					<a class="project-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Projekt im Web... 1</a>
-					<a class="project-url" href="#" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_system">Projekt im Web... 2</a>
+					<a id="project-url" href="#" class="externallink ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" target="_blank">Projekt im Web... 1</a>
 					<a id="project-share" href="#"  class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-left">Teilen</a>
 				</div>
 			
@@ -272,42 +271,17 @@
 				Model: <span id="info-model"></span> <br />
 				Build intern: 0.1.13 beta<br />
 				Netzverbindung: <span id="online-status" class="wichtig">keine</span>.</p>
-				
-				<div data-role="collapsible" class="debug">
-					<h4>TODO:</h4>
-					<ul>
-						<li>Bug?: Auto-Update zumindest im Browser läuft nicht --> es müsste wenigstens korrekte Meldung erscheinen statt einfrieren bzw. falscher Anzeige!!</li>
-						<li>der jetzige CSS-background-Autozoom des Titels ist inakzeptabel, der Schriftzug wird fest, ohne Sommerfeld (höchstens mit Wolken) dargestellt,
-							eine Verkleinerung bei sehr schmalen Displays (jquery width bei onResize oder beim Start abfragen) evtl. denkbar</li>
-						<li>Kopfbereich mit Hintergrundfarbe!</li>
-						<li>02.01.15 was passiert in Texten mit Links und anderen Tags im App-Content (verlinken in den Browser oder Link tag löschen?, falls verlinken, müsste funktionsfähigkeit des Links geprüft werden)
-						außerdem wird bei Begriffen verlinken <i>innerhalb</i> der App erwartet. Diese Links deaktivieren? oder mit page-load und richtiger kwd_current_* anzeigen?							
-						 
-</li>
-						<li>02.01.15 Problem: ###teaser## sind bei get appdata schon weg (verarbeitet), deshalb kann auch nicht ###app### ohne weiteres implementiert werden
-							</li>
-						<li></li>
-						<li>wenn error bei update, dann setTimeout ca. 1min für nächsten Versuch
-						 </li>
-						<li>anhand von updatedate veraltete Inhalte erkennen.</li>
-						<li>alle transform Anweisungen,  nicht nur webkit-transform</li>
-						<li>teste header als persistent toolbar</li>
-						<li></li>
-						<li></li>
-						<li>Eigene Version anzeigen (aus config.xml)</li>
-						
-					</ul>
-
-				</div>
-				
+								
 				<h2>Kontakt:</h2>
 								
 				<div data-role="controlgroup"> 
-					<a href="#"  class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-left" onClick="navigator.app.loadUrl('http://www.kuehne-webdienste.de', { openExternal:true } )">Web</a>
+					<a href="http://www.kuehne-webdienste.de"  class="externallink ui-btn ui-corner-all ui-icon-action ui-btn-icon-left">Web</a>
 					<!--
 						für Erzwingen externer Browser: bei www-Links
 						javascript:
 						navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
+						
+						siehe allgemeine Funktin für '.externallink'
 					--> 
 					<a href="mailto:thomas@kuehne-webdienste.de" class="ui-btn ui-corner-all ui-icon-mail ui-btn-icon-left">E-Mail</a>
 					<a href="sms:+491705191814" class="ui-btn ui-corner-all ui-icon-comment ui-btn-icon-left">SMS</a>

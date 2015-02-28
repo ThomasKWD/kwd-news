@@ -174,6 +174,16 @@ function onDeviceReady() {
 		// $("select#flip-debug").val ("off");
 		// $("select#flip-debug").flipswitch("refresh"); // na endlich		
 	});
+	// calling external link (does not work without JS):
+	$('.externallink').click(function() {
+		if(kwd.isDevice) {
+			//alert(href);
+			// TODO: according to forum this does NOT work an ALL systems!
+			navigator.app.loadUrl(this.href, { openExternal:true } );
+			return false; // shall prevent default action of <a>			
+		}
+		else return true;
+	});
 	// TODO: wie besser die Klick-handler dort deklarieren, wo sie gebraucht werden (Seite)
 	//    oder zusammenfassen als function?
 	$('#project-share').click(function() {

@@ -111,8 +111,8 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		// TODO: code for images
 		$('#page-title').text(p['name']);
 		$("#project-info").html(p['info']);
-		$(".project-url").attr("href", p['url']); // mehrere wegen Tests
-		$(".project-url").text(p['url'].replace('http://',''));
+		$("#project-url").attr("href", p['url']); // mehrere wegen Tests
+		$("#project-url").text(p['url'].replace('http://',''));
 	
 		var i = 0;
 		var html = '';
