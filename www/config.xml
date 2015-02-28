@@ -7,7 +7,9 @@
     <name>KÜHNE-Webdienste</name>
 
     <description>
-        Diese App zeigt alle wichtigen infos von KÜHNE-Webdienste.de offline mit Auto-Update.
+        Diese App zeigt alle wichtigen Inhalte von KÜHNE-Webdienste.de offline mit Auto-Update.
+		Daten werden als Text mit Ajax übertragen, Bilder als Dateien herunzergeladen.
+		Das Layout ist komplett unabhängig von der Web-Version der Inhalte.
     </description>
 
     <author href="http://www.kuehne-webdienste.de" email="thomas@kuehne-webdienste.de">
@@ -41,7 +43,7 @@
     <icon src="res/icon/android/icon-96-xhdpi.png"  gap:platform="android"    gap:density="xhdpi" />
     <icon src="res/icon/android/kwd3-144-xxhdpi.png"  gap:platform="android"    gap:density="xxhdpi" />
 
-    	<icon src="res/icon/blackberry/icon-80.png"     gap:platform="blackberry" />
+    <icon src="res/icon/blackberry/icon-80.png"     gap:platform="blackberry" />
     <icon src="res/icon/blackberry/icon-80.png"     gap:platform="blackberry" gap:state="hover"/>
     <icon src="res/icon/ios/icon-57.png"            gap:platform="ios"        width="57" height="57" />
     <icon src="res/icon/ios/icon-72.png"            gap:platform="ios"        width="72" height="72" />
