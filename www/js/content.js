@@ -10,12 +10,8 @@ bestehenden Funktionen
 - specialized class for "CachedFileContent" planned
 - display with callback, so waiting for update is no problem
 
-* TODO: warum wird placeholder nicht von anfang an angezeigt??? (zum Test mal anderes Bild!)
-* TODO: wenn localStorage UND Internetverbindung nicht vorhanden,
-* müsste getList und getitem null oder leere Liste zurückgeben
-* und dann AUCH code ausgeführt werden, der bei .load() definiert wurde,
-* damit Warnhinweise verarbeitet werden  können 
-* 
+* TODO: warum wird placeholder nicht von anfang an angezeigt bei Images in einzel-Projektseite??? (zum Test mal anderes Bild!)
+* TODO: Liste wird nicht gleich gezeigt, wenn download nötig :-(
 * 
 */
 

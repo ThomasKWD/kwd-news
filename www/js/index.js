@@ -184,13 +184,26 @@ function onDeviceReady() {
 			kwd_debug=true;
 			// CSS Sichtbarkeit
 			$('.debug').css( {'display':'block'});			
-			//$('#debug-switch').css( {'display':'block'});			
+			$('#debug-switch').css( {'display':'block'});			
 		}
 		else {
 			kwd_debug=false;
+			kwd_debug_counter=0;
 			$('.debug').css( {'display':'none'});						
+			$('#debug-switch').css( {'display':'none'});			
 		}
-	});	
+	});
+	$('#sysinfo').click(function() {
+		if(kwd_debug==false) kwd_debug_counter++;
+		if(kwd_debug_counter > 2) $('#info-os').text(kwd_debug_counter);
+		if(kwd_debug_counter > 6) {
+			kwd_debug = true;
+			$('.debug').css( {'display':'block'});						
+			$('#debug-switch').css( {'display':'block'});
+			$('#info-os').text("Debug Modus EIN");		
+			$("#flip-debug").val('on'); // geht nicht
+		}
+	});
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
@@ -289,6 +302,9 @@ function onDeviceReady() {
 	// initial set
 	setDataInfo();
 	
+	if(kwd_debug==false) {
+			$('#debug-switch').css( {'display':'none'});			
+	}
 	kwd.init(); // for preloading text data		
 	
 	// SHOW

@@ -10,10 +10,12 @@
 */
 
 // Globale Schalter
-var kwd_debug=true;
+var kwd_debug=false;
 // wenn true Test Ausgaben in html
 // abhängig von jquery
 var kwd_debugscreen=false;
+// zählt zum Einschalten von kwd_debug um debug modus Einschalter zu verstecken 
+var kwd_debug_counter = 0;
 
 function kwd_log(object) {
 	if (kwd_debug) {
