@@ -11,7 +11,9 @@ bestehenden Funktionen
 - display with callback, so waiting for update is no problem
 
 * TODO: warum wird placeholder nicht von anfang an angezeigt bei Images in einzel-Projektseite??? (zum Test mal anderes Bild!)
-* TODO: Liste wird nicht gleich gezeigt, wenn download nötig :-(
+* TODO: Problem: callback/eval code nicht eindeutig: Wenn download großes Bild länger dauert und der Benutzer weiter blättert,
+*		wird u.U. altes Projektbild in anderem Projekt gezeigt, da nur Indizes und keine eindeutigen ids bei getItem vergeben wurden. 
+* TODO: Liste wird nicht gleich gezeigt, wenn download nötig war? (Callback-Problem, gilt auch für Files) 
 * 
 */
 

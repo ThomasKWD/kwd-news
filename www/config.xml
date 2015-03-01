@@ -2,7 +2,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "de.kuehne-webdienste.kwd-news"
-        version   = "0.1.29"
+        version   = "0.1.30"
         versionCode = "1" >
     <name>KÜHNE-Webdienste</name>
 
@@ -53,7 +53,7 @@
     <icon src="res/icon/windows-phone/icon-48.png"  gap:platform="winphone" />
     <icon src="res/icon/windows-phone/icon-173.png" gap:platform="winphone"   gap:role="background" />
 -->
-    <gap:splash src="res/screen/sommerfeld.jpg"  gap:platform="android" />
+    <gap:splash src="res/kwd3-titel.jpg"  gap:platform="android" />
     <!--
     <gap:splash src="res/screen/android/screen-mdpi-portrait.png"  gap:platform="android" gap:density="mdpi" />
     <gap:splash src="res/screen/android/screen-hdpi-portrait.png"  gap:platform="android" gap:density="hdpi" />
