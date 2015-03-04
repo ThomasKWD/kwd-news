@@ -255,7 +255,7 @@ bestehenden Funktionen
 	
 	/* generates image data depending on current caching status for one element of data
 	 * - adds field 'images' to data (or replaces field)
-	 * 
+	 * TODO: put together with setThumbSources and use Iterators
 	 */
 	this.setImageSources = function(id) {
 		
@@ -276,7 +276,7 @@ bestehenden Funktionen
 			}
 			// only if string
 			if(images[i]) {
-				images[i] = files.getCached('files/'+images[i],c); // adds 'files/', TODO: should be provided by web data
+				images[i] = files.getCached(images[i],c); 
 			}
 			// else set default
 			else {
