@@ -47,7 +47,8 @@ function kwd_projects2list_oop() {
 			
 			html += '<li class="aproject">';
 			
-			// click handler über jquery geht in diesem Fall irgendwie nicht
+			// click handler über jquery geht in diesem Fall nicht
+			// da Code noch nicht als Element im DOM existiert
 			html += "<a href=#page-aproject onClick=\"kwd.projects.setCurrent("+(i)+");\">";
 			// you need a call-back or a add function
 			// otherwise you must use the jquery code inside your data objects
@@ -98,9 +99,9 @@ $( document ).on( "pagebeforeshow", "#page-projects", function() {
 	$('#page-title').text("Referenzen, Auswahl");
 });
 
-// TODO: on pageshow ist etwas spät. gibt es auch before show oder on create??
 $( document ).on( "pagebeforeshow", "#page-aproject", function() {
-	var code = '$("#projectimage###id###").attr("src","###uri###");';           				
+	var curitem = kwd.projects.getCurrent();
+	var code = '$("#projectimage-'+curitem+'-###id###").attr("src","###uri###");';           				
 	var p = kwd.projects.getItem(code); // item is preselected by setCurrent
 	if (p!=null) {
 		$('#page-title').text(p['name']);
@@ -114,7 +115,7 @@ $( document ).on( "pagebeforeshow", "#page-aproject", function() {
 		var i = 0;
 		var html = '';
 		for(i=0;i<p['images'].length;i++) {
-			html += '<img id="projectimage'+i+'"src="'+p['images'][i]+'" /> ';
+			html += '<img id="projectimage-'+curitem+'-'+i+'"src="'+p['images'][i]+'" /> ';
 		}
 		$("#project-images").html(html);
 	}

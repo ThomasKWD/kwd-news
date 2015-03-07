@@ -13,8 +13,8 @@ bestehenden Funktionen
 * TODO: warum wird placeholder nicht von anfang an angezeigt bei Images in einzel-Projektseite??? (zum Test mal anderes Bild!)
 * TODO: Problem: callback/eval code nicht eindeutig: Wenn download großes Bild länger dauert und der Benutzer weiter blättert,
 *		wird u.U. altes Projektbild in anderem Projekt gezeigt, da nur Indizes und keine eindeutigen ids bei getItem vergeben wurden. 
-* TODO: Liste wird nicht gleich gezeigt, wenn download nötig war? (Callback-Problem, gilt auch für Files) 
-* 
+* TODO: download versuch wiederholen wenn fail
+* 	insbesondere bei event ononline reagieren und update() welches entscheidet ob download nötig
 */
 
 
@@ -98,6 +98,7 @@ bestehenden Funktionen
 		if(onloadcontentfunction) {
 			if(typeof onloadcontentfunction !== 'function') logthis("javascript says is no function");
 			onloadcontentfunction.call();
+			//logthis("inside display");
 		}
 		else logthis("no callback set in display()");
 	};
@@ -107,13 +108,13 @@ bestehenden Funktionen
 	 * - TODO: add special code for DroidScript
 	 */
 	this.checkConnection  = function() {
-		if(device != 'phonegap') return true; // status quo
-		else {
+		if(device == 'phonegap') {
 			if(navigator.connection && navigator.connection.type) {
 				if (navigator.connection.type == Connection.NONE) return false;
-				else return true;	// TODO: check what Connection.UNKNOWN means!! 
+				//else return true;	// TODO: check what Connection.UNKNOWN means!! 
 			}			
 		}
+		return true;
 	};
 
 	/* store data of AJAX download
@@ -127,7 +128,12 @@ bestehenden Funktionen
 			var strdata = JSON.stringify(response); 
 			localStorage.setItem(storageKey, strdata);
 			
+			// hope this works (scope?)
+			// otherwise load inside display or getlist etc. needed
+			data = response;
+			
 			// use that in callback
+			kwd_log("response-->display");
 			that.display(); // update also invokes the display callback code
 		}
 
@@ -168,13 +174,13 @@ bestehenden Funktionen
 		      timeout: 10000
 		      
 		    }).error(function(){
-		    	//logthis("download -"+storageKey+"- timeout (Kein Internet oder falsche id)");
+		    	logthis("download -"+storageKey+"- timeout (Kein Internet oder falsche id)");
 				//$('#load-result').html("");
 				//$('#load-result').append("update error");
 			}).complete(function(){
 				//console.log('update fertig');
 				//$('#load-result').html('fertig');
-		    	//logthis("download "+storageKey+" complete.");
+		    	logthis("download "+storageKey+" complete.");
 		    	
 			}).success(this.response);
 		} // this.checkConnection
@@ -251,6 +257,13 @@ bestehenden Funktionen
 	*/
 	this.setCurrent = function(id) {
 		current = id;
+	};
+	
+	/* getter for current item in list of data elements
+	*  - returns -1 if no current is set!
+	*/
+	this.getCurrent = function() {
+		return current;
 	};
 	
 	/* generates image data depending on current caching status for one element of data
