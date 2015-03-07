@@ -24,9 +24,10 @@
 	- warum wird download *immer* gestartet wenn Verbindung? (kann ja, soll aber vorher schon gecachte Datei anzeigen)
 	- was passiert im OFFLINE mode der App?
 	- bei Programmstart oder bei ONLINE/AUTO müsste überprüft werden ob Downloads ausstehen!!!
+		- Nein, eigentlich erst bei nächstem Anzeigeversuch
+		--> müsste automatisch bei Finden von status=='download passieren
+	
 	- TODO: falls Caching möglich aber ausgeschaltet, --> welcher Pfad wird gespeichert, --> was passiert beim Einschalten
-	- TODO: bei Zwangs-Löschen des Cache sollten Bilder gelöscht und auch der Pfad neu *erzeugt* werden
-	- TODO: auch im 'browser'-Modus alle Cache-Funktionen aktiv, nur das speichern selbst wird nicht ausgeführt
 */
 function CachedFiles(params) {
 	
@@ -36,7 +37,7 @@ function CachedFiles(params) {
 	var storagePath = '';
 	var storageFiles = '';
 	var updatemode = "auto";  //auto|online|offline
-	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
+	var device = 'browser';   // get info from my container, browser|phonegap|droidscript
 	var list = new Array();   // sub-elements: 'name' + 'local'
 	var downloadCounter = -1;
 	var moreDownloads = 0; // counts in addition to downloadCounter since the "startDownload" my be called to frequently
@@ -205,7 +206,6 @@ function CachedFiles(params) {
 	/* returns current save path
 	 * - should also be used by methods of this object
 	 * - tries to create path if not saved
-	 * TODO: due to new phonegap file you don't need dummy.html anymore 
 	 */
 	this.getLocalBase = function() {
 		
@@ -213,7 +213,7 @@ function CachedFiles(params) {
 			if(localBase=='') {
 				var p = localStorage.getItem(storagePath);
 				if(p) {					
-					logthis("got path: "+p);		
+					logthis("got saved path: "+p);		
 					localBase = p;
 					return localBase;
 				}
@@ -224,7 +224,7 @@ function CachedFiles(params) {
 						if(localBase) {
 							if(localBase.lastIndexOf('/')!=localBase.length-1) localBase += '/';
 							localStorage.setItem(storagePath,localBase);
-							logthis("found path: "+localBase);
+							logthis("created path: "+localBase);
 							return localBase;							
 						}
 					}
@@ -263,8 +263,7 @@ function CachedFiles(params) {
 	 */
 	this.requireFileList = function() {
 		if (list.length<1) {
-			var strread = null;
-			strread = localStorage.getItem(kwd_storage_files);
+			var strread = localStorage.getItem(kwd_storage_files);
 			if(strread) {
 				logthis("got files");
 				//logthis(strread);
@@ -353,19 +352,19 @@ function CachedFiles(params) {
 		
 		if (!name) return '';
 		
-		// try to load (assumes that filelist already loaded when not empty)
-		// thus is called only once when app runs
 		this.requireFileList(); // loads list only if not yet loaded can still be empty after this (if load failed)
 		
 		// find name in list
 		var i;
-		var j=list.length;
+		var j = 0;
+		if(list && list.length) j = list.length;
 		var entry = '';
 
 		for (i=0;i<j;i++) {
 			if (list[i]['name']==name) {
 				break;
 			}
+			
 		}
 		
 		// not  yet in list
@@ -376,8 +375,8 @@ function CachedFiles(params) {
 			a['local'] = this.getLocalPath(name);
 			logthis('new set local path: '+a['local']);
 
-			list.push(a); // hopefully always as next entry at the end!
-			this.saveFileList();
+			// list.push(a); // hopefully always as next entry at the end!
+			list[i] = a;
 
 			if(a['remote']==a['local']) {
 				list[i]['status'] = 'na'; 
@@ -385,7 +384,6 @@ function CachedFiles(params) {
 			else {
 				list[i]['status'] = 'download';
 				//TODO: don't start download when offline
-				this.startDownload(); 			
 			}
 		}
 		
@@ -398,8 +396,10 @@ function CachedFiles(params) {
 		}
 		list[i]['code'] = c;
 		
+		this.saveFileList();
+		
 		if(list[i]['status'] == 'cache' || list[i]['status'] == 'na') {
-			logthis("get file "+list[i]['name']+" from cache");
+			//logthis("get file "+list[i]['name']+" from cache");
 			try {
 				eval(list[i]['code']);
 			}
@@ -408,8 +408,10 @@ function CachedFiles(params) {
 			}
 			return list[i]['local'];
 		}
-		
-		else return '';
+		else {
+			this.startDownload(); 			
+			return '';
+		}
 	};
 	
 	

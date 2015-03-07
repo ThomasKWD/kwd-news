@@ -119,6 +119,18 @@ body {
 debug oder develope gekennzeichnet
 und bei Bedarf ausgeblendet
 */
+.table-wrapper {
+	width:100%;
+	overflow:auto;
+}
+#files-table {
+	border-collapse: collapse;
+	border:1px solid blue;
+}
+#files-table td {
+	border:1px solid blue;
+}
+
 .debug,
 .develope,
 #debug-switch {

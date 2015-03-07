@@ -146,19 +146,31 @@ function onDeviceReady() {
 
 		var strread = localStorage.getItem(kwd_storage_files);
 		if(strread) {
-			kwd_log("test files array:");
-			kwd_log(JSON.parse(strread));
+			var filedata = JSON.parse(strread);
+			var l = filedata.length;
+			kwd_log("files from storage, size: "+l);
+			var i;
+			var h = '';
+			for (i=0;i<l;i++) {
+				h += '<tr>';
+				h += '<td>'+i+'</td>';
+//				h += '<td>'+(filedata[i]['name'].substr((filedata[i]['name'].length-32)))+'</td>';
+				h += '<td>'+(filedata[i]['name'])+'</td>';
+				h += '<td>'+(filedata[i]['status'])+'</td>';
+				h += '<td>'+(filedata[i]['code'])+'</td>';
+				h += '<td>'+(filedata[i]['remote'])+'--</td>';
+				h += '<td>'+(filedata[i]['local'])+'--</td>';
+//				h += '<td>'+(filedata[i]['remote'].substr(0,32))+'...</td>';
+//				h += '<td>'+(filedata[i]['local'].substr(0,32))+'...</td>';
+				h+= '</tr>';
+			}
+			$('#files-table').html(h);
+			
+			// nicer output of table
 		}
-		else ("no files array found");
+		else kwd_log("no files array found");
 		           				
 		// $('#testbild').attr('src','http://localhost/tk/kwd-redaxo-46/files/me-shot.jpg');           				
-	});
-	$('#data-rel-forward').click(function(){
-		window.history.go(1); // try to go forward history				           				
-	});
-	$('.aproject').click(function() {
-		alert('project');
-		kwd_log('project');
 	});
 	// update mode
 	$('#flip-6').change(function() {
@@ -207,13 +219,13 @@ function onDeviceReady() {
 	$('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
-	$('#doClearCache').click(function() {
+	$('#doClearCache').on('tap',function() {
 
 		// localstorage gespeicherte Keys auflisten?
 		kwd_log("ClearCache Items: "+window.localStorage.length);
-		// TODO: delete images before text data!
+		// delete images *before* text data!
 		kwd.cachedFiles.removeAll();
-		// save and set mode, because it will be cleared as well bei localStorage.clear() 
+		// save and restore mode, because it will be cleared as well bei localStorage.clear() 
 		var tempmode = kwd.updateMode();
 		window.localStorage.clear();
 		kwd.updateMode(tempmode);
@@ -317,13 +329,14 @@ function onDeviceReady() {
 	
 	// TESTS
 	
-	v = new PrivateStatic();
+	/*v = new PrivateStatic();
 	kwd_log(v.static());
 	kwd_log(v.static(1));
 	kwd_log(v.static());
 	kwd_log(v.static(2));
 	kwd_log(v.static());
 	kwd_log(v.privatemember());
+	*/
 }
 
 
