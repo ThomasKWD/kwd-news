@@ -56,7 +56,7 @@ function KwdApp()	 {
 	// private members:
 	
 	var remoteBase = "";
-	var myplaceholder = 'kwd.png'; // TODO: weißes Bild mit kleinem "k" in der Mitte
+	var myplaceholder = 'kwd-4-placeholder-gradient.png'; // TODO: weißes Bild mit kleinem "k" in der Mitte
 	
 	// wird gespeichert (auch in localStorage) und an enthaltene Objekte weitergegeben:
 	var updatemode = 'auto'; 
