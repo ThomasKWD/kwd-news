@@ -37,7 +37,11 @@ function onTachoShow() {
 
 	$(".autofade").css({"opacity":"1"});
 	// due to body color set bei jqm...:
-	$('body').css({ "background-color" : "black"});
+	
+	// because you cannot invoke '!important' by $('body').css(...  
+	var csstxt = $('body').css('cssText') + ';background-color: black !important;';
+	$('body').css('cssText', csstxt);
+
 	// code hier wirkt bei öffnen der Seite
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
 	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
@@ -66,7 +70,10 @@ function onTachoHide() {
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
 	window.myHudTimeout = null;
 	$(".autofade").css({"opacity":"1"});
-	$('body').css({ "background-color" : "#83c2fd !important"});
+
+	// because you cannot invoke '!important' by $('body').css(... in some browsers  
+	var csstxt = $('body').css('cssText') + ';background-color: #83c2fd !important;';
+	$('body').css('cssText', csstxt);
 	
 	//screen timeout wieder an
 	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.allowSleepAgain();	
