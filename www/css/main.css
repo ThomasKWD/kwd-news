@@ -7,7 +7,7 @@
 
 /*experimental*/
 body {
-	background-color: #83C2FD !important;		
+	background-color: #83C2FD;		
 }
 /* falls gradient gewünscht, umgebenden div für #header implementieren */
 #header-wrapper {

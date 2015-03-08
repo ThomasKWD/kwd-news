@@ -36,11 +36,12 @@ function onTachoShow() {
 //<button onclick="window.plugins.insomnia.allowSleepAgain()">allow sleep again</button>
 
 	$(".autofade").css({"opacity":"1"});
+
 	// due to body color set bei jqm...:
-	
 	// because you cannot invoke '!important' by $('body').css(...  
-	var csstxt = $('body').css('cssText') + ';background-color: black !important;';
-	$('body').css('cssText', csstxt);
+	//var csstxt = $('body').css('cssText') + ';background-color: black !important;';
+	//$('body').css('cssText', csstxt);
+	$('body').css({'background':'black'});
 
 	// code hier wirkt bei öffnen der Seite
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
@@ -72,8 +73,11 @@ function onTachoHide() {
 	$(".autofade").css({"opacity":"1"});
 
 	// because you cannot invoke '!important' by $('body').css(... in some browsers  
-	var csstxt = $('body').css('cssText') + ';background-color: #83c2fd !important;';
-	$('body').css('cssText', csstxt);
+	//var csstxt = $('body').css('cssText');
+	//var c = $('body').css;
+	//kwd_log("css:"+c);
+	//$('body').css('cssText', csstxt);
+	$('body').css({'background':'#83C2FD'});
 	
 	//screen timeout wieder an
 	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.allowSleepAgain();	
