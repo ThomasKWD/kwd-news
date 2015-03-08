@@ -53,7 +53,7 @@
     <icon src="res/icon/windows-phone/icon-48.png"  gap:platform="winphone" />
     <icon src="res/icon/windows-phone/icon-173.png" gap:platform="winphone"   gap:role="background" />
 -->
-    <gap:splash src="res/kwd3-titel.jpg"  gap:platform="android" />
+    <gap:splash src="res/kwd-4-splash-patch.9.png"  gap:platform="android" />
     <!--
     <gap:splash src="res/screen/android/screen-mdpi-portrait.png"  gap:platform="android" gap:density="mdpi" />
     <gap:splash src="res/screen/android/screen-hdpi-portrait.png"  gap:platform="android" gap:density="hdpi" />

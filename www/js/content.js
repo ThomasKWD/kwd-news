@@ -287,13 +287,11 @@ bestehenden Funktionen
 				c = c.replace('###id###',i);
 				// the other placeholder is not parsed here!
 			}
-			// only if string
+			// only if string present 
 			if(images[i]) {
-				images[i] = files.getCached(images[i],c); 
-			}
-			// else set default
-			else {
-				images[i] = this.placeHolderFile();
+				var s = files.getCached(images[i],c); // returns '' when caching
+				if(s) images[i] = s;
+				else images[i] = this.placeHolderFile();
 			}
 		}
 		
