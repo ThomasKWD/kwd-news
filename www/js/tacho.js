@@ -14,10 +14,12 @@ function onTachoInit() {
 		
 		if(window.isHUD) {
 			// TODO: weitere Transform (opera, mozilla ...)
+			$("#speed").css({"transform":"scale(1,1)"});
 			$("#speed").css({"-webkit-transform":"scale(1,1)"});
 			window.isHUD = false;
 		}
 		else {
+			$("#speed").css({"transform":"scale(-1,1)"});
 			$("#speed").css({"-webkit-transform":"scale(-1,1)"});
 			window.isHUD=true; 
 		}
@@ -34,6 +36,8 @@ function onTachoShow() {
 //<button onclick="window.plugins.insomnia.allowSleepAgain()">allow sleep again</button>
 
 	$(".autofade").css({"opacity":"1"});
+	// due to body color set bei jqm...:
+	$('body').css({ "background-color" : "black"});
 	// code hier wirkt bei öffnen der Seite
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout); // alten löschen, damit nicht mehrere unterwegs sind
 	window.myHudTimeout = window.setTimeout("onFadeHud()",5000);
@@ -62,6 +66,8 @@ function onTachoHide() {
 	if (window.myHudTimeout) window.clearTimeout(window.myHudTimeout);
 	window.myHudTimeout = null;
 	$(".autofade").css({"opacity":"1"});
+	$('body').css({ "background-color" : "#83c2fd !important"});
+	
 	//screen timeout wieder an
 	if (window.plugins && window.plugins.insomnia) window.plugins.insomnia.allowSleepAgain();	
 }
@@ -80,9 +86,9 @@ var s;
 	if(!window.geocounter) window.geocounter = 1;
 	else window.geocounter++;
 	
-	$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
+	//$('#gps-status').html('GPS ok ['+window.geocounter+'] ');
 	if (pos.coords) {
-		$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
+		//$('#gps-status').append((JSON.stringify(pos.coords)).replace(/,/g,', '));
 	}
 	if (pos.coords.speed!==null) {
 		s = pos.coords.speed*3.6;
@@ -95,9 +101,9 @@ var s;
 function onGeoError(error) {
 
 	kwd_log('geo code: ' + error.code + '\n' + 'message: ' + error.message + '\n');
-	$('#gps-status').html('GPS nicht aktiv.');  // TODO: Ausgabe String var
+	//$('#gps-status').html('GPS nicht aktiv.');  // TODO: Ausgabe String var
 	if(window.mylastspeed===0 || window.mylastspeed>0) {
-		$("#speed").html('('+window.mylastspeed+')');
+		$("#speed").html(window.mylastspeed);
 	}
  } 
 

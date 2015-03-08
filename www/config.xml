@@ -2,7 +2,7 @@
 <widget xmlns     = "http://www.w3.org/ns/widgets"
         xmlns:gap = "http://phonegap.com/ns/1.0"
         id        = "de.kuehne-webdienste.kwd-news"
-        version   = "1.0.2"
+        version   = "1.0.3"
         versionCode = "2" >
     <name>KÜHNE-Webdienste</name>
 
@@ -31,8 +31,8 @@
     <preference name="orientation" value="default" />
     <preference name="target-device"    value="universal" />
     <preference name="fullscreen"       value="false" />
-	<preference name="splash-screen-duration" value="6000"/>
-	<preference name="splashscreen" value="res/sommerfeld.jpg"/>
+	<preference name="SplashScreen" value="kwd-4-splash-patch.9.png" />
+	<preference name="SplashScreenDelay" value="5000" />
 	<preference name="AndroidPersistentFileLocation" value="Internal" />
 
     <icon src="kwd.png" />
@@ -53,7 +53,9 @@
     <icon src="res/icon/windows-phone/icon-48.png"  gap:platform="winphone" />
     <icon src="res/icon/windows-phone/icon-173.png" gap:platform="winphone"   gap:role="background" />
 -->
-    <gap:splash src="res/kwd-4-splash-patch.9.png"  gap:platform="android" />
+	<gap:splash src="splash.png" />
+    <gap:splash src="kwd-4-splash-patch.9.png"  gap:platform="android" gap:qualifier="xhdpi" />
+    <gap:splash src="kwd-4-splash-patch.9.png"  gap:platform="android" gap:qualifier="xxhdpi" />
     <!--
     <gap:splash src="res/screen/android/screen-mdpi-portrait.png"  gap:platform="android" gap:density="mdpi" />
     <gap:splash src="res/screen/android/screen-hdpi-portrait.png"  gap:platform="android" gap:density="hdpi" />
