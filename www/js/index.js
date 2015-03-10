@@ -120,12 +120,14 @@ function onDeviceReady() {
 		performBackAction();
 	});	
 	$('#doUpdate').click(function(){
-		// show progress indicator
+		// TODO: show progress indicator
+		// TODO: make central update: kwd.update()
 		kwd.projects.download();
 		kwd.news.download();
 		kwd.offers.download();
 		//TODO: was passiert bei click VOR erstem Anzeigeversuch? (Da dann Callback-function noch nicht gesetzt)
 		//TODO: alle Image Updates hier!
+		// warum nicht 'update()'?
 		// hide progress indicator
 	});
 	$('#doQuit').click(function(){
