@@ -122,12 +122,9 @@ function onDeviceReady() {
 	$('#doUpdate').click(function(){
 		// TODO: show progress indicator
 		// TODO: make central update: kwd.update()
-		kwd.projects.download();
-		kwd.news.download();
-		kwd.offers.download();
+		kwd.updateAll();
 		//TODO: was passiert bei click VOR erstem Anzeigeversuch? (Da dann Callback-function noch nicht gesetzt)
 		//TODO: alle Image Updates hier!
-		// warum nicht 'update()'?
 		// hide progress indicator
 	});
 	$('#doQuit').click(function(){
@@ -209,8 +206,9 @@ function onDeviceReady() {
 	});
 	$('#sysinfo').click(function() {
 		if(kwd_debug==false) kwd_debug_counter++;
-		if(kwd_debug_counter > 2) $('#info-os').text(kwd_debug_counter);
-		if(kwd_debug_counter > 6) {
+		if(kwd_debug_counter > 7) $('#info-os').text(kwd_debug_counter);
+		if(kwd_debug_counter > 10) {
+			kwd_debug_counter = 0;
 			kwd_debug = true;
 			$('.debug').css( {'display':'block'});						
 			$('#debug-switch').css( {'display':'block'});
@@ -260,7 +258,7 @@ function onDeviceReady() {
 				shareok=true;
 			}
 		}
-		if (!shareok) alert ("Teilen in diesem Kontext nicht möglich");
+		if (!shareok) alert ("'Teilen' in diesem Kontext nicht möglich");
 	}); 
 	$('#news-share').click(function() {
 		// - URL auf die Seite im Web
@@ -443,6 +441,7 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 		$("#logo").css({"background-image":"none"});
 		if (current=="page-info") $("#page-title").text("Infos & Kontakt");
 		if (current=="page-einstellungen") $("#page-title").text("Einstellungen");	
+		if (current=="page-tacho") $("#page-title").text("Tachometer");	
 	}
 	if(current!="page-tacho") {
 		onTachoHide();

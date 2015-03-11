@@ -40,7 +40,7 @@ bestehenden Funktionen
 	var device = 'browser';       // get info from my container, browser|phonegap|droidscript
 	var onloadcode = '';
 	var globalplaceholderfile = 'spacer.gif';
-	var onloadcontentfunction;
+	var onloadcontentfunction = null;
 	
 	var that = this;
 	
@@ -108,12 +108,12 @@ bestehenden Funktionen
 	 * - TODO: add special code for DroidScript
 	 */
 	this.checkConnection  = function() {
-		if(device == 'phonegap') {
-			if(navigator.connection && navigator.connection.type) {
+		//if(device == 'phonegap') {
+			if(navigator && navigator.connection && navigator.connection.type) {
 				if (navigator.connection.type == Connection.NONE) return false;
 				//else return true;	// TODO: check what Connection.UNKNOWN means!! 
 			}			
-		}
+		//}
 		return true;
 	};
 
@@ -339,16 +339,6 @@ bestehenden Funktionen
 		return null;
 	};
 
-	// update on construct just is easier
-	// Problem: App waits on statup in case no internet connection
-	// TODO: check connection status and call method from kwd object
-	// TODO: in tatsächlicher App bisher (fast) niemals ausgeführt, da event 'deviceready'
-	// 	viel später triggert und bis dahin connection==OFFLINE gefunden wird.
-	this.init = function() {
-		//this.download();
-		//logthis("no init in 'projects'");
-	};
-	
 	/* updates the content from localStorage or remote if needed and executes callback set by this.load()
 	 * 
 	 */
@@ -361,6 +351,17 @@ bestehenden Funktionen
 		}
 	};
 	
+	/* use this init for the instance due to timing (e.g. wait for system ready)
+	 * - ...instead of doing this on construction
+	 * - manually inits data
+	 * - in this version == update()
+	 * TODO: you could construct this later in the app-object, and only the app-object has init + a mechanism to handle forgotten init
+	 */
+	  this.init = function() {
+		this.update();
+	};
+	
+
 	/* saves callback to be run when projects available or timeout
 	 * WARNING!: does NOT correspond to onlinecode
 	 */

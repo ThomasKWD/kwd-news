@@ -55,6 +55,7 @@
     <body>
 
 	 
+       <!-- header außerhalb page, da header für alle Pages -->
        <div id="header-wrapper">
        	
 	       <div data-role="header" id="header" class="autofade" data-position="fixed" data-theme=a>
@@ -74,6 +75,20 @@
 
       <div data-role="page" id="page-start" class="page">
         
+        
+        <div data-role="panel" data-display="overlay" id="mypanel">
+    <!-- panel content goes here -->
+			  <div data-role="controlgroup"> 
+				  <a href="#page-news" class="ui-btn ui-corner-all ui-icon-bullets ui-btn-icon-left">News</a>              
+				  <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
+				  <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
+				  <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
+				  <a href="#mypanel" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Panel</a>              
+				  <!--<a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>-->
+				  
+			  </div>              
+</div><!-- /panel -->
+        
 			<div role="main" class="ui-content page-content">
 
 				<h2>Design und Programmierung für Web, App und Druck</h2>
@@ -85,7 +100,9 @@
 				  <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
 				  <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
 				  <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
+				  <a href="#mypanel" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Panel</a>              
 				  <!--<a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>-->
+				  
 			  </div>              
 			  
 			<a href="#page-tacho" class="ui-btn ui-corner-all ui-icon-dashboard ui-btn-icon-left">Tachometer Widget</a>              
@@ -315,6 +332,16 @@
 				    </div>
 				</div>
       
+				
+				<div id="box-options-info" class="ui-corner-all" style="display:none">
+					<div class="ui-bar ui-bar-a">
+						<h3>Hinweis</h3>
+					</div>
+					<div class="ui-body ui-body-a">
+						<p id="options-info">&nbsp;</p>
+					</div>
+				</div>
+	
 				<form id="debug-switch">
 				    <div class="ui-field-contain">
 				        <label for="flip-debug">Debug-Modus</label>
@@ -325,15 +352,18 @@
 				    </div>
 				</form>
 
-				
-				<div id="box-options-info" class="ui-corner-all" style="display:none">
-					<div class="ui-bar ui-bar-a">
-						<h3>Hinweis</h3>
-					</div>
-					<div class="ui-body ui-body-a">
-						<p id="options-info">&nbsp;</p>
-					</div>
-				</div>
+				<h3>Tachometer</h3>
+				    
+				<form id="clock-switch">
+				    <div class="ui-field-contain">
+				        <label for="flip-clock">Uhr anzeigen</label>
+				        <select name="flip-clock" id="flip-debug" data-role="flipswitch">
+				            <option value="off">Nein</option>
+				            <option value="on"  selected="selected">Ja</option>
+				        </select>
+				    </div>
+				</form>
+		    
 				
 			</div>		              
 		</div><!--page Einstellungen-->
