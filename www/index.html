@@ -28,13 +28,20 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="viewport" content="user-scalable=no, initial-scale=1, width=device-width, height=device-height" />
         <title>Willkommen</title>
-       	<link rel="stylesheet"  href="css/jquery.mobile-1.4.2.min.css" type="text/css" />
+       	<link rel="stylesheet"  href="css/jquery.mobile-1.4.5.min.css" type="text/css" />
        	<link rel="stylesheet"  href="css/icon-pack-custom.css" type="text/css" />
        	<link rel="stylesheet"  href="css/main.css" type="text/css" charset="UTF-8"/>       	
         <script type="text/javascript" src="phonegap.js"></script>
         <script type="text/javascript" src="js/debug.js"></script>
         <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
-        <script type="text/javascript" src="js/jquery.mobile-1.4.2.min.js"></script>
+		<script>
+		// code *must* be here
+		$(document).bind("mobileinit", function () {
+			
+		    $.mobile.defaultPageTransition = 'none';
+		});
+		</script>
+        <script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
         <script type="text/javascript" src="js/content.js" charset="UTF-8"></script>
         <script type="text/javascript" src="js/globals.js" charset="UTF-8"></script>
         <script type="text/javascript" src="js/files.js" charset="UTF-8"></script>
@@ -100,7 +107,6 @@
 				  <a href="#page-offers" class="ui-btn ui-corner-all ui-icon-check ui-btn-icon-left">Leistungen</a>              
 				  <a href="#page-projects" class="ui-btn ui-corner-all ui-icon-grid ui-btn-icon-left">Referenzen</a>              
 				  <a href="#page-info" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Info</a>              
-				  <a href="#mypanel" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Panel</a>              
 				  <!--<a id="#doQuit" href="#" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-left">Beenden</a>-->
 				  
 			  </div>              
@@ -116,6 +122,7 @@
               <li><a id="doTest3" href="#">Cached Files</a></li>
               <li><a id="doSave" href="#">Cache Images</a></li>
               <li><a id="doTest2" href="#">Show Cached Images</a></li>              
+			  <li><a href="#mypanel" class="ui-btn ui-corner-all ui-icon-info ui-btn-icon-left">Panel</a></li>              
               <!--<li><a id="switchtacho" href="#">Switch Tacho</a></li>-->
               </ul>              
            </div>
@@ -369,7 +376,7 @@
 		</div><!--page Einstellungen-->
 
 		<!--DroidScript START-->
-	    <script type='application/javascript' src='../KWD-News.js'></script>
+	    <!--<script type='application/javascript' src='../KWD-News.js'></script>-->
 		<!--DroidScript END-->
 	
     </body>
