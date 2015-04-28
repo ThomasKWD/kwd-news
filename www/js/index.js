@@ -94,9 +94,6 @@ function onDeviceReady() {
 	else {
 		kwd_log('keine connection');
 	}
-
-	if (navigator.geolocation) kwd_log('GPS verfügbar');
-	else kwd_log('kein GPS.');
 	
     // EVENT LISTENER ------------------------------------------------------------
     
@@ -216,9 +213,11 @@ function onDeviceReady() {
 			$("#flip-debug").val('on'); // geht nicht
 		}
 	});
-	$('#switchtacho').click(function() {
+	/*
+	 $('#switchtacho').click(function() {
 		window.gpsinterval=true;	
 	});
+	*/
 	$('#doClearCache').on('tap',function() {
 
 		// localstorage gespeicherte Keys auflisten?
@@ -298,8 +297,9 @@ function onDeviceReady() {
 	});
 
 	// Intervall-Modus voreinstellen
-	window.gpsinterval=true;
-	onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
+	//window.gpsinterval=true;
+	//onTachoInit(); // ist auch klick handler // TODO: könnte man erst beim ersten Aufruf des Tacho setzen 
+
 	// schreibe Funktion, die dies für alle Links automatisiert!
 	//navigator.app.loadUrl('http://www.google.com', { openExternal:true } );
 	
@@ -392,16 +392,19 @@ function onOffline() {
 	setDataInfo();
 }
 function onPause() {
-	if(window.geoWatchId || window.geoInterval) {
+/*
+ 	if(window.geoWatchId || window.geoInterval) {
 		onTachoHide();
 		window.tachopaused=true;
 	}
+*/
 }
 function onResume() {
-	if(window.tachopaused) {
+/*	if(window.tachopaused) {
 		onTachoShow();
 		window.tachopaused=false;
 	}
+*/
 }
 
 $(function() {
@@ -427,7 +430,7 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 		case 'page-aproject': previous = 'Referenzen'; break;
 		case 'page-anews': previous = 'News'; break;		
 		case 'page-anoffer': previous = 'Leistungen'; break;
-		case 'page-tacho': onTachoShow(); // hier kein break!	
+		//case 'page-tacho': onTachoShow(); // hier kein break!	
 		default : previous = "Start";
 	}
 	if (current == "page-start") {
@@ -441,9 +444,12 @@ $( document ).on( "pagebeforeshow", "[data-role='page']", function() {
 		$("#logo").css({"background-image":"none"});
 		if (current=="page-info") $("#page-title").text("Infos & Kontakt");
 		if (current=="page-einstellungen") $("#page-title").text("Einstellungen");	
-		if (current=="page-tacho") $("#page-title").text("Tachometer");	
+		//if (current=="page-tacho") $("#page-title").text("Tachometer");	
 	}
-	if(current!="page-tacho") {
+	/*
+	 
+	 if(current!="page-tacho") {
 		onTachoHide();
 	}
+	*/
 });
