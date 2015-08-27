@@ -1,0 +1,2267 @@
+<!DOCTYPE HTML>
+<html>
+<!-- this code is freely copyable between browser/phonegap/DoridScript -->
+<!--
+	JavaScript:
+	TODO:
+	- glob Variablen oder array für sichtbarkeit von Komponenten spart zeitaufwendiges u. manchmal 
+	  fehleranfälliges (wegen Dauer) abfragen über jQuery
+	  besonders für das häufige Abfragen innerhal gpstool.change
+-->
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1,  maximum-scale=1, user-scalable=no">
+    
+    <meta name="charset" content="utf-8">
+    
+    <title>Tachometer App Android DroidScript</title>
+    
+    <link rel="stylesheet" href="css/fontello.css">
+    <link rel="stylesheet" href="css/cssgauge.css">
+  
+    <script src='file:///android_asset/app.js'></script>
+	    <script src='js/droidscript.js'></script>
+    
+    <!--TODO: include all this by own files to prevent searching something from the internet-->
+    <script src="file:///android_asset/Html/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.8.2.min.js"></script>
+        
+    <script src="js/jquery.tap.js"></script>
+
+    <script src="js/cssgauge.js"></script>
+
+    <style>
+        /* #83C2FD */
+        /* #DD0000 warning */
+         
+        * {box-sizing:border-box;font-family:Tahoma,Verdana,Univers,sans-serif;}
+        body { margin:0;padding:0;font-size:15px;color:white;}
+        p,h1,h2,h3,h4 {margin:0;padding:0;color:white;}
+       
+        .test {
+        	background-color: #83C2FD;
+            transition:2s background-color ease-in;
+        }
+        .ext-btn,
+        .btn {
+            display:block;
+            color:white !important;
+            font-size:130%;
+            font-weight:bold;
+            background-color:#888;
+            padding:5px;
+            margin:1em;
+            border:4px solid #f0f0f0;
+            border-radius:15px;
+            box-shadow:3px 3px 10px #ddd inset,-3px -3px 7px #555 inset;
+            text-decoration:none;
+            text-align:center;
+        }
+        /* want colors of KWD Logo */
+        .ext-btn { 
+        	border-color:red;
+            box-shadow:3px 3px 10px #ddd inset,-3px -3px 7px #555 inset, 5px 5px 10px #555;
+        }
+        /*  switcher must not have .btn
+            can have class "switched-on" to determine state
+        */
+        a.switcher,
+        a.switcher:link,
+        a.switcher:visited,
+        a.switcher:hover,
+        a.switcher:focus,
+        a.switcher:active {
+            display:block;
+            color:white;
+            padding:1em 1em 1em 1em;
+            /*padding:1em 1em 1em 3em;
+             text-indent:-1.5em;*/
+            margin:0;
+            border-top:1px solid white;
+            text-decoration:none;
+            background:none;
+            outline:none;
+            -webkit-tap-highlight-color: rgba(0,0,0,0);
+        }
+        .lastswitcher {
+            border-bottom:1px solid white;
+        }
+        .fa {
+            color:#dd0000;
+            display:inline-block;
+            width:40px;
+            padding-right:20px;
+            /* TODO: test ob mit height:100% das ursprüngliche line-wrap *hinter* dem Icon funktioniert */
+        }
+        .switched-on .fa {
+			color :#00dd00;
+		}
+		.menuitem .fa
+		{
+            color:#FFFFFF;
+        }
+		.mirror {
+			transform:scale(-1,1);
+            padding-right:0;
+            padding-left:1em;
+            text-align:right;
+		}
+		.icon-zoom-out {
+			font-size:65%;
+		}
+        
+		/* marks elements to be changed when no-gps
+		 */
+		.gps {
+		}
+		.no-gps {
+			color:#dd0000 !important;
+		}
+        /* some properties are set by JS */
+        #digital-on-analog {
+            position:absolute;
+            font-size:40px;
+            font-weight:bold;
+            text-align:center;
+            color:white;
+            line-height:1em;
+            background-color:#000000;
+            letter-spacing:0;
+        }
+
+        #info-on-analog {
+            position:absolute;
+            color:white;
+            line-height:1em;
+            text-align:center;
+            font-weight:bold;
+        }
+        .gps-warning {
+        	color:#DD0000;
+        }
+        .gps-warning-text {
+        	font-size:1.75em;
+        	line-height:1em;
+        }
+        /* text inside #digital-on-analog shield */
+        #dona-text {
+            position:absolute;
+            letter-spacing:0;                      
+        }
+        /* TODO: möglichst viele Eigenschaften aller digital-Anzeigen hier! */
+        /* ! ORI font-size:30px;
+        */
+        .display-frame {
+            position:relative;
+            display:block;
+            width:auto;
+            height:auto;
+            margin:10px;
+            padding:20px 10px 20px 10px;
+            font-size:150px;
+            font-weight:bold;
+            line-height:1em;
+            text-align:center;
+            overflow:hidden;
+            border:1px solid white;
+            white-space:nowrap;
+            letter-spacing:0;
+        }
+        #display-container {
+            position:relative;
+        }
+        .halfsize {
+        	background-color: #000000;
+        }
+        #maxspeed {
+        	float:right;
+        }
+        #averagespeed {
+			float:left; 	
+        }
+        .speed {
+            line-height:1.25em;
+        }
+        /* kmh wird jetzt unabhängig gesetzt, da es bei analog die Anzeige
+        von canvgauge verdeckt.
+        wenn digital, soll es allerdings innerhalb positioniert werden.
+        Alternative: zwei verschiedene 
+        
+        TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
+            in Funktion gleichwertig verarbeiten!
+            
+        */
+        .unitlabel {
+            position:absolute;
+            color:white;
+            line-height:1em;
+            text-align:center;
+            font-weight:bold;
+            padding:10px;
+            font-size:20px;
+            right:0;
+            bottom:0;        
+        }
+        /* some properties are set by JS */
+        #digitalspeed {
+        }
+        /* some properties are set by JS */
+        /* TODO: gleichsetzen mit #digitalspeed als class */
+        #time,
+        #geolocation,
+        #geoaltitude {
+        }
+        #geolocation {
+            font-family:monospace;
+            overflow:hidden;
+        }
+        #positiontext {
+            line-height:1em;
+        }
+        #gauge {
+            /*
+                  transform:scale(-1,1);
+          -moz-transform:scaleX(-1);
+          -webkit-transform: scaleX(-1);
+          */
+        }
+        #title {
+            position:relative;
+            bottom:1em;
+            padding:1em;
+        }
+        #logo img {
+            width:100%;
+            margin-left:-7px;
+            margin-bottom:15px;
+        }
+        #title p{
+            margin-bottom:5px;
+        }
+        /* for current control funcs. all dialogs must be visible! */
+        .dialog {
+        	display:block;
+            position:absolute;
+            width:90%;
+            background-color: rgba(0,0,0,0.9);
+            color:white;
+            border:10px solid #ddd;
+  background-image:linear-gradient(#777 5%, #000 40%);
+  box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;
+            border-radius:3em;
+            font-size:1em;
+        }
+        .dialog p,
+        .dialog h1,
+        .dialog h2,
+        .dialog h3 {
+            margin:1em;
+        }
+        #menu {
+            margin: 1em auto;
+            text-align:center;
+            display:none;
+        }
+        #warningdialog {
+            color:white;
+            border-color:red;
+        }
+        #warningdialog h1 {
+            color:red;
+            text-align:center;
+        }
+        #yesnodialog {
+            text-align:center;
+            top:25%;
+        }
+        #yesnodialog * {
+            font-size:1.2em;
+        }        
+        #splashscreen {
+            background-color: #83C2FD;
+            position:absolute;
+            padding:20px;
+            top:0;
+            left:0;
+            width:100%;
+            height:100%;
+        }
+        #splashscreen p {
+            margin-top:50%;
+        }
+        #splashscreen img {
+            width:100%;
+            margin-left:-5px;
+        }
+        #wait {
+            width:200px;
+            height:2em;
+            margin:auto;
+        }
+        #infocard {
+            position:absolute;
+            top:0;
+            width:100%;
+            overflow:scroll;
+            background-color:white;
+            color:black;
+            padding:25px;
+            display:none;
+        }
+        #infocard * {
+            color:black;
+        }
+        #infocard p,
+        #infocard h1,
+        #infocard h2,
+        #infocard h3 {
+            margin-bottom: 0.7em;
+        }
+        #infocard h3{
+            font-size:1em;
+        }
+        #infocard a {
+            font-weight:bold;
+            color:  #40a1fc;
+        }
+        /* neg right padding due to css of .fa : */
+        #menubutton {
+            position:absolute;
+            top:0;
+            right:0;
+            font-size:2em;
+            padding:0.5em 0em 1em 1em;
+            margin: 0 -0.25em 0 0;
+        }
+        #gpswarning {
+            position:absolute;
+            top:0;
+            left:0;
+            font-size:15px;
+            font-weight:bold;
+            color:#ff2222;
+            color:white;
+            padding:0.3em;
+            background-color: rgba(0,0,0,0.6);
+            border-right:3px solid #aa0000;
+            border-bottom:3px solid #aa0000;
+            border-bottom-right-radius: 10px;
+        }
+        .toastmessage {
+		    width:80%;
+		    height:auto;
+		    position:fixed;
+		    left:50%;
+		    margin-left:-40%;
+		    bottom:10px;
+		    background-color: #383838;
+		    color: #F0F0F0;
+		    font-family: Calibri;
+		    font-size: 20px;
+		    padding:10px;
+		    text-align:center;
+		    border-radius: 2px;
+		    -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+		    -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+		    box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+		    display:none;
+		}
+    </style>
+</head>
+
+<body class="test" onload="app.Start()">
+<!-- start html -->
+    <div id="display-container">
+      <div id="display-col-1">
+        <div id="digitalspeed" class="hud switchhud display-frame"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel">km/h</div>
+        </div>
+        <div id="cssgauge-wrapper"> <!--flexible size planned-->
+			<div id="cssgauge" class="gauge switchhud">
+				<div class="g-scale"></div>
+					<div id="g-pointer" class="g-pointer g-item"></div>
+					<!-- change order  when testing finished -->
+					<div class="g-center g-item"></div>
+	            <div id="digital-on-analog" class="hud switchhud"><div id="dona-text" class="speed gps">0000</div></div>
+	            <div id="info-on-analog"><div class="units-kmh gps-no-warning">kmh/h</div><div class="gps-warning">kein<br /><span class="gps-warning-text">GPS</span></div></div>
+			</div>
+		</div>
+        <div id="speedstats" class="2-in-a-row">
+            <div id="averagespeed" class="display-frame hud switchhud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
+            <div id="maxspeed" class="display-frame hud switchhud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
+        </div>
+
+    </div>
+    
+    <div id="display-col-2">
+        <div id="time" class="hud switchhud display-frame"><span class="display-text">00:00:00</span></div>
+        <div id="geoaltitude" class="hud switchhud display-frame"><span id="altitudetext" class="display-text gps">0000</span><div id="m-alt" class="unitlabel">m</div> </div>
+        <div id="geolocation" class="hud switchlocformat display-frame"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
+        <div id="geobearing" class="hud display-frame"><span id="bearingtext" class="display-text gps">000°</span><div id="bearinginfo" class="unitlabel">Sensor</div></div>
+        <div id="geoaccuracy" class="hud display-frame"><span id="accuracytext" class="display-text gps">0000</span><div id="accuracyinfo" class="unitlabel">m</div></div>
+    </div>
+</div><!--display-container-->
+
+    <div id="title" class="autofade">
+        
+	  <p id="no-gauges"><a class="btn" href="#settings">Anzeigen zuschalten</a></p>
+	  
+  	</div>
+
+    <div id="menu">
+        <a class="btn" href="#info">Info</a>
+        <a class="btn" href="#settings">Einstellungen</a>
+    </div>
+    
+    <div id="infocard" class="card">
+        <h2>Viel Spaß mit unserer<br />Tacho- und  GPS-App!</h2>
+      <p>powered by</p>
+	  <a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
+	  <p>Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
+	  <p> Die HUD-Funktion
+        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen.</p>
+        
+        <p>Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
+        Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden
+        (Auf die Positionsanzeige tippen).</p>
+        
+        <p>Die Genauigkeit der Höhenangabe sollte nicht überschätzt werden.
+        Sie liegt etwa im gleichen Bereich wie die der Position, wo die Ungenauigkeit
+        selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
+        Ähnliches gilt für die Geschwindigkeitsangabe bei sehr geringen Geschwindigkeiten (unter 10km/h).</p>
+        
+        <p>Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
+        Ihres Gerätes aktivieren müssen.</p>
+        
+        <p>Standortdaten werden nicht weiter verarbeitet.</p>
+        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KÜHNE-Webdienste.de</a></p>
+        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
+        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
+        
+        <p>Diese App verzichtet auf Werbe-Einblendungen und ist dennoch kostenlos.
+        Falls Ihnen die App gefällt, können Sie ihre Entwicklung voran treiben,
+        indem Sie einen kleinen Betrag spenden. Vielen Dank!
+        
+        <a href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link">Spenden</a>
+        
+        </p>
+
+    </div>
+
+  <div id="warningdialog" class="dialog">
+    <h1>Warnung!</h1>
+    <p>Verwendung auf eigene Gefahr!</p>
+    <p>Bedienen Sie diese App nicht,
+      während Sie ein Fahrzeug oder eine Maschine steuern! Starten Sie die App vor Beginn der Fahrt/Tätigkeit!</p>
+    <p> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert (sobald die Statuszeile des Gerätes ausgeblendet wird).
+      Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
+	<p><a href="#warningcont" class="btn">Weiter</a></p>
+  </div>
+
+    <div id="settingsdialog" class="dialog">
+        <h3>Auswahl</h3>
+<!--        <a id="digital" class="switcher radio" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Digital</a>
+        <a id="analog" class="switcher radio" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Analog</a>
+        <a id="all" class="switcher radio switched-on" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Analog & Digital</a>
+-->
+      <a id="tachoswitch" class="switcher switched-on" href="#"><span class="fa icon-gauge"></span>Tachometer</a>
+	  <a id="switchtime" class="switcher switched-on" href="#"><span class="fa icon-clock"></span>Uhrzeit</a>
+	  <a id="switchaltitude" class="switcher switched-on" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span>Höhe über NN</a>
+	  <a id="switchposition" class="switcher switched-on" href="#"><span class="fa icon-location"></span>Position</a>
+	  <a id="switchhudsettings" class="switcher" href="#"><span class="fa icon-sort-numeric mirror"></span>HUD</a>
+      <a id="moresettings" class="switcher menuitem" href="#"><span class="fa icon-cog"></span>Einstellungen ...</a>
+
+	  <!--<a id="switchbackkey" class="switcher switched-on" href="#"><span class="fa icon-ok"></span> Beenden mit Zurück-Taste</a>-->
+	  
+
+        <a class="btn" href="#info">Info</a>
+        <a class="btn" href="#exit">App BEENDEN</a>
+        <!--<a class="btn" href="#cancel">Abbrechen</a>-->
+    </div>
+    
+    <div id="tachosettingsdialog" class="dialog">
+        <h3>Tachometer</h3>
+
+	      <a id="digitalanalog" class="switcher switched-on radio" href="#"><span class="fa icon-gauge-2"></span>Digital & Analog</a>
+	      <a id="digital" class="switcher radio" href="#"><span class="fa icon-sort-numeric"></span>Nur Digital</a>
+		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span>Nur Analog</a>        
+	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span>Wertebereich zurücksetzen</a>	  
+		  <!--
+		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
+		  <a id="averagesettings" class="switcher menuitem" href="#"><span class="fa icon-right"></span>Mittlere Geschwindigkeit</a>
+		  -->
+		  <!--<a id="alarmsettings" class="switcher menuitem" href="#"><span class="fa icon-bell-alt"></span>Geschwindigkeitsalarm</a>-->
+		  <!--
+		  	TODO: implement later, when auto-background-management is not enough
+		  	<a id="backgroundsettings" class="switcher swithhed-on" href="#"><span class="fa icon-chart-area"></span>Hintergrundmessung</a>
+		  -->
+    </div>
+
+    <div id="moresettingsdialog" class="dialog">
+        <h3>Einstellungen</h3>
+
+	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span>Tachometer ...</a>
+       <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span>Hinweise anzeigen</a>
+	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span>Warnungen anzeigen</a>
+    </div>        
+    
+    <!--<div id="menubutton"><span class="fa fa-ellipsis-v autofade"></span></div>-->
+    
+  <div id="gpswarning" class="gps-warning"><small>kein </small>GPS</div>
+  
+    <div id="yesnodialog" class="dialog">
+    <p> test </p>
+    <a class="btn" id="yes" href="#">JA</a>
+    <a class="btn" id="no" href="#">Nein</a>
+    </div>
+
+    <div id="splashscreen" class="screencard">
+        <p>powered by</p>
+        <img src="res/kwd-4-title.png" />
+    </div>
+    
+    <div class="toastmessage">Das ist ein Popup</div>
+    
+	<script type="text/javascript">
+	/* start javascript */
+
+/*
+IDEE:
+Funktionen auslagern in .js Datei außer gerade editierte...
+*/
+
+// Konstanten
+const storage_tachorange = 'tachorange'; 
+const storage_tachocurrentmax = 'tachocurrentmax'; // meint Höchstgeschwindigkeit
+const storage_tachoaverage = 'tachoaveragegroups'; 
+var tacho_defaultrange = 200;
+var layout_gauges = 0; // counts number of displayed components (for layout and messages)
+var clock_visible = false; // to check if Geoloaction can be paused
+var clock_interval = null; // will be cleared if clock hidden (for performance)
+var gpswarning_blinkinterval = null; 
+var gpswarning_timeout = null;
+var gpswarning_active = false; // saves state of warning (performance)
+var cssgauge_visible = true; // will be set/unset by setTachoLayout  (performance)
+
+// recognize browser
+// ask var app_browsermode
+var app_browsermode = false; 
+ 
+ 
+
+/* gibt eine message aus
+    - kapselt app.ShowPopup, um Layout und Zusatzfunktionen steuern zu können
+    (z.B. stapeln von Nachrichten ähnlich log)
+*/
+function toastMessage(msg) {
+    app.ShowPopup(msg,'bottom');
+}
+
+var gps_running = false; // prevent loc.Start() if running OR loc.Stop() when if already stopped
+function startGps() {
+	if (!gps_running) {
+		if (typeof loc != 'undefined') {
+			if (!(layout_gauges==1 && clock_visible)) { // clock only --> no gps needed
+				 
+				loc.Start();
+				gps_running = true;
+			}
+		}
+	}
+}
+function stopGps() {
+	if (gps_running) loc.Stop();
+	gps_running = false;
+}
+
+var gps_blinking = false;
+function gpsBlink() {
+	var color = (gps_blinking) ? '#dd0000' : 'black';
+	$('.gps-warning').css('color',color);		
+	gps_blinking = !gps_blinking;
+}
+/* sets colors and warning text
+ * - called by timeout or directly
+ */
+function setGpsWarning() {
+	if(!gpswarning_active) {
+	    $("#gpswarning,.gps-warning").show();
+	    $('.gps-no-warning').hide();
+		$('.gps').addClass('no-gps');
+		gpswarning_blinkinterval = setInterval(gpsBlink,500);
+		gpswarning_active = true;
+	}	
+}
+/* removess colors and warning text
+ * - usually called only directly
+ * - resets the timeout 
+ */
+function clearGpsWarning() {
+	if(gpswarning_active) {
+		$("#gpswarning,.gps-warning").hide();
+	    $('.gps-no-warning').show();
+		$('.gps').removeClass('no-gps'); // check if without . (dot)	
+		if(gpswarning_blinkinterval!==null) clearTimeout(gpswarning_blinkinterval);
+		gpswarning_active = false;
+	}
+	if(gpswarning_timeout!==null) clearTimeout(gpswarning_timeout);
+	gpswarning_timeout = setTimeout(setGpsWarning,6000); // 6s is a matter of fealing :-)
+}
+
+//var previous_time = 0; // save time for check (for performance)
+/* refresh display of clock
+ * - called only as interval callback
+ * - disabled when clock hidden
+ */
+function changeTime() {
+    //update watch 
+    // TODO: ask if time is currently displayed (set in menü!) 
+    var date = new Date();
+    // you don't need it since interval is large anyway:
+    //if (date.getTime() < previous_time + 1000) return; // is ca. one second
+    
+    var h = date.getHours();
+    h = ((h < 10) ? "0" + h : h);
+    var m = date.getMinutes();
+    m = ":"+((m < 10) ? "0" + m : m);
+    var s = date.getSeconds();
+    s = ":"+((s < 10) ? "0" + s : s);
+    $('#time').text(h+m+s);
+    
+    // this prevents warning when clock is used alone
+    if (layout_gauges==1) clearGpsWarning();
+    
+} 
+function startClock() {
+	clock_interval = setInterval(changeTime,1000);
+	clock_visible = true;
+}
+function stopClock() {
+	if (clock_interval !== null) clearInterval(clock_interval);
+	clock_visible = false;
+}
+
+function OnConfig() {
+    //ATTENTION!: don't check screen rotation result here, 
+    // since width and height are still old values in WebView!
+    // see $(window.resize(...)
+}
+
+//Called when application is paused.
+function OnPause() 
+{ 
+    if (typeof settings !== 'undefined') settings.save();    
+    app.PreventScreenLock(false);
+	//app.SetScreenMode('Normal');
+    //if (typeof loc !== 'undefined') loc.Stop(); // ist die Frage ob es nicht im Hintergrund weiterlaufen soll!
+    // --> TODO: ein flag setzen, so dass gpstool.change darauf reagieren und z.B. nur die wichtigsten Sachen machen
+    // kann, z.B. nur die Werte weiter verarbeiten, die die für die Statistik erforderlich sind.
+    if (typeof gpstool !== 'undefined') gpstool.saveAverage();  
+}
+ 
+// TODO: check what it does when inside menu?
+// --> the double check should prevent fade
+function OnResume() 
+{ 
+	app.Debug("on resume");
+    
+    if (typeof loc !== 'undefined') loc.Start(); // check if error when start twice!!!    
+    resetHud();
+}
+
+// back button hides open dialogs or screen modes like hud
+function OnBack()
+{
+    if (app_browsermode) app.Debug('OnBack'); // why cannot see this msg??
+    
+	// just check if there is any open menu
+	// otherwise show main menu
+	if(menustack.current()=="") menustack.push('settingsdialog');
+	else {
+		menustack.pop(); // you can read the popped element and react!
+	    // no gauges warning now with *counter* 
+	}
+	
+	resetHud(); 
+	// TODO: irgendwie scheint das resetHud erst bei Klick *im* Hauptmenü zu reagieren
+}
+
+// my own app.Exit wrapper, app.Exit() must not exist more than once!
+// (so i control things much better!!)
+function Quit() {
+    OnPause();  // nach neuesten Tests nicht automatisch
+    app.Exit();
+}
+
+function confirmYesNo(str) {
+    $('#yesnodialog p').text(str);
+    $('#yesnodialog').show();
+}
+
+/* hardware menu button
+*/
+function OnMenu( name )
+{                
+    OnBack(); // TODO: stack löschen und wieder bei Hauptmenü anfangen!
+}
+
+
+
+//Called when we get a change in location.  // TODO: direkt set???
+function loc_OnChange( data ) 
+{ 
+    gpstool.change(data);
+} 
+
+/* TODO: better receive gauge as var instead of using the global var
+*/
+// class
+function GpsTools () {
+    //private:
+    var speed =0.0;
+    var lastspeed = 0.0;
+    var dspeed = 0.0;
+    var step = 0.0;
+    var stepcount = 0;
+    var lat = 0;
+    var lon = 0;
+    var locformat = true; // if true format in ° ' ", otherwise float val
+    var alt = 0;
+    var hud = false;
+    var that=this;
+    var maxspeed = 0; 
+    var tachorange = 10;
+    var dochangetachorange = false;
+    var speedtest = 0;
+    // TODO: a class from this would be nicer
+    // TODO: make SIMPLE calculation by saving just the SUM and the COUNT
+    // TOOD: by this make sure there will be no +e form 
+    var average_count = 0; // current count of all older groups
+    var average_sum = 0;   // current sum of all older groups
+    var average_grouplist = new Array();
+    
+    var average_itemcount = 0;
+    var average_list = new Array();
+    var average_groupsize = 2;
+    var average_treshhold = 5400;
+ 
+    function ConvertDDToDMS(D, lng){
+        return {
+            dir : D<0?lng?'W':'S':lng?'E':'N',
+            deg : 0|(D<0?D=-D:D),
+            min : 0|D%1*60,
+            sec :(0|D*60%1*6000)/100
+        };
+    }
+
+    function refreshLocDisplay() {
+        if(locformat) {                    
+            var lf = ConvertDDToDMS(lat,false);
+            //        lattest = parseInt(lf['deg']) + parseInt(lf['min']) /60 + parseInt(lf['sec']) / 3600;
+            var tempstr = lf['deg']+'°'+lf['min']+"'"+(Math.round(lf['sec']*10)/10).toFixed(1)+'"'+lf['dir']+'<br />';
+            var lf = ConvertDDToDMS(lon,true);
+            tempstr += lf['deg']+'°'+lf['min']+"'"+(Math.round(lf['sec']*10)/10).toFixed(1)+'"'+lf['dir'];
+            $('#positiontext').html(tempstr);
+        }
+        else $('#positiontext').html(lat+',<br />'+lon);
+    }
+    
+    //public
+    
+    this.switchLocFormat = function() {
+        locformat = !locformat;
+        refreshLocDisplay();
+    };
+    
+    this.setStep = function() {
+      stepcount++;
+      dspeed += step;
+      $('#digitalspeed').text(Math.round(dspeed));
+      if(stepcount<4) window.setTimeout(that.setStep,250);
+    };
+    
+    /*
+        collects values for average speed
+          s: speed value to add
+          resettime: value != 0 defines max time span (value in hours!), in this case reset the average collection! 
+        
+        - makes timestamp from hours
+        - stores timestamp internally
+        - does NOT auto save averagespeed persisently (must be done seperately, eg. on resetAutoFade/resetHud, or OnPause)
+
+        akt. Implementation: 
+        - gleich bei Beginn Gruppe mit 2, dadurch alle 2 s ein neuer Wert
+        - dann Gruppen gestaffelt 2,4,8,16 
+        - Gruppenerweiterung nur, wenn treshhold == gewünschte max. Länge der Liste erreicht. (z.B. 5400)
+        - wenn max. Länge der höchsten Stufe (16) erreicht, werden alte Werte gelöscht.
+        - der einzige Sinn der Gruppierung ist Performance-Einbruch des JS zu verhindern,
+          durch Tests könnte der treshhold bestimmt werden
+        - wenn bei Basisgruppe =2 bleibt --> Werte von 3 Stunden
+        - NICHT beachtet ist bisher, dass alte Werte gelöscht werden sollten, wenn 24h oder mehr um sind, OHNE dass Tachometer benutzt wurde
+          (ist vielleicht erstmal ganz gut so :-)
+          
+         TODO: neue Implementation: 
+         - einfach 2 Werte speichern: summe und Anzahl. fertig!.
+         - man bräuchte aber 2 Summen, nämlich die gesamte und die bis vor Ablauf der Gleitwerte
+         --> da einzige Problem ist nun der *gleitende* Mittelwert
+         - deshalb auch Gruppen speichern, genau 1 je Programmstart.
+         - da Zeitüberchreitung des Zeitfensters (z.B. 24h) sowieso nicht bei laufender Messnung beachtet werden soll,
+    */
+    this.averageSpeed = function(s,resettime) {
+ 
+ 		var i,cas,clength; // used several times
+ 		
+		
+		if (resettime && resettime > 0) {
+		
+			// time value not yet used
+			
+			delete average_list;	
+		}
+		else {
+			// TODO: völlig neue Berechnung!
+			// first collect values
+			average_grouplist.push(Math.round(s*100)/100);		
+			// check if group is full
+			var gs = average_grouplist.length; // only if gs is used again
+			if (gs >= average_groupsize)  {
+				// now add group to main list by making average value and clear grouplist
+				 cas=0;
+				 for(i=0;i<average_groupsize;i++) {
+				 	cas += average_grouplist[i];
+				 }
+				cas = cas / average_groupsize;
+				//app.Debug(average_grouplist);
+				//app.Debug(cas);
+				average_list.push(cas);
+				// the main list will get cutted if too large
+				clength = average_list.length;
+				if (clength>average_treshhold) {
+					averagelist.shift(); // or first change group size!
+					clength--;
+					//TODO: make startindex instead of shift, the array will cutted by storing/restoring + restarting app
+				}
+	
+				 // noe get average from main list
+				 //if (clength % 100 ==0) app.Debug ('avg main list size:'+averagelist.length);
+				 //if (clength) app.Debug ('avg main list size:'+average_list.length);
+				 //if (clength) app.Debug (average_list);
+				 app.Debug(clength);
+				 cas=0;
+				 for(i=0;i<clength;i++) {
+				 	cas += average_list[i];
+				 }
+				 cas = cas / clength;
+				 $('#averagespeedtext').text(Math.round(cas));
+	        
+				average_grouplist.length = 0 ; // slowest	        
+			}
+		} // else // resettime
+
+    };
+ 
+ 	/* save function  for average speed
+ 	 * 
+ 	 * - seperate from generating for performance reasons (should be used only on pause / quit )
+ 	 * - makes string of array
+ 	 * - if array empty save empty string!
+ 	 * 
+ 	 * return: true: success; false:error
+ 	 */
+ 	this.saveAverage = function () {
+	 		
+	 	var str = '';
+	 	var clength = average_list.length;
+	 	if (clength) {
+	 		try {
+	 			str = JSON.stringify(average_grouplist);
+	 		}
+	 		catch(e) {
+	 			app.Debug(e);
+	 			return false;
+	 		}
+	 		app.Debug(str);
+	 		app.SaveText(storage_tachoaverage,str);
+	 	}
+	 	return true;
+ 	};
+ 	/* load function for average speed
+ 	 * - makes array of object out of string with JSON.parse
+ 	 * - error while loading or empty string leaves array unchanged
+ 	 * return: true=success, false=nothing (sensible) loaded
+ 	 */
+ 	this.loadAverage = function() {
+ 		var str = app.LoadText(storage_tachoaverage,'');
+ 		var err=0;
+ 		if (str) {
+ 			// for the unusual case of loading after init of app delete list:
+ 			if(average_grouplist.length) average_grouplist.length = 0;
+ 			try {
+ 				average_grouplist = JSON.parse(str);
+ 			}
+ 			catch(e) {
+ 				app.Debug(e);
+ 				err=1;
+ 				average_grouplist = new Array();
+ 			}
+ 		}
+ 		if (err) return false;
+ 		else return true;
+ 	};
+    /*
+        sets the maxspeed
+        - newmaxspeed: only accepted if > current maxspeed
+        - newmaxspeed: < 0: reset maxspeed with value (like in this.tachoRange)
+        - auto saves maxspeed persisently
+    */
+    this.maxSpeed = function(newmaxspeed) {
+        
+        
+        if(newmaxspeed > maxspeed || newmaxspeed < 0) {
+            maxspeed = (newmaxspeed<0) ? -newmaxspeed  : newmaxspeed;
+            app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
+            $('#maxspeedtext').text(maxspeed);
+        }
+       
+        return (maxspeed);
+        
+    };
+    
+    this.change = function(newlocdata) {
+		app.Debug('loc change');        
+
+        // if provider == network, speed has no reasonible value
+        // so keep old value unless gps
+        // TODO: alle Änderungen auch ohne GPS wenn möglich - z.B.  für initiale Werte
+        // oder != 0 abfragen : entweder Wert !=0 oder nur von gps
+        
+        if (newlocdata.provider.toLowerCase() == "gps") {
+			clearGpsWarning();
+			
+            lastspeed=speed;
+            // rounding saves a lot of space when converting values to string
+            speed =  newlocdata.speed;
+            if (speed < 0) speed = 0; // for the case of calculation or rounding errors
+            //(if speed is momentarily <0 this can disturb statictic/display functions of app)
+            speed *= 3.6; // km/h
+            // kmhspeed = speed * 3.6;  // planned
+            // mphspeed = speed * 0.44704; // planned
+            // knspeed = speed * 0.514444; // planned
+            
+            //currently not used $('#bearingtext').text(newlocdata.bearing+'°');
+            //currently not used $('#bearinginfo').text('GPS');
+
+
+	        //if (speedtest<50) speedtest+=0.9;
+	        //else speedtest+=9;
+	        //speed=speedtest;// test value for debug
+	        //speed=42;
+	        
+	        //TODO: turn on: this.averageSpeed(speed);
+	        this.maxSpeed(speed);
+	        
+	        var ss = "";
+	        //sieht Scheiße aus: if (speed < 10) ss = speed.toFixed(1); //eine Kommastelle bei <10 km/h
+	        // Kommastelle nur wenn hinterer Teil ganz kleine Schrift
+	        ss = Math.round(speed);
+	        
+	        $('.speed').text(ss);
+	
+	        if (cssgauge_visible) { // flag for performance
+		        // correct scale if >1000 or <1000
+		        if (speed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
+		        else if (speed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
+		        
+	        	if (speed > 0) this.tachoRange(speed); // must not be <= 0  (accidently)
+	        	gauge.setValue(speed); // hier den exakten float value nutzen
+	        }
+        }
+        else {
+            //$('#bearinginfo').text('Sensor');
+            // gpswarning is controlled by block above only
+        }
+        
+		// get always these values !:
+		// but only set if not 0
+        if (newlocdata.latitude!=0) lat = newlocdata.latitude; // TODO: check if you should round!
+        if (newlocdata.longitude!=0) lon = newlocdata.longitude;    // TODO: check if you should round!
+        if (newlocdata.altitude!=0) alt = newlocdata.altitude; // TODO: check if you should round!
+        //currently not used  $('#accuracytext').text(newlocdata.accuracy); 
+        // analog speed testing: 
+        
+
+
+        //step = (speed - lastspeed) / 4;
+        //stepcount=0;
+        //dspeed = lastspeed;
+        // window.setTimeout(this.setStep,250);
+
+        //test
+//        lat = 40.1641164;
+//        lon = -7.8928645;
+
+        //update geolocation
+        refreshLocDisplay();
+        
+        //update altitude
+        
+        $('#altitudetext').text(Math.round(alt));
+    };
+    
+    /* switch the hud (mirroring) on and off
+    - sets one specific state if parameter setto is set ('on'|'off')
+    */
+    this.switchHud = function(setto) {
+    
+        if (setto=='on') hud = true;
+        else if (setto=='off') hud = false;
+        else hud = !hud; 
+        
+        var scale = hud ? -1 : 1;
+
+        $("#display-container").css({
+            'transform' : 'scaleY('+scale+')',
+            '-webkit-transform' : 'scaleY('+scale+')',
+            '-moz-transform' : 'scaleY('+scale+')',
+            '-o-transform' : 'scaleY('+scale+')',
+        });
+		if (hud) {
+		  $('.hud').css({'border-color':'black'});
+		}
+		else {
+		  $('.hud').css({'border-color':'white'});
+		}
+    };
+	
+	/*
+	  setzt Tacho Wertebereich in Anzeige analog hoch 
+	  - newvalue enthält eine aktuelle Geschwindigkeit, die ausgewertet werden muss!
+	  - wenn newvalue < 0, Max. Wert auf abs(newvalue) direkt gesetzt anstatt zu erhöhen
+	  - wenn newvalue zufällig 0 -> nichts tun
+	  - Automatische Wertebereich-Erhöhung kann real nicht abgeschaltet werden, sondern wird
+	    im Menü lediglich auf niedrig oder hoch zurückgesetzt :-)
+	  - TODO: value gleich setzen, wenn Bereich geändert, am besten auch, wenn nicht geändert
+	*/
+	this.tachoRange = function(newvalue) { 
+
+    	if(newvalue) {
+
+    	    var dochange = false;
+    	    
+    	    if (newvalue > tachorange
+                && $('#cssgauge').is(':visible') // nichts tun wenn ananlog nicht sichtbar!
+            ) { 
+                
+                // do NOT increase but directly calculate new; the divisor == step to round up
+                // (this avoids jumping 5 times when starting while having e.g. 100km/h)
+                // TODO: 40th step does not work properly
+                if (newvalue >= 500) tachorange = Math.ceil(newvalue / 500)*500;
+                else if (newvalue >= 100) tachorange = Math.ceil(newvalue / 100)*100;
+                else if (newvalue >= 20) tachorange = Math.ceil(newvalue / 50)*50;
+                else if (newvalue >= 10) tachorange = Math.ceil(newvalue / 20)*20;
+                else tachorange  = 20;
+                
+                app.Debug("extended range:"+tachorange);
+    	        dochange = true;
+            }
+            else if (newvalue < 0) {
+                // this makes it possible to reset to a range
+                tachorange = -newvalue;
+                dochange = true;
+            }
+            
+            // nun ist tachorange korrekt berechnet, falls nicht größer, nichts tun
+            if (dochange) {
+                
+        	    var minors = 2;
+				var maj = tachorange / 10; 
+				var split = 6;
+				
+				if (tachorange<=10) {
+				    minors = 2;
+				}
+				else if (tachorange<=20) {
+				    minors = 2;
+				}
+				else if (tachorange<=50) {
+				    minors = 5;
+				}
+				else if (tachorange<=200) {
+				    minors = 2;
+				}
+				else if (tachorange<=300) {
+				    minors = 3;
+				}
+				else if (tachorange<=400) {
+				    maj = 50;
+				    minors = 5;
+				}
+				else if (tachorange<=500) {
+				    
+				    minors = tachorange / 100;
+				}				
+				else {
+				    minors = 2;
+				}
+				    
+				
+				var steps = tachorange / maj;
+				// TODO: autoadjust by checking amount of steps
+			    split = Math.floor(steps / 3 * 2);
+				
+        	    gauge.config({
+					'wrapper':'cssgauge-wrapper',
+					'gauge':'cssgauge',
+					'size':'auto', // not yet implemented !
+					'maxRange':tachorange,
+					'majorStep':maj, // must be < maxRange and reasonable adjusted
+					'minorTicks':minors, // should be between 0 and 5
+					'overallAngle':270, // degrees, better < 340
+					'value':0 // must be < max Range
+        	    });
+        	    app.SaveNumber(storage_tachorange,tachorange);
+            }
+    	}
+    	return tachorange; 
+	};
+	
+	this.old_tachoRange = function(newvalue) { 
+
+    	if(newvalue) {
+
+    	    var dochange = false;
+    	    
+    	    if (newvalue > tachorange
+                && $('#analogspeed').is(':visible') // nichts tun wenn ananlog nicht sichtbar!
+            ) { 
+                
+                // do NOT increase but directly calculate new; the divisor == step to round up
+                // (this avoids jumping 5 times when starting while having e.g. 100km/h)
+                // TODO: 40th step does not work properly
+                if (newvalue >= 500) tachorange = Math.ceil(newvalue / 500)*500;
+                else if (newvalue >= 100) tachorange = Math.ceil(newvalue / 100)*100;
+                else if (newvalue >= 20) tachorange = Math.ceil(newvalue / 50)*50;
+                else if (newvalue >= 10) tachorange = Math.ceil(newvalue / 20)*20;
+                else tachorange  = 20;
+                
+                app.Debug("extended range:"+tachorange);
+    	        dochange = true;
+            }
+            else if (newvalue < 0) {
+                // this makes it possible to reset to a range
+                tachorange = -newvalue;
+                dochange = true;
+            }
+            
+            // nun ist tachorange korrekt berechnet, falls nicht größer, nichts tun
+            if (dochange) {
+                
+        	    var minors = 2;
+				var maj = tachorange / 10; 
+				var split = 6;
+				
+				if (tachorange<=10) {
+				    minors = 2;
+				}
+				else if (tachorange<=20) {
+				    minors = 2;
+				}
+				else if (tachorange<=50) {
+				    minors = 5;
+				}
+				else if (tachorange<=200) {
+				    minors = 2;
+				}
+				else if (tachorange<=300) {
+				    minors = 3;
+				}
+				else if (tachorange<=400) {
+				    maj = 50;
+				    minors = 5;
+				}
+				else if (tachorange<=500) {
+				    
+				    minors = tachorange / 100;
+				}				
+				else {
+				    minors = 2;
+				}
+				    
+				
+				var steps = tachorange / maj;
+				// TODO: autoadjust by checking amount of steps
+			    split = Math.floor(steps / 3 * 2);
+				
+        	    var mts = Array();
+        	    for(var i = 0;i<=steps;i++) {
+        	        mts[i]=i*maj;
+        	    }
+        	    
+        	   /* gauge.updateConfig({  maxValue    : tachorange,
+        	    majorTicks  : mts,
+        	    minorTicks : minors,
+                
+                highlights  : [
+                    { from : 0, to : mts[split], color : 'rgba(0, 0, 0, 0.5)' }, // to mts[6] = split point
+                    { from : mts[split], to : mts[steps], color : 'rgba(255, 0, 0, 0.5)' }, // to mts[6] = split point
+                ]
+                
+                });
+                */
+        	    app.SaveNumber(storage_tachorange,tachorange);
+            }
+    	}
+    	return tachorange; 
+	};
+	
+	// construct
+	
+    // current maxspeed
+    this.maxSpeed(-app.LoadNumber(storage_tachocurrentmax,1)); // neg. value forces set, default 1, because -0 is just 0
+    // current average speed
+    this.loadAverage();
+    
+
+} // GpsTools
+
+/*  AutoSettings
+    sucht per jquery Elemente aus dem DOM, deren Zustand in 
+    localStorage gespeichert wird, um z.B. Programmeinstellungen
+    wiederherstellen zu können.
+    - abhängig von bestimmten Konventionen im HTML:
+        - id muss gesetzt sein
+        - class 'switcher'
+        - Funktionen sollten Zustandsänderung an AutoSettings weitergeben
+          (Bsp. hier siehe 'setRadio()' und 'switchClass()'
+        - Zustände sollten nicht außerhalb von AutoSettings in vars gespeichert 
+          werden
+          
+    TODO: PROBLEM: funktioniert in App nicht oder schlecht, 
+        - Verhalten von get (kann auch *undefined* liefern!) wurde repariert
+        --> Timing Problem (wegen jQuery?) besteht immer noch
+        - besser wäre, alle switcher bei Programmstart in Array aufzunehmen, wenn
+          load scheitert, dies würde auch Array-Vergrößern bei erstem Switch 
+          sparen
+*/
+//class
+function AutoSettings(newstoragename,newsetclass) {
+    //private
+    var data = new Array();
+    var storagename = '';
+    var setclass = 'switched-on';
+    var check = "";
+    
+    var that = this;
+    
+    //public
+    
+    
+    /*  speichert in storage wenn möglich
+        - gibt false zurück, wenn speichern nicht möglich
+        - verändert Struktur 'data' nicht
+    */
+    this.save = function() {
+        
+        if(storagename!='' && data.length!=0) {
+            var str = JSON.stringify(data);
+            window.localStorage.setItem(storagename,str);
+            return true;
+        }    
+        return false;        
+        
+    };
+    
+    /*  lädt von storage wenn möglich
+        - gibt false zurück, wenn laden nicht möglich
+        - verändert Struktur 'data' nicht, wenn laden nicht möglich
+    */
+    this.load = function() {
+        
+        if(storagename!='') {
+            var str = window.localStorage.getItem(storagename);
+            if(str!==null) {
+                data = JSON.parse(str);
+                return true;
+            }            
+        }    
+        return false;        
+    };
+
+    /* findet Element oder fügt es hinzu
+        - gibt index des Elementes zurück oder -1 im Fehlerfall
+    */
+    this.added = function(name) {
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['name'] == name) {
+                return i;
+            }
+        }
+        
+        if(i==data.length) {
+            var a = new Object();
+            a['name'] = name;
+            a['value'] = 'false';
+            data[i] = a;
+
+            return i;
+        }
+        
+        return -1;
+    };
+    
+    /*  initialisiert alle Switches
+        - ändert HTML der entsprechenden Elemente
+        - liest aktuelles 'data', versucht intern keinen 'load' oder 'generate'
+    */        
+    this.initall = function() {
+        
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['value'] == 'false') {
+                $('#'+data[i]['name']).removeClass(setclass);
+            }
+            else {
+                $('#'+data[i]['name']).addClass(setclass);
+            }
+        }
+    };
+
+    /*  liest einen Wert aus Settings liste
+        liefert undefined wenn Wert nicht vorhanden
+    */
+    this.get = function(name) {
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['name'] == name) {
+                return data[i]['value'];
+            }
+        }
+        
+        return undefined; // TODO: lieber String 'unset'
+    };
+    
+    /*  setzt einen Status und erzeugt Element, wenn nicht vorhanden
+        - value string!! 'true' und 'false' werden behandelt
+    */
+    this.set = function(name,value) {
+        
+        if(name!=undefined) {
+            var i = this.added(name);
+            if(i!=-1) {
+                data[i]['value'] = value;
+                return true;
+            }           
+        }
+        return false;
+    };
+    
+    
+    /* return: true: on, false: off
+ 		- value: if given sets to this (must be string 'true'|'false') (TODO: test!)
+ 		TODO: alles mit normalem true|false (keine Strings)
+	       TODO: id statt elem, da eh wieder zurück referenziert werden muss
+     */
+    
+    this.switchit = function(elem,value) {
+        
+        var id = $(elem).attr('id');
+        var sw = $(elem).hasClass(setclass);
+        var setto = (value == 'true') ? true : false; // value undefined also leads to false
+        
+        if (sw && setto) return true; // prevent multiple set of class
+        
+        if(sw && !setto) {
+        	// remove class may sometimes be called when there is nor more class - without effect
+            $(elem).removeClass(setclass);
+            this.set(id,'false');
+        }
+        else {
+            $(elem).addClass(setclass);
+            this.set(id,'true');
+        }
+
+        this.save();
+        return !sw;
+    };
+    
+    /* im Gegensatz zum switch muss bei radio bei allen
+       betreffenden Elementen (klasse) das Element gesetzt/erzeugt werden
+       TODO: id statt elem, da eh wieder zurück referenziert werden muss
+    */
+    this.radio = function(klasse,elem) {
+        
+        // alle der klasse auf false
+        $(klasse).removeClass('switched-on');
+        $(klasse).each(function() {
+            that.set($(this).attr('id'),'false');
+        });
+        
+        // gesetztes auf true
+        $(elem).addClass('switched-on');
+        this.set($(elem).attr('id'),'true');
+        
+        this.save();
+    };
+
+    
+    //construct
+    if(newstoragename) storagename = newstoragename;
+    if(newsetclass) setclass = newsetclass;
+    if(this.load()) this.initall();
+}
+
+
+/* manages Visibility of menus or cards or any HTML elements given by id (always called 'menu' here)
+ * - 
+ * - push() and pop() make sure the caller does not need to know order or type or id of open menu
+ */
+// class
+function PopupStack() {
+	
+	// private:
+	
+	var stack = new Array();
+	/* adds a menu to the stack
+	 * - callback will be used on pop for additional actions on pop
+	 * - id must be the name used by HTML element id  
+	 */
+	
+	//public:
+	
+	/* code for the current project, 
+	 * TODO: to make this class independently provide callback mechanism!
+	 */
+	this.doOnChange = function() {
+	    window.scrollTo(0,0);
+	};
+	
+	this.push = function(id,callback) {
+	
+		var stackentry = new Object( {
+			'id': id,
+			'callback' : callback
+		});
+		
+		// we hide the last stackentry and
+		if (stack.length) {
+			var last = stack[stack.length-1];
+			$('#'+last.id).hide(); // !jQuery
+		} 
+		// now show the new menu
+		// id is always stored without the #, user can decide to write # or not
+		if (id.charAt(0)=='#') id = id.substr(1,id.length-1);
+		//app.Debug(id);
+		
+		$('#'+id).show(); // jQuery!		
+		stack.push(stackentry);
+		//app.Debug(stack);
+		
+		this.doOnChange();
+	}; 
+	
+	/* removes a menu from stack
+	 * - return: id of popped menu
+	 * - if stack empty, do nothing and give back emptys string
+	 */
+	this.pop = function() {
+		
+		if (stack.length>=1) {
+			var entry = stack.pop();
+			// hide the menu to be popped
+			$('#'+entry.id).hide(); // !jQuery
+			if(stack.length) {
+				var last = stack[stack.length-1]; // now the previous is the topmost
+				$('#'+last.id).show(); // !jQuery
+			}
+
+			this.doOnChange();
+			return entry.id;
+		}
+		else return '';
+	};
+	
+	/* returns the currently visible menu of stack
+	 * - does nothing but returning id,
+	 * - returns empty string if no menu there
+	 * - just use this method to check for an empty stack! 
+	 */
+	this.current = function () {
+		if (stack.length) {
+		  var e = stack[stack.length-1];
+		  if (e.id) {
+		      app.Debug(e.id);
+		      return e.id; // TODO: check if can be written like that!
+		  }
+		}
+		app.Debug('stack empty');
+		return '';
+	};	
+}
+
+
+
+// in browser global var important:
+var gauge = null;
+
+/*
+TODO: function to create gauge and change values
+*/
+function DrawGauge() 
+{
+
+    var w = 500; // will be re-scaled anyway
+    
+    var ms = 200;
+
+    app.Debug('new Gauge');
+    
+    gauge = new Gauge({
+        renderTo    : 'gauge',
+        width       : w,
+        height      : w,
+        glow        : true,
+        units       : '',
+        title       : '',
+        minValue    : 0,
+        maxValue    : ms,
+        majorTicks  : ['0','20','40','60','80','100','120','140','160','180','200'],
+        minorTicks  : 4,
+        strokeTicks : false,
+        /*
+        highlights  : [
+            { from : 0, to : 50, color : 'rgba(0, 0,  255, 0.5)' },
+            { from : 50,   to : 100, color : 'rgba(0,   255, 0, 0.3)' },
+            { from : 100, to : 130, color : 'rgba(255, 255, 0, 0.5)' },
+            { from : 130, to : ms, color : 'rgba(255, 30,  0, 0.5)' }
+        ],
+        */
+        // set all to black:
+        highlights  : [
+            { from : 0, to : ms, color : 'rgba(0, 0, 0, 1)' }
+        ],
+        
+        colors      : {
+            plate      : '#000',
+            majorTicks : '#f5f5f5',
+            minorTicks : '#ddd',
+            title      : '#fff',
+            units      : '#ccc',
+            numbers    : '#eee',
+          //  needle     : { start : 'rgba(240, 128, 128, 1)', end : 'rgba(255, 160, 122, .9)' }
+            needle     : { start : 'rgba(255,255,255,1)', end : 'rgba(255, 255, 255, 1)' }
+     },
+animation : { delay : 0, duration : 1000, fn : 'linear' } 
+    });
+
+    gauge.draw();
+};    
+
+
+var fadetimeout = false;
+
+// only called onInit and OnBack
+// function on ice since we don't need infos on the main screen now
+/*function resetAutoFade() {
+	
+    app.SetScreenMode( "Normal"); // show statusbar    
+    app.PreventScreenLock(false); // display timeout on again
+
+    if(fadetimeout!==false) clearTimeout(fadetimeout);
+
+    $('.autofade').show();
+    $('.test').css({ 'background-color': '#83C2FD' });
+
+    
+    // TODO: class "preventfade" oder so
+    // is now handled by PopupStack :-)
+    if(menustack.current()=='') {
+        fadetimeout = setTimeout(fadehud,5000);
+		app.Debug("fade timeout set, since no menus open");
+    } else app.Debug("fade DENIED");
+}
+*/
+function fadehud() {
+    
+    // restart counter if something is in the way:
+    // TODO: class "preventfade" oder so
+    // TODO: hidden abfrage geht nicht :-(
+    if(menustack.current()=='') {
+    	// TODO: use .autofade again for color/backgroundcolor of several elements e.g. gauge 
+        //$('.autofade').fadeOut('slow');
+        $('.test').css( { "background-color" : "#000" });
+    }
+    else clearTimeout(fadetimeout);
+}
+
+
+/* does only the lock and fullscreen
+ * - no fading or hiding (until needed again) 
+ * - TODO: fullscreen geht evtl.erst durch nächste grafische Änderung (???)
+ */
+function resetHud() {
+
+    $('.autofade').show();
+    $('.test').css({ 'background-color': '#83C2FD' });
+    if(fadetimeout!==false) clearTimeout(fadetimeout);
+
+	if (menustack.current()=="") {
+        app.SetScreenMode( "Full"); 
+        app.PreventScreenLock(true);		
+        fadetimeout = setTimeout(fadehud,5000);
+	}	
+	else {
+	    //app.SetScreenMode( ""); // show statusbar    
+	    //app.PreventScreenLock(false); // display timeout on again
+	}
+	
+	// TODO: make info of advertising here :-)
+	if (layout_gauges < 1 && menustack.current()=="") $('#no-gauges').show();
+	else $('#no-gauges').hide();
+}
+
+
+/* setzt analog und digital-Tacho korrekt einzeln oder übereinander
+    - da es nur gleiche Aufrufe gab, jetzt keine Parameter mehr- Elemente direkt genutzt
+    - settings Struktur muss initialisiert sein!
+*/
+function setTachoLayout() {
+     
+    if (settings.get('tachoswitch')!='false') 
+	  $('#display-col-1').show();
+	else $('#display-col-1').hide();
+                   	
+    var a;
+    var d;
+    if (settings.get('digitalanalog')!='false') a = d = true;
+    else {
+		a = (settings.get('analog')=='false') ? false:true;
+		d = (settings.get('digital')=='false') ? false:true;
+	}
+
+    if(a && d) {
+        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
+        $('#digital-on-analog').show();    
+        $('#digitalspeed').hide();   
+    }
+    else if (a && !d) {
+        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
+        $('#digital-on-analog').hide();
+        $('#digitalspeed').hide();   
+    }
+    else if (!a && d) {
+        $('#cssgauge-wrapper').hide(); cssgauge_visible = false;
+        $('#digitalspeed').show();   
+    }
+    else {
+        $('#cssgauge-wrapper').hide();  cssgauge_visible = false;
+        $('#digitalspeed').hide();           
+    }
+}
+
+
+//Add messages to log.
+// log is an array since we don't when we can first access the output we like
+// thus array can be read later
+logarray = new Array(); // global
+function Log( msg ) 
+{ 
+    logarray.push(msg);
+    if (app_browsermode) app.Debug(msg);
+    /*
+if( txt.GetLineTop( txt.GetLineCount() ) >= 0.2 )  
+        log.shift(); 
+    log.push( msg + "\n" ); 
+    txt.SetText( log.join("") );
+*/
+    //txt.SetText(msg);
+} 
+
+var fontsizes = new Array();
+/* proper sizes and positions for displays and fonts
+    - should only run on startup and when screen rotates
+    initial: true|false (true=font-sizes neu berechnen,
+            ggf. müssen dazu zwischenzeitlich alle Digital-Displays aktiviert werden
+*/
+var dona_scalebase = 0;
+var dona_scale3 = 1.33;
+var dona_scale4 = 1;
+var dona_space = 0;
+
+function dona_text_scale(scale) {
+    $('#dona-text').css({
+        '-webkit-transform':'scale('+scale+','+scale+')',
+        'transform':'scale('+scale+','+scale+')'
+    });
+}
+
+function scaleDisplays(initial) {
+    
+    app.Debug("scaleDisplays(new)");
+    
+    // get vars and test, since we got problems with body.client... vs. window.innerheight
+	var screen_w = window.innerWidth
+	|| document.documentElement.clientWidth
+	|| document.body.clientWidth;
+	
+	var screen_h = window.innerHeight
+	|| document.documentElement.clientHeight
+	|| document.body.clientHeight;
+
+    var w = 0;
+    
+    
+    if (screen_w <  screen_h) {
+       isLandscape = false;
+       w = screen_w;
+    }
+    else {
+       isLandscape = true;
+       w = screen_h;
+    }
+    
+    $('#cssgauge-wrapper').css({
+    	'width':w+'px',
+    	'height':w+'px'
+    });
+    gauge.scale();
+    
+    var timewidth = $('#time').width(); // for geolocation // better .display-frame width
+    
+    // TODO: make all displays visible for calculations of sizes and scales
+    // OR use project global vars for resizing
+    
+    //test ... w = $("#gauge").width();
+    //app.ShowPopup(w+'/'+$('#time').width());
+    
+    
+    
+    if (initial) {
+        // TODO: zuerst alle Displays wieder anzeigen, alle auf font-size 150px
+        // dann funktion setzen, danach je nach settings bestimmte wieder 
+        // verstecken (alles nötig bei *erstem* rotate
+        
+        // wird genau berechnet, da % wegen border+margin zu unsicher
+        // andere Lösung wäre umgebender div
+        // TODO: gerade das nicht nur bei initial !
+        $('.display-frame,#cssgauge-wrapper').css('width',screen_w - 20 + 'px');
+        $('.halfsize').css({
+        	'width': (screen_w / 2 ) - (w*0.15) + 'px', // 4 *10px margin = 40, durch border-box müsste border mit drin sein.
+        	'margin-top':-w*0.175 + 'px'
+        });
+        // text wird sich anpassen, wenn Breite vorher gesetzt....
+
+
+        // - width() scheint immer innere Breite der Blocks zu liefern
+        // f/newf = tw/bw --> f * bw / tw
+        // - scheint Rechenzeit zu verbrauchen!
+        $('.display-frame').css('font-size',function(index,value){
+            var f = parseFloat(value);
+            var bw = parseFloat($(this).width());
+            var tw = parseFloat($('.display-text',this).width());
+            var size = f * bw / tw;
+            fontsizes[index]=size;
+            return size+'px';
+        });
+        
+        // falls mehrere Breiten mit verschieden großen Schriften, müsste man Höhe anpassen
+        // --> alle auf die höchtse vorkommende Höhe setzen
+        
+        // löscht initiale Werte, die nur zur Größenbestimmung da waren:
+        $('.display-text').text('--');
+        
+        // TODO: gute Basis für allgemeine Routine, auch für kleinere/größere
+        // benötigte Displays
+        
+        // setze sinnvolle Werte falls schon vorhanden: 
+        // außer maxspeed - setzen sich automatisch
+    }
+    // zentriere analog gauge horizontal
+    $('#cssgauge-wrapper').css('left',(screen_w - $('#cssgauge-wrapper').width())/2);
+    
+    // zentriere alle Dialoge:
+    // - automatische Abfrage ob Dialog größer Bildschirm
+    // - Korrekturwert für border und padding
+    // TODO: man könnte auch wrapper der dialoge mit layout versehen und diesen in Größe variieren lassen
+    //       mit transition dann weiche Übergänge 
+    //tests:
+    app.Debug('screen:'+screen_w+'x'+screen_h);
+    /*
+    $('.dialog').css('top',function(index,value){
+        var hoff = (screen_h - $(this).outerHeight()) / 2;
+        if (hoff < 10) hoff = 10;
+        var woff = (screen_w - $(this).outerWidth()) / 2;
+        $(this).css('left',woff+'px');
+        return hoff+'px';
+    });
+    */
+	// zur Zeit keine vert. Zentrierung
+	$('.dialog').css('top','20px');
+    $('.dialog').css('left',function(index,value){
+        var woff = (screen_w - $(this).outerWidth()) / 2;
+        return woff+'px';
+    });
+	
+	// jetzt können alle versteckt werden:
+    $('.dialog').hide(); // TODO: auch wenn nicht initial??
+    
+    if (initial) {    
+    
+	    // digital on analog speed size
+	    // now orientated to position and size of #cssgauge (not screen at all!)
+	    // ! note that this is only needed when *initial* since it is scaled together with gauge 
+		var cssgaugewidth = $('#cssgauge').width(); // here NOT outerWidth! 
+	    var wdona = cssgaugewidth * 0.4; 
+	    var newfontsize = wdona/2;
+	    
+	    $("#digital-on-analog").css({
+	        'width':wdona+'px',
+	        'height': newfontsize*1.2+'px',
+	        'border-radius':newfontsize/2+'px'
+	      });
+	    
+	    $("#digital-on-analog").css({
+	        'left': (cssgaugewidth - $('#digital-on-analog').width()) / 2,
+	        'top':  (cssgaugewidth - $('#digital-on-analog').height()) / 2
+		});
+
+	    // size and position of info (km/h) on analog must depend on cssgauge
+	    // TODO: simpler calculation??
+	    $('#info-on-analog').css({
+	        'width':cssgaugewidth/2.7+'px',
+	        'height':'auto',
+	        'top':cssgaugewidth*0.73+'px',
+	        'left':((cssgaugewidth-(cssgaugewidth/2.7))/2)+'px', // must be same ratio like in width
+	        'font-size':cssgaugewidth/20+'px',
+	        'line-height':'1em'
+	    });
+	
+	    //$('#digital-on-analog .speed').css({'font-size':''+newfontsize+'px'});
+	    // position digital
+	    // dona-text is a div inside:
+	    
+	    // dona-text 
+	    // - save width with max. digits (4)
+	    // - make the width fixed
+	    // - now you scale to a) size with 4 digits b) to bigger size with 3 digits
+	    // - for b) you must calculate the difference in width (about 1/4 == 1 digit)
+
+
+        dona_scalebase = $('#dona-text').width(); // must be 0000 in this moment!
+        dona_space = wdona * 0.85; // max width we want the number have to, because need border
+        
+        $('#dona-text').css({
+            // the width will be set her ONCE
+            'width': dona_scalebase + 'px'
+        });
+        
+        // compute scale for 4 digits (0000):
+        dona_scale4 = dona_space / dona_scalebase;
+        dona_scale3 = dona_space / (dona_scalebase*0.75);
+        dona_text_scale(dona_scale3);
+        // replace inital 0000 text
+        $('#dona-text').text('0');
+        
+    }
+    // only correct centered position
+    // - the css width is not changed anymore
+    $('#dona-text').css({
+        'left': ($('#digital-on-analog').width() - $('#dona-text').width()) / 2 + 'px', // must take width of #digital-on-analog as ref
+        'top': ($('#digital-on-analog').height() - $('#dona-text').height()) / 2 + 'px',
+    });
+}
+
+
+
+/* neu positionieren der Anzeigen ohne scale
+    - showinfo: true zeigt den Info-Text in abhängigkeit von verdeckten Displays
+    - TODO: evtl. doch eine Fkt. mit scaleDisplays mit Parametern??
+*/
+function positionDisplays (showinfo) {
+    
+    app.Debug('position displays...');
+    
+    var titleoffset = 0; // war mal 150
+    var hcontainer = $("#display-container").height();
+	var hscreen = window.innerHeight
+	|| document.documentElement.clientHeight
+	|| document.body.clientHeight;
+
+    var m;
+    if (hcontainer + titleoffset < hscreen) {
+        m = (hscreen - hcontainer) / 2;
+    }
+    else {
+        m = 0;
+    }
+    
+    $("#display-container").css({'margin-top':m+'px'});
+    
+    // find out whether screen < gauges
+    if (showinfo && hcontainer > hscreen && $('warningdialog').is(':hidden')) toastMessage('Einige Anzeigen außerhalb (Anzeige nach unten rollen!)');
+    // TODO: digitale kleiner bis min. Schriftgröße, wenn nicht reicht, auch analog kleiner
+    //  deshalb allgemeine Größen-Routine besonders wichtig.
+    
+}
+
+/* central proc to save/restore the tacho range (persistent app settings).
+  mode: "load" | "save" (if not set, performs load!)
+  value: speed to be set (if "load", value is default in case load fails), if value not set or set to <=0, the CURRENT value will be taken if available
+  return: -1 : error, else value which has been set
+  
+  ! save routine is inside gpstool.tachoRange
+  
+  TODO: check if it is possible that function runs before gpstool is defined!
+*/
+function resetTachoRange(mode,value) {
+    
+    // TODO: test change value
+    
+    if (mode=='save') {
+        
+        if (value && value>0) {
+            gpstool.tachoRange(-value); // minus --> force set
+        }
+        else value=-1;
+    }
+    else {
+        var c = app.LoadNumber(storage_tachorange,value);  // default==10, if no value found
+        gpstool.tachoRange(-c); // neg. value -> force set    
+    }
+
+    return value;
+}
+    
+ 
+// global vars
+var displayHints = true;
+/*
+zählt bis 2 oder 3 (mit resize) um initApp() zu starten
+10: init bereits ausgeführt */
+var initCounter = 0;
+
+    
+
+/* vereint alle Programmstartfunktionen
+(sinn siehe caller)
+- returns: true: Code ausgeführt,
+-          false: Code nicht ausgeführt
+*/
+function initApp()  {
+	if (initCounter<3 || initCounter > 5) return false;
+    
+    // ONSTART
+    
+    app.GetLanguageCode(); // TODO: make something of it!
+	
+    // init gauge before first scaleDisplays!
+    //DrawGauge();
+    gauge = new CssGauge( {
+		'wrapper':'cssgauge-wrapper',
+		'gauge':'cssgauge',
+		'size':'auto', // not yet implemented !
+		'maxRange':10,
+		'majorStep':1, // must be < maxRange and reasonable adjusted
+		'minorTicks':2, // should be between 0 and 5
+		'overallAngle':270, // degrees, better < 340
+		'value':0 // must be < max Range
+	});
+
+	// TODO: enable again:
+	$('#speedstats').hide();
+	
+	scaleDisplays(true);
+    // ORI scaleDisplays(); // must be before handling settings! 
+    
+    menustack = new PopupStack();
+    settings = new AutoSettings('kwd_tacho_settings'); // string definiert Namen in localstorage
+    
+    // TODO: layout_gauges sollte man evtl. auch mit einem stack steuern !!
+    setTachoLayout();
+	if (settings.get('tachoswitch')!='false') layout_gauges++;
+	
+    if(settings.get('switchwarning')=='false')  {
+        $('#warningdialog').hide();
+        displayHints = false;
+    }
+    if(settings.get('switchredwarning')!='false')  menustack.push('warningdialog'); // note: all dialogs hidden by default!
+    if(settings.get('switchtime')=='false') $('#time').hide(); else { layout_gauges++; startClock(); }
+    if(settings.get('switchposition')=='false') $('#geolocation').hide(); else layout_gauges++;
+    if(settings.get('switchaltitude')=='false') $('#geoaltitude').hide(); else layout_gauges++;
+    if(settings.get('switchhudsettings')=='true') {
+    	settings.switchit($('#switchhudsettings','false')); // auto saved will be overidden here
+    }
+    
+    // TODO: wenn setting "große Schrift" aus,
+    // muss hier scale wiederholt werden, mit settings abfrage
+
+    //siehe unten positionDisplays(displayHints);
+    
+    
+    // prevent accidently back all the time
+    app.EnableBackKey( false );
+
+    // EVENTS
+	
+	// TODO: events als letztes
+    
+    $('.ext-link').click(function() {
+        var linktarget = $(this).attr("href");
+        app.OpenUrl( linktarget );
+        return false;
+    });    
+    
+    $(".btn").on('tap',function() {
+        
+        var check = $(this).attr('href');
+        //app.ShowPopup(check,"center");
+        switch (check) {
+            case '#exit' : Quit(); break;
+            case '#cancel' : OnBack(); break; // TODO: test
+            case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
+            case '#info' :  menustack.push('infocard'); break;
+			case '#warningcont' :
+				// TODO: check if another menu COULD come in between!
+				OnBack();
+				break;
+	        }
+        
+        return false;
+    });
+    
+    // TODO: bei toggle von displays spezielle Funktion wegen Anpassungen - unabhängig von scaleDisplays !!
+    var posinfo = false;
+    $(".switcher").on('tap',function() {
+        
+        var check = $(this).attr('id');
+        switch (check) {
+            case 'tachoswitch' :
+            	if(settings.get(check)=='false') {
+            		layout_gauges ++;
+            	}      
+            	else layout_gauges --;
+                settings.switchit(this);
+                setTachoLayout();            	
+                posinfo = true;
+            	break;
+            case 'digitalanalog':     	
+            case 'digital' :
+            case 'analog' :
+            	settings.radio('.radio',this);
+            	if(settings.get('tachoswitch')!='true') settings.switchit($('#tachoswitch')); // always activate tacho as well
+                setTachoLayout();            	
+                posinfo=true;
+                break;
+            case 'switchtime':
+                $('#time').toggle();
+                if(settings.switchit(this)) {
+                	layout_gauges++ ;
+                	startClock();
+                }
+                else {
+                	layout_gauges--;
+                	stopClock();
+                }
+                posinfo=true;
+                break;
+            case 'switchaltitude':
+                $('#geoaltitude').toggle();
+                if(settings.switchit(this)) layout_gauges++ ; else layout_gauges--;
+                posinfo=true;
+                break;
+            case 'switchposition':
+                $('#geolocation').toggle();
+                if(settings.switchit(this)) layout_gauges++ ; else layout_gauges--;
+                posinfo=true;
+                break;
+            case 'switchhudsettings':
+           		gpstool.switchHud();
+                settings.switchit(this);
+            	break;
+            case 'switchwarning':
+                if (settings.get(check)=='false') {
+                    //$('#warningdialog').show();
+                    toastMessage('Alle Hinweise aktiviert.');
+                    displayHints = true;
+                }
+                else {
+                   toastMessage('Alle Hinweise deaktiviert.');
+				  displayHints = false;
+				}  
+                
+                settings.switchit(this);
+                break;
+            case 'switchredwarning':
+                if (displayHints) {
+                    if (settings.get('switchredwarning')=='false') toastMessage('Warnhinweise wieder eingeschaltet.');
+                    else toastMessage('Warnhinweise ausgeschaltet.');
+                }
+                settings.switchit(this); // TODO get new state as return so you can use it for switch reacting without the need of settings.get
+                break;                
+            case 'switchautorange':
+                resetTachoRange("save",10);  // current minimum
+                if (displayHints) toastMessage('Auto-Bereich zurückgesetzt');
+                //settings.switchit(this);
+                break;
+            default: settings.switchit(this);
+                break;
+        }
+        //scaleDisplays(false);
+        
+        
+        // optimize positions and font sizes
+        if (!displayHints) posinfo = false;
+        positionDisplays(posinfo);
+        
+        // always (cases are checked inside functions)
+		startGps();
+        
+        return false;
+    });
+    
+    // TODO: if id of button stored or can be derived from id of targeted dialog
+    // --> you could automate this too
+    $("#menubutton").click(function() {
+        OnBack();
+    });
+    $("#tachosettings").on('tap',function() {
+        menustack.push('tachosettingsdialog');
+    });
+    $("#moresettings").on('tap',function() {
+        menustack.push('moresettingsdialog');
+    });
+    $("#resetsettings").on('tap',function() {
+        menustack.push('resetsettingsdialog');
+    });
+    $(".switchhud").click(function() {
+        //gpstool.switchHud();
+		if (displayHints) toastMessage('HUD aktivieren ab jetzt im Menü');
+    });
+    $(".switchlocformat").click(function() {
+        gpstool.switchLocFormat();
+        gpstool.switchHud('off');
+        // (for nice coloration highlights as well)
+    });
+    // yes no on back
+    $('#yes').on('tap',function() {
+        Quit();
+    });
+    $('#no').on('tap',function() {
+        $('#yesnodialog').hide(); // TODO: use menustack, but then u must start it with menustack too
+    });
+  
+    
+	//Zeug von OnStart:
+	
+
+    //settings.init('backkey',true); // init bewirkt, dass true nur gesetzt wird, wenn es nicht geladen werden konnte
+    // init ist meist nicht nötig, wenn im html der gewünschte Anfangsstatus gesetzt ist
+    
+    // menu for exit instead of back a
+    // TODO: what happens on tablets??
+    //app.SetMenu( "Einstellungen,Beenden" );
+
+    tablet = app.IsTablet(); // returns boolean
+    
+    gpstool = new GpsTools(); //global var speed now named: gpstool
+   
+    //Create and start location sensor. 
+    //(Achievable update rate is hardware specific) 
+    loc = app.CreateLocator( "GPS,Network" ); 
+    loc.SetOnChange( loc_OnChange );  // you cannot directly set to member of gpstool :-(
+    loc.SetRate( 1 ); //seconds (refresh data), test lower rate! good for background activity!
+    startGps(); // never do loc.Start(); alone --> use this wrapper  
+    
+    
+    // TODO: do also inside gpstoool
+    // ! now always load (no switching) !
+	resetTachoRange("load",10); // default==10, if no value found
+    
+    //if(settings.get('switchautorange')=='false') {
+    //    resetTachoRange("save",tacho_defaultrange);
+    //}
+    //else {
+      //  resetTachoRange("load",10); // default==10, if no value found
+    //}
+
+    // TODO: show when settings ready:
+    $('#geobearing,#geoaccuracy').hide();
+    
+    // TODO: hier auch scaleDisplays(), besonders für Landscape
+    positionDisplays(displayHints); // warum geht nicht? - timing problem??
+    setGpsWarning(); // display warnings until gps works 
+    
+    
+    
+    $('#splashscreen').hide();
+    //app.SetScreenMode( "Full"); 
+    
+    app.Debug('num gauges:'+layout_gauges);
+    resetHud();
+
+	// mechanism to handle the case you don't know whether 
+    // OnStart or document ready comes first:
+	initCounter = 100;
+	return true;	
+} // initApp
+
+
+function OnStart() {
+	//app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
+	//mydebug = app.CreateDebug();
+	//app.ShowDebug(false);
+	
+	app.Debug("onStart");
+	if (app_browsermode==true) app.Debug('browser mode');
+	
+    // frage ob gerade landscape, dann init erst bei resize:
+	if (app.GetOrientation()=="Landscape") {
+	Log("landscape");
+	initCounter++; // causes init to be done on resize
+	}
+	else initCounter+=2; 
+	
+	// force portrait until layout is more flexible:
+	app.SetOrientation( "Portrait" ); 
+	// für lock -> bekommt man halt entweder primary portrait oder primary landscape
+        	
+	initApp();
+}
+
+
+$(document).ready(function() {
+
+	app.Debug('document ready');
+    initCounter++;
+	initApp();
+	
+	 // more reliable than onconfig ! :-)
+	 $(window).resize(function() {
+        // TODO: only if really needed: 
+        //      handle problem with possible multiple trigger resize events in some cases
+        Log('on resize');
+        // TODO: warum reagiert nicht, wenn Statusbar des Gerätes weg ??
+        //app.ShowPopup("resize");
+		initCounter++;
+		if (initApp()==false) {
+            // resize after init
+    		scaleDisplays(false);
+    		//ORI scaleDisplays(); // wenn später korrekt arbeitet, dürfte doppelter Aufruf egal sein!!
+    		positionDisplays();
+		}
+    });
+    
+});
+
+/*
+verwende source id : de.kuehne_webdienste.kwdtacho
+
+akt. Zeilenzahl: ca. 1500
+*/
+
+</script>   
+</body>
+</html> 

@@ -1,0 +1,78 @@
+/* cssgauge */
+#cssgauge-wrapper {
+  position: relative;
+}
+/* the width is for initial adjustment of proportions inside the gauge
+   if there are rounding-errors, you should start with higher values
+*/
+.gauge {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  border: 10px solid #eee;
+  background-color: black;
+  background-image:linear-gradient(#777 0%, #000 50%);
+  box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;
+}
+/* this may be changed by JS: */
+.gauge {
+  border-radius: 250px;
+}
+.g-item {
+  position: absolute;
+}
+.g-center {
+  width: 25px;
+  height: 25px;
+  border: 3px solid black;
+  border-radius: 14px;
+  background-color:#83C2FD;
+}
+/* the pointer (hand) is a narrow triangle,
+build with smart-using of solid borders
+you could even draw a pointer with 2 triangle halfs with another code (+rotate 45deg)
+http://blog.michelledinan.com/08/2012/drawing-triangles-with-css/
+
+- you could also cut the tip bei overlapping something
+! length defined by border-bottom 
+ */
+.g-pointer {
+  width: 0;
+  height: 0;
+  border-left: 10px solid transparent;
+  border-bottom: 165px solid white;
+  border-right: 10px solid transparent;
+  border-top-width: 0;
+  -webkit-transition: 1s -webkit-transform linear;
+          transition: 1s transform linear;
+  /* neg. vs. pos. values important for direction of rotation*/
+  /*	transform:rotate(-90deg);*/
+    -webkit-animation-fill-mode: forwards; /* Chrome, Safari, Opera */
+    animation-fill-mode: forwards;
+}
+.g-tick {
+  /* make less vars here!! */
+  width: 20px;
+  height: 3px;
+  background-color: #ff0000;
+}
+.g-minor {
+	width: 10px;
+	height:1px;
+  	background-color: #83C2FD;
+  	z-index: -500;
+}
+/* initial rotate for all majors: */
+.g-tickval {
+  width: 30px;
+  height: 15px;
+  line-height: 15px;
+  font-size: 15px;
+}
+.g-tickval-inner {
+  width: 100%;
+  height: 100%;
+  line-height: 15px;
+  font-size: 15px;
+  text-align:center;
+}
