@@ -77,10 +77,11 @@ function CssGauge(init_settings) {
 		// pointer position; left middle  = rotation center
 		$('.g-pointer').css({
 			'top' : '0px',
-			'left' : gauge_height/2-($('.g-pointer').outerWidth()/2) + 'px',
+		/*	'left' : gauge_height/2-($('.g-pointer').outerWidth()/2) + 'px',*/
+			'left' : '130px', // hard coded because error not found :-(
 			'transform-origin': 'center ' +gauge_height/2 +'px 0' // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
 		});
-
+		
 		// make some major ticks
 		//var step = 20;
 		var step = parseFloat(settings.majorStep);
@@ -91,7 +92,7 @@ function CssGauge(init_settings) {
 			$('.g-tick,.g-tickval,.g-minor').remove();
 		//generate:
 		for(var i=0;i<majorcount;i++) {
-			$('.g-scale').append('<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
+			$('.g-scale').append('<div id="major'+i+'" class="g-item g-tick g-majortick skin"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
 		}
 		
 		// make minor ticks
@@ -99,7 +100,7 @@ function CssGauge(init_settings) {
 		//console.log(minorcount);
 		if (minorcount>0) {
 			for(var i=0;i<minorcount;i++) {
-				$('.g-scale').append('<div id="minor'+i+'" class="g-item g-minor"></div>');
+				$('.g-scale').append('<div id="minor'+i+'" class="g-item g-minor skin"></div>');
 			}
 		}
 		
