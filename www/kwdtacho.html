@@ -77,7 +77,7 @@
     		height:100%;
     		/* JS must reset me to real height */
     		background-color:#83C2FD;
-    		transition:2s opacity ease-in;/* TODO: construct tags so you can use opacity!*/
+    		transition:1.5s opacity ease-in;/* TODO: construct tags so you can use opacity!*/
       
 		}
 		/* for debugging and testing: */
@@ -315,6 +315,7 @@
 			margin:10px;
             color:white;
             background-image:-webkit-linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
+            background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
             /*box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;*/
             box-shadow: 5px 5px 10px #000 inset;
             border:10px solid #ddd;
@@ -358,15 +359,18 @@
         }        
         #splashscreen {
             background-color: #83C2FD;
-            position:absolute;
+            position:fixed;
             padding:20px;
             top:0;
             left:0;
             width:100%;
-            height:120%;
+            height:100%;
         }
         #splashscreen p {
             margin-top:50%;
+            font-weight:bold;
+            margin-bottom:1em;
+            text-align:center;
         }
         #splashscreen img {
             width:100%;
@@ -630,6 +634,7 @@
     </div>
 
     <div id="splashscreen" class="screencard">
+    	<p>Tachometer & GPS-Tool<br />by</p>
         <img src="res/kwd-4-title.png" />
     </div>
     
@@ -1734,13 +1739,23 @@ function DisplayBoxList(id_maxwidth) {
 	this.scaleTo = function(x,y) {
 			var i;
 			
-			// get visibles:
+			if(list.length>=4) { // just to be saver from errors
+				// get visibles:
+				// - there are just 2 possible entries which need the border (can be !first)
+				// - TODO: this as a general rule/loop
+				list[0].setFirst(true);
+				list[1].setFirst(true);
+				var check = (!list[1].isVisible()); // hope check is getting boolean			
+				list[2].setFirst(check); 
+				check = (!list[2].isVisible());
+				list[3].setFirst(check); 
+			}			
+			
 			var c = 0;
 			// ! only works when #digitalspeed is first in list !
+			// ! counts from second entry 
 			for(i=1;i<list.length;i++) { // always loop forward here!
-				list[i].setFirst(false);					
 				if (list[i].isVisible()) {
-					if (c==0) list[i].setFirst(true); // clearboolean into -> setFirst(boolean)
 					c++;
 				}
 			}
@@ -1767,9 +1782,7 @@ function DisplayBoxList(id_maxwidth) {
 						list[i].resize(x,dy,"");						
 					}	
 				}
-				app.Debug('scaled to h ='+dy);				
-
-				
+				app.Debug('scaled to h ='+dy);								
 			}
 	};
 	// construct
