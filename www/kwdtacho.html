@@ -3,7 +3,9 @@
 <!-- this code is freely copyable between browser/phonegap/DoridScript -->
 <!--
 	NOTES:
-
+	TODO: for this release
+	- line between position/time
+	- 
 	
 	TODO: for next release:
 
@@ -366,23 +368,23 @@
             font-size:1.2em;
         }        
         #splashscreen {
+        	display:table;
             background-color: #83C2FD;
-            position:fixed;
-            padding:20px;
+            position:absolute;
             top:0;
             left:0;
             width:100%;
             height:100%;
+        	padding:20px;
         }
         #splashscreen p {
-            margin-top:50%;
+        	display:table-cell;
+        	vertical-align:middle;
             font-weight:bold;
-            margin-bottom:1em;
             text-align:center;
         }
         #splashscreen img {
             width:100%;
-            margin-left:-5px;
         }
         #wait {
             width:200px;
@@ -472,6 +474,9 @@
 		}
 		.skin-minimal .g-center {
 			background-color:black;
+		}
+		.skin-minimal .g-pointer {
+			border-bottom-width: 130px;
 		}
 		.gauge.skin-minimal .g-minor,
 		.gauge.skin-minimal .g-majortick {
@@ -648,8 +653,9 @@
     </div>
 
     <div id="splashscreen" class="screencard">
-    	<p>Tachometer & GPS-Tool<br />by</p>
-        <img src="res/kwd-4-title.png" />
+    	<p>
+         <img src="res/kwd-4-title.png" />
+    	</p>
     </div>
     
     <div class="toastmessage">Das ist ein Popup</div>
@@ -1177,6 +1183,7 @@ function GpsTools () {
 		}
 		else {
 		  $('.skin').removeClass('skin-minimal');
+		  app.SetScreenMode('Normal');
 		}
     };
 	
@@ -1768,11 +1775,11 @@ function DisplayBoxList(id_maxwidth) {
 				// get visibles:
 				// - there are just 2 possible entries which need the border (can be !first)
 				// - TODO: this as a general rule/loop
-				list[0].setFirst(true);
-				list[1].setFirst(true);
+				list[0].setFirst(true); // digitalspeed
+				list[1].setFirst(true); // time
 				var check = (!list[1].isVisible()); // hope check is getting boolean			
 				list[2].setFirst(check); 
-				check = (!list[2].isVisible());
+				check = (!(list[1].isVisible()|| list[2].isVisible()));
 				list[3].setFirst(check); 
 			}			
 			
