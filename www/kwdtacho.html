@@ -3,15 +3,20 @@
 <!-- this code is freely copyable between browser/phonegap/DoridScript -->
 <!--
 	NOTES:
-	- #digitalspeed is no .display-box anymore
+
 	
 	TODO: for next release:
-	- Schriftzoom fehler!
+
 	- Landscape
+		- TRY to use position:absolute
+		- float des wrappers nach rechts oder absolute
+		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
 
 	TODO: nach nächstem Release:
-	- warum neue Performance-Probleme -> css besonders shadows evtl. auch gradients 
-	
+	- was tun bei sehr quadrat-nahen Bildschirmen? -> evtl. analog Tacho kleiner,um
+	andere nicht zu klein werden lassen (Problem tritt bei nur-digital nicht auf)
+	-> Treshhold als ratio w/h einfach im Browser ausprobieren 
+	- untere Ecken von display-wrapper nicht rund und Rand außerhalb	
 	 
 	TODO:
 	Ideen:
@@ -248,8 +253,8 @@
 		#tacho-container,
         #display-wrapper {
         	margin-top:10px;
-			position:relative;
         }
+        #tacho-container,
 		#digitalspeed-wrapper {
 			position:relative;
 		}        
@@ -280,11 +285,11 @@
         .unitlabel {
             position:absolute;
             color:white;
-            line-height:1em;
+            line-height:2rem;
             text-align:center;
-            font-weight:bold;
+            font-weight:normal;
             padding:10px;
-            font-size:20px;
+            font-size:0.9rem;
             right:0;
             bottom:0;        
         }
@@ -322,12 +327,15 @@
             border-radius:3em;
             font-size:1em;
         }
+        #display-wrapper {
+        	position: relative;
+        }
 		.dialog {
 		  display:none;
 		  position:absolute;
             width:90%;
             max-width:30em;
-			top:20px;
+			top:10px;
 			right:5%;
 			box-shadow: 5px 5px 20px #000;
 		 }
@@ -455,12 +463,18 @@
 		*/
 		
 		/* skin-minimal */  
+		/* TODO: skin class only in wrapper
+		 * TODO: .g-pointer shorter in .skin-minimal
+		 */
 		.gauge.skin-minimal {
 			background-image: none;
 			border-color:black;
 		}
-		.g-minor.skin-minimal,
-		.g-majortick.skin-minimal {
+		.skin-minimal .g-center {
+			background-color:black;
+		}
+		.gauge.skin-minimal .g-minor,
+		.gauge.skin-minimal .g-majortick {
 			background-color:white;
 		}
 		.display-box.skin-minimal {
@@ -505,13 +519,13 @@
             <div id="maxspeed" class="display-frame hud switchhud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
         </div>
 
-	  <div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud switchhud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel">km/h</div></div></div>
+	  <div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud switchhud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade">km/h</div></div></div>
 
 	</div><!--tacho-container-->
 
     <div id="display-wrapper" class="skin">    	
 	    <div id="time" class="hud switchhud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
-	    <div id="geoaltitude" class="hud switchhud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel">m</div> </div>
+	    <div id="geoaltitude" class="hud switchhud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade">m</div> </div>
 		<div id="geolocation" class="hud switchlocformat display-box skin"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
     </div>
 	
@@ -776,7 +790,7 @@ function OnPause()
 { 
     if (typeof settings !== 'undefined') settings.save();    
     app.PreventScreenLock(false);
-	//app.SetScreenMode('Normal');
+	app.SetScreenMode('Normal');
     //if (typeof loc !== 'undefined') loc.Stop(); // ist die Frage ob es nicht im Hintergrund weiterlaufen soll!
     // --> TODO: ein flag setzen, so dass gpstool.change darauf reagieren und z.B. nur die wichtigsten Sachen machen
     // kann, z.B. nur die Werte weiter verarbeiten, die die für die Statistik erforderlich sind.
@@ -790,7 +804,10 @@ function OnResume()
 	app.Debug("on resume");
     app.PreventScreenLock(true);
     
-    if (typeof loc !== 'undefined') loc.Start(); // check if error when start twice!!!    
+    if (typeof loc !== 'undefined') loc.Start(); // check if error when start twice!!!
+    if (typeof gpstool !== undefined) 
+    	if (gpstool.isHud())
+    		app.SetScreenMode('Full');
     resetHud();
 }
 
@@ -1133,6 +1150,9 @@ function GpsTools () {
         $('#altitudetext').text(Math.round(alt));
     };
     
+    this.isHud = function() {
+    	return hud;
+    }
     /* switch the hud (mirroring) on and off
     - sets one specific state if parameter setto is set ('on'|'off')
     */
@@ -1152,6 +1172,8 @@ function GpsTools () {
         });
 		if (hud) {
 		  $('.skin').addClass('skin-minimal');
+		  app.SetScreenMode('Full');
+
 		}
 		else {
 		  $('.skin').removeClass('skin-minimal');
@@ -1244,6 +1266,9 @@ function GpsTools () {
 					'overallAngle':270, // degrees, better < 340
 					'value':0 // must be < max Range
         	    });
+        	    // some skin classes must be set again:
+        	    //if(hud)	$('.skin').addClass('skin-minimal'); // TODO: problem if multiple adds possible
+
         	    app.SaveNumber(storage_tachorange,tachorange);
             }
     	}
