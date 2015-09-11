@@ -1,49 +1,12 @@
 <!DOCTYPE HTML>
 <html>
-<!-- this code is freely copyable between browser/phonegap/DoridScript -->
-<!--
-	NOTES:
-	TODO: for this release
-
-	
-	TODO: for next release:
-
-	- Landscape
-		- TRY to use position:absolute
-		- float des wrappers nach rechts oder absolute
-		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
-
-	TODO: nach nächstem Release:
-
-	- was tun bei sehr quadrat-nahen Bildschirmen? -> evtl. analog Tacho kleiner,um
-	andere nicht zu klein werden lassen (Problem tritt bei nur-digital nicht auf)
-	-> Treshhold als ratio w/h einfach im Browser ausprobieren 
-	- untere Ecken von display-wrapper nicht rund und Rand außerhalb	
-	 
-	TODO:
-	Ideen:
-	-GPS-Warnung Balken unten auch bei GPS an mit Farben (je nach Range) 
-	
-	- glob Variablen oder array für sichtbarkeit von Komponenten spart zeitaufwendiges u. manchmal 
-	  fehleranfälliges (wegen Dauer) abfragen über jQuery
-	  besonders für das häufige Abfragen innerhal gpstool.change
-
-	- vordefinierte Verschachtelung für displays:
-		- wenn drei, die 2 kürzesten nebeneinander, das lange darunter
-		- wenn vier, die beiden langen auf eine Seite??
-		- wenn 2 immer untereinander	  
-		- gilt für landscape ohne gauge und portrait unter gauge
-		- Länge wird im Objekt bei init gespeichert, genau wie der init-string
-		
-	- bei Tablet Menüs (immer rechts und )immer 90% Höhe und *immer extra Fenster mit Hinweisen*
--->
 
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-    
     <meta name="charset" content="utf-8">
-    
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
     <title>Tachometer App Android DroidScript</title>
     
     <link rel="stylesheet" href="css/fontello.css">
@@ -60,6 +23,63 @@
 
     <script src="js/cssgauge.js"></script>
 
+<!-- this code is freely copyable between browser/phonegap/DroidScript -->
+<!--
+	NOTES:
+	LANDSCAPE:
+	- alle "positioner"== umgebende divs position:absolute
+	- dadurch freie Gestaltung mit margins innerhalb möglich
+	- der positioner darf keinerlei margin,border,padding haben, um spätere Berechnungen übersichtlich zu halten
+
+	TODO: for this release
+
+	- LANDSCAPE
+		- allgemeine Routine zum Positionieren eines wrappers mit enthaltenen displays
+		- evtl. Objekthierarchie für verschiedene Displaytypen
+		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
+		- initApp Mechanismus für landscape anpassen
+	- GPS: aus, wenn Uhr alleine läuft (solange kein Mittel/Max)
+		
+	TODO: for next release:
+	- ZOOM
+	- LANGUAGE - erstmal Links auf verschiedene Seiten der Website	
+	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
+	TODO: nach nächstem Release:
+
+	- .skin-hud von skin-minimal trennen (nur ähnlich)
+	- was tun bei sehr quadrat-nahen Bildschirmen? -> evtl. analog Tacho kleiner,um
+	andere nicht zu klein werden lassen (Problem tritt bei nur-digital nicht auf)
+	-> Treshhold als ratio w/h einfach im Browser ausprobieren 
+	- untere Ecken von displays-wrapper nicht rund und Rand außerhalb	
+	 
+	TODO:
+	
+	Ideen:
+	- Schnellumschaltungen "1-touch" (abschaltbar)
+	- Skins: Standard, Minimal, Auto(=Tag/Nacht)
+	-GPS-Warnung Balken unten auch bei GPS an mit Farben (je nach Range) 
+	
+	- glob Variablen oder array für sichtbarkeit von Komponenten spart zeitaufwendiges u. manchmal 
+	  fehleranfälliges (wegen Dauer) abfragen über jQuery
+	  besonders für das häufige Abfragen innerhal gpstool.change
+
+	- vordefinierte Verschachtelung für displays:
+		- wenn drei, die 2 kürzesten nebeneinander, das lange darunter
+		- wenn vier, die beiden langen auf eine Seite??
+		- wenn 2 immer untereinander	  
+		- gilt für landscape ohne gauge und portrait unter gauge
+		- Länge wird im Objekt bei init gespeichert, genau wie der init-string
+		
+	- bei Tablet Menüs (immer rechts und )immer 90% Höhe und *immer extra Fenster mit Hinweisen*
+	- Tablet Menüs evtl. auch Untermenüs rechts von Hauptmenüs (grundsätzlich Platz für drei Menüs nebeneinander, bei Portrait 2)
+	  - Hilfedialog zuschaltbar (abh. vo Hinweise??)- auch bei phones/portrait (hier Breite des normalen Menüs abh. von *Höhe* in Landsacpe damit nict so breit aussieht...)
+	- im menu einstellbar ob max unt mittel im Hintergrund genommen werden, wenn Tacho aus (dann könnte man ggf. GPS
+	  abschalten, wenn Uhr alleine sichtbar)
+	  
+	- BEENDEN bei Landscape möglichst immer sichtbar (einfach nach oben?)
+-->
+
+
     <style>
         /* #83C2FD */
         /* #DD0000 warning */
@@ -71,6 +91,8 @@
         /* note: select/callout should be activated in input fields or longer texts
         */
         body { margin:0;padding:0;font-size:15px;color:white;background-color:black;}
+        body.en :lang(de) { display:none; }
+        body.de :lang(en) { display:none; }
         p,h1,h2,h3,h4 {margin:0;padding:0;color:white;}
        html { height: 100%; } body { min-height: 100%; }
         .hgchange {
@@ -84,8 +106,7 @@
     		height:100%;
     		/* JS must reset me to real height */
     		background-color:#83C2FD;
-    		transition:1.5s opacity ease-in;/* TODO: construct tags so you can use opacity!*/
-      
+    		transition:1.5s opacity ease-in;
 		}
 		/* for debugging and testing: */
 		#ruler {
@@ -252,13 +273,31 @@
        		border-top-color:transparent;
        		margin-top:0;
        }
-		#tacho-container,
-        #display-wrapper {
+		.positioner {
+			position:absolute;
+		}
+		#displays-positioner {
+			/*outline: 1px solid green;*/
+		}
+		#digitalspeed-positioner {
+						outline: 1px solid yellow; 
+		}
+		/* not yet defined!: */
+		#analogspeed-positioner {
+			outline: 1px solid red;
+ 		}
+ 		#cssgauge-wrapper {
+ 			outline:1px solid orange;
+ 		}
+        #displays-wrapper {
         	margin-top:10px;
         }
         #tacho-container,
 		#digitalspeed-wrapper {
 			position:relative;
+		}
+		#tacho-container {
+			outline:1px solid red;
 		}        
         #seconds-text {
         	font-size:50%;
@@ -317,7 +356,7 @@
         }
         /* for current control funcs. all dialogs must be visible! */
         .dialog,
-		#display-wrapper,
+		#displays-wrapper,
 		#digitalspeed-wrapper {
 			margin:10px;
             color:white;
@@ -329,16 +368,15 @@
             border-radius:3em;
             font-size:1em;
         }
-        #display-wrapper {
+        #displays-wrapper {
         	position: relative;
         }
 		.dialog {
-		  display:none;
-		  position:absolute;
-            width:90%;
-            max-width:30em;
+			display:none;
+			position:absolute;
+	        width:90%;
+	        max-width:30em;
 			top:10px;
-			right:5%;
 			box-shadow: 5px 5px 20px #000;
 		 }
         .dialog p,
@@ -359,6 +397,9 @@
         #warningdialog h1 {
             color:red;
             text-align:center;
+        }
+        #warningdialog p {
+        	font-weight:bold;
         }
         #yesnodialog {
             text-align:center;
@@ -449,7 +490,7 @@
 		    bottom:10px;
 		    background-color: #383838;
 		    color: #F0F0F0;
-		    font-family: Calibri;
+		    font-family: Calibri,sans-serif;
 		    font-size: 20px;
 		    padding:10px;
 		    text-align:center;
@@ -490,7 +531,7 @@
 			border-top-color: black;
 		}
 		#digitalspeed-wrapper.skin-minimal,
-		#display-wrapper.skin-minimal {
+		#displays-wrapper.skin-minimal {
 			background-image:none;
 			
 			border-color:transparent;
@@ -510,29 +551,35 @@
     <div id="tacho-container">
   
         <div id="cssgauge-wrapper"> <!--flexible size planned-->
-			<div id="cssgauge" class="gauge switchhud skin">
+			<div id="cssgauge" class="gauge skin">
 				<div class="g-scale"></div>
 					<div id="g-pointer" class="g-pointer g-item"></div>
 					<!-- change order  when testing finished -->
 					<div class="g-center g-item"></div>
-	            <div id="digital-on-analog" class="hud switchhud skin"><div id="dona-text" class="speed gps">0000</div></div>
+	            <div id="digital-on-analog" class="hud skin"><div id="dona-text" class="speed gps">0000</div></div>
 	            <div id="info-on-analog"><div class="units-kmh gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
 		</div>
         <div id="speedstats" class="2-in-a-row">
-            <div id="averagespeed" class="display-frame hud switchhud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
-            <div id="maxspeed" class="display-frame hud switchhud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
+            <div id="averagespeed" class="display-frame hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
+            <div id="maxspeed" class="display-frame hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
         </div>
 
-	  <div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud switchhud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade">km/h</div></div></div>
-
+		<!-- möglicherweise ungünstig, dies im tachocontainer zu haben-->
+		<div id="digitalspeed-positioner" class="positioner">
+			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade">km/h</div></div></div>
+		</div>
+		
 	</div><!--tacho-container-->
 
-    <div id="display-wrapper" class="skin">    	
-	    <div id="time" class="hud switchhud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
-	    <div id="geoaltitude" class="hud switchhud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade">m</div> </div>
+	<div id="displays-positioner" class="positioner">
+    
+    <div id="displays-wrapper" class="skin">    	
+	    <div id="time" class="hud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
+	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade">m</div> </div>
 		<div id="geolocation" class="hud switchlocformat display-box skin"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
     </div>
+   </div>
 	
 </div>
 <!--        <div id="geobearing" class="hud display-frame"><span id="bearingtext skin" class="display-text gps">000°</span><div id="bearinginfo" class="unitlabel">Sensor</div></div>
@@ -551,7 +598,7 @@
     </div>
     
     <div id="infocard" class="card">
-        <h2>Viel Spaß mit unserer<br />Tacho- und  GPS-App!</h2>
+        <h2><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to the Tacho And GPS Tool</span></h2>
       <p>by</p>
 	  <a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
 	  <p>Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
@@ -586,32 +633,41 @@
     </div>
 
   <div id="warningdialog" class="dialog">
-    <h1>Warnung!</h1>
-    <p>Verwendung auf eigene Gefahr!</p>
-    <p>Bedienen Sie diese App nicht,
+    <h1 lang="de">Warnung!</h1>
+    <h1 lang="en">Warning!</h1>
+    
+    <p  lang="de">Verwendung auf eigene Gefahr!</p>
+    <p  lang="en">Use this app at your own risk!</p>
+    
+    <p lang="en">Opening or controlling the app while driving or using a machine is dangerous! Start this app before you start driving or working!</p>
+    	<p lang="de">Bedienen Sie diese App nicht,
       während Sie ein Fahrzeug oder eine Maschine steuern! Starten Sie die App vor Beginn der Fahrt/Tätigkeit!</p>
-    <p> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert.
+      
+    <p lang="en">The display timeout of your device is disabled. Don't let the device unattended!</p>
+    <p lang="de"> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert.
       Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
-	<p><a href="#warningcont" class="btn">Weiter</a></p>
+      
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Resume</span></a></p>
   </div>
 
     <div id="settingsdialog" class="dialog">
-        <h3>Auswahl</h3>
+        <h3 lang="de">Auswahl</h3>
+        <h3 lang="en">Options</h3>
 <!--        <a id="digital" class="switcher radio" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Digital</a>
         <a id="analog" class="switcher radio" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Analog</a>
         <a id="all" class="switcher radio switched-on" href="#"><span class="fa fa-dot-circle-o fa-lg"></span> Analog & Digital</a>
 -->
-      <a id="tachoswitch" class="switcher switched-on" href="#"><span class="fa icon-gauge"></span>Tachometer</a>
-	  <a id="switchtime" class="switcher switched-on" href="#"><span class="fa icon-clock"></span>Uhrzeit</a>
+      <a id="tachoswitch" class="switcher switched-on" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
+	  <a id="switchtime" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhrzeit</span><span lang="en">Time</span></a>
 	  <a id="switchaltitude" class="switcher switched-on" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span>Höhe über NN</a>
 	  <a id="switchposition" class="switcher switched-on" href="#"><span class="fa icon-location"></span>Position</a>
 	  <a id="switchhudsettings" class="switcher" href="#"><span class="fa icon-sort-numeric mirror"></span>HUD</a>
       <a id="moresettings" class="switcher menuitem" href="#"><span class="fa icon-cog"></span>Einstellungen ...</a>
-
+		<a id="showinfo" class="switcher menuitem" href="#"><span class="fa icon-info-circled"></span>Info ...</a>
 	  <!--<a id="switchbackkey" class="switcher switched-on" href="#"><span class="fa icon-ok"></span> Beenden mit Zurück-Taste</a>-->
 	  
 
-        <a class="btn" href="#info">Info</a>
+        <!--<a class="btn" href="#info">Info</a>-->
         <a class="btn" href="#exit">App BEENDEN</a>
         <!--<a class="btn" href="#cancel">Abbrechen</a>-->
     </div>
@@ -665,10 +721,13 @@
 	<script type="text/javascript">
 	/* start javascript */
 
-/*
-IDEE:
-Funktionen auslagern in .js Datei außer gerade editierte...
-*/
+// class for global vars
+function KwdTachoApp() {
+	// public members
+	this.language = 'en';
+}
+
+kta = new KwdTachoApp();
 
 // Konstanten
 const storage_settings = 'kwd_tacho_settings';
@@ -699,6 +758,11 @@ var app_browsermode = false;
 function toastMessage(msg) {
     app.ShowPopup(msg,'bottom');
 }
+function showHint (msg) {
+  if(displayHints) toastMessage(msg);
+}
+
+// TODO: integrate or extra function for hints (displayHints) == can be disabled
 
 var gps_running = false; // prevent loc.Start() if running OR loc.Stop() when if already stopped
 function startGps() {
@@ -752,31 +816,36 @@ function clearGpsWarning() {
 }
 
 //var previous_time = 0; // save time for check (for performance)
+var previous_minutes = -1;
+
 /* refresh display of clock
  * - called only as interval callback
- * - disabled when clock hidden
+ * - disabled when clock hidden (so you don't have to check this here)
+ * TODO: check whether minutes/hours have changed before calling jQuery  
  */
 function changeTime() {
-    //update watch 
-    // TODO: ask if time is currently displayed (set in menü!) 
+	
     var date = new Date();
-    // you don't need it since interval is large anyway:
-    //if (date.getTime() < previous_time + 1000) return; // is ca. one second
     
-    var h = date.getHours();
-    h = ((h < 10) ? "0" + h : h);
-    var m = date.getMinutes();
-    m = ":"+((m < 10) ? "0" + m : m);
     var s = date.getSeconds();
     s = ":"+((s < 10) ? "0" + s : s);
-    $('#time-text').text(h+m);
     $('#seconds-text').text(s);
+
+    // minutes and hours are only formatted + displayed when changed:
+    var m = date.getMinutes();
+    if(m!=previous_minutes) {
+	    previous_minutes = m;	    
+	    m = ":"+((m < 10) ? "0" + m : m);
+   	    var h = date.getHours();
+	    h = ((h < 10) ? "0" + h : h);
+	    $('#time-text').text(h+m);
+    }
     
     // this prevents warning when clock is used alone
     if (layout_gauges==1) clearGpsWarning();
-    
 } 
 function startClock() {
+	previous_minutes = -1; // to ensure update on restart
 	clock_interval = setInterval(changeTime,1000);
 	clock_visible = true;
 }
@@ -829,7 +898,7 @@ function OnBack()
 		menustack.pop(); // you can read the popped element and react!
 	    // no gauges warning now with *counter* 
 	}
-	
+	if(menustack.current()!==false) resetMenuFade();
 	resetHud(); 
 	// TODO: irgendwie scheint das resetHud erst bei Klick *im* Hauptmenü zu reagieren
 }
@@ -850,6 +919,7 @@ function confirmYesNo(str) {
 */
 function OnMenu( name )
 {                
+    menustack.clear();
     OnBack(); // TODO: stack löschen und wieder bei Hauptmenü anfangen!
 }
 
@@ -1511,6 +1581,7 @@ function PopupStack() {
 	 */
 	this.doOnChange = function() {
 	    window.scrollTo(0,0);
+	    resetMenuFade();
 	};
 	
 	this.push = function(id,callback) {
@@ -1558,6 +1629,16 @@ function PopupStack() {
 		else return '';
 	};
 	
+	/* hides current element and empties stack
+	 * 
+	 */
+	this.clear = function() {
+ 		if(stack.length) {
+ 			$('#'+stack[stack.length-1].id).hide();
+ 			stack.length = 0; // clear all
+ 		}
+	};
+	
 	/* returns the currently visible menu of stack
 	 * - does nothing but returning id,
 	 * - returns FALSE if no menu there, else the id string without '#'
@@ -1590,6 +1671,7 @@ function DisplayBox (newid,mode) {
 	var primary = false;
 	var visible = true;  // for toggle - and performance
 	var firstvisible = false;
+	var teststring = newid;
 	
 	/* gibt Namen zurück
 	 * 
@@ -1597,6 +1679,11 @@ function DisplayBox (newid,mode) {
 	this.name = function() {
 		return id;
 	};
+	
+	this.testString = function(newstr) {
+		if((typeof newstr != 'undefined') && newstr) teststring = newstr;
+		return teststring;
+	}
 	
 	this.show = function() {
 		if(!visible) {
@@ -1692,10 +1779,10 @@ function DisplayBox (newid,mode) {
 			'width':x+'px',
 			'height':y+'px'
 		});
-	// try to center text into wrapper box
-	$(textRef).css({
-		'left':($(boxRef).innerWidth() - $(textRef).width()) / 2 + 'px' 
-	});
+		// try to center text into wrapper box
+		$(textRef).css({
+			'left':($(boxRef).innerWidth() - $(textRef).width()) / 2 + 'px' 
+		});
 
 		this.scale(dim);
 	};
@@ -1735,16 +1822,22 @@ function DisplayBoxList(id_maxwidth) {
 	/* adds an element to list
 	 * id: id of HTML tag
 	 */
-	this.add = function(id) {
+	this.add = function(id,reset_text) {
 
 		if (id.charAt(0)=='#') id = id.substr(1,id.length-1);
 		var box = new DisplayBox(id,(id==idmaxwidth)); // ! boolean result for 2nd param
 		list.push(box);
 		//debug
-		for (var i=0;i<list.length;i++) app.Debug('list '+i+' '+list[i].name());	
+		//for (var i=0;i<list.length;i++) app.Debug('list '+i+' '+list[i].name());
+		//now reset text content of box
+		if(reset_text)
+			$('.display-text','#'+id).text(reset_text); // TODO: check if this destroys inner of .display-text!!	
 		return box;			
 	};
 	
+	/* returns object with certain id
+	 * - TODO: provide function to return object by index, or return all (or at least length of array)
+	 */
 	this.get = function(id) {
 		for(var i=0;i<list.length;i++) {
 			if(list[i].name()==id) return list[i];
@@ -1826,10 +1919,17 @@ function DisplayBoxList(id_maxwidth) {
 // in browser global var important:
 var gauge = null;
 
-/*
-TODO: function to create gauge and change values
-*/
-
+function fadeMenus() {
+	//if(menustack.current()!==false) $('.dialog').fadeOut();// TODO: fade mit complete function
+	menustack.clear();
+}
+var menutimeout = false;
+function resetMenuFade() {
+	if(menutimeout!==false) clearTimeout(menutimeout);
+	var newtimeout = 2*1000*60;
+	if(menustack.current=='infocard') newtimeout*=5;
+	menutimeout = setTimeout(fadeMenus,newtimeout);
+}
 var fadetimeout = false;
 
 // only called onInit and OnBack
@@ -1971,7 +2071,7 @@ function dona_text_scale(scale) {
  */
 function scaleDisplays(initial) {
     
-    app.Debug("scaleDisplays(new)");
+    app.Debug("scaleDisplays: "+(initial ? 'app start' : 'normal'));
  
     // get vars and test, since we got problems with body.client... vs. window.innerheight
 	var screen_w = window.innerWidth
@@ -1998,39 +2098,28 @@ function scaleDisplays(initial) {
 	var w1 = w; // for col 1
 	var w2 = w; // for col 2
 	
-    // now we detect landscape - ending up with to container sizes!
-    if (isLandscape) { // prepare two cols in a row
-		w2  = screen_w - w - 20; // offset due to margin of cssgauge
-		$('#display-col-1').css({
-			'width':w1+'px', // note that display-col-1 can be hidden at the moment
-			'float':'left'
-		});
-		$('#display-col-2').css({
-			'width':w2+'px',      // TODO: adjust and test offset - OR: make everything position absolute!
-			'float':'right'
-		});
-    }
-    else {
-    	$('#display-col-1,#display-col-2').css({
-    		'float':'none'
-    	});
-    }
+	// set the positioners to a certain initial width:
+	// (otherwise displays can not init to a certain size)
+	if(initial) {
+    	$('.positioner').css('width',screen_w); // first set screen width for all
+    	// TODO: make sure that inner wrapper does not set its width
+	    if (isLandscape) {
+	    }
+	    else {
+	    }		
+	}
     
     //app.Debug (w2);
     
-    // let 10px margin
-    // gauge will be centered later (?)
+    // gauge will be centered later
     $('#cssgauge-wrapper').css({
-    	'width':w-20+'px',
-    	'height':w-20+'px'
+    	'width':w+'px',
+    	'height':w+'px'
     });
     gauge.scale();
 
 
-    
-    // zentriere analog gauge horizontal
-    // TODO: need check if alone!!
-    if (!isLandscape) $('#cssgauge-wrapper').css('left',(screen_w - $('#cssgauge-wrapper').width())/2);
+        
 //    else $('#cssgauge-wrapper').css({
 //    	'left':'10px',
 //    	'top':'10px'
@@ -2054,13 +2143,16 @@ function scaleDisplays(initial) {
         return hoff+'px';
     });
     */
-	// zur Zeit keine vert. Zentrierung
-	//$('.dialog').css('top','20px');
+   
 	// TODO: center without JS ??
     $('.dialog').css('left',function(index,value){
-        var woff = (screen_w - $(this).outerWidth()) / 2;
+        var woff = (screen_w - $(this).outerWidth(true)) / 2;
         return woff+'px';
     });
+    
+    // make some dialogs height depending on main menu
+	// outerheight -> corresponds to box-sizing!
+	$('#moresettingsdialog,#tachosettingsdialog').css('min-height',$('#settingsdialog').outerHeight()+'px');
 	
 	// jetzt können alle versteckt werden:
     //$('.dialog').hide(); // TODO: auch wenn nicht initial??
@@ -2135,296 +2227,148 @@ function scaleDisplays(initial) {
     
         
 	// set this *after* init of DisplayBoxList
-	$('.display-text').not('#time-text-wrapper').text('--');
-	// (re)make sub elements for #time
+	// this must be done after init of displays (e.g. inside display-generator) or never ...:-)
+	//$('.display-text').not('#time-text-wrapper').text('--');
 }
 
-/* berechnet alle Größen und Positionen der Anzeigen
- * - initial: gesetzt wenn bei Programmstart aufgerufen
+/* adjusts positions, proportions and sizes of displays,
+ * depending on which display is currently visible
+ * - also perfoms scaling of displays
+ * - to check if maximized size fits: first maximize, then scal down, if not fit
+ * - TODO: must only be called when display arrangement changes
  */
-function scaleDisplays_old(initial) {
-    
-    app.Debug("scaleDisplays(new)");
- 
-    // get vars and test, since we got problems with body.client... vs. window.innerheight
+function positionDisplays() {
+	
+	var hscreen = window.innerHeight
+	|| document.documentElement.clientHeight
+	|| document.body.clientHeight;
 	var screen_w = window.innerWidth
 	|| document.documentElement.clientWidth
 	|| document.body.clientWidth;
 	
-	var screen_h = window.innerHeight
-	|| document.documentElement.clientHeight
-	|| document.body.clientHeight;
-
-    var w = 0;
-    var h = 0;
-    
-    
-    if (screen_w <  screen_h) {
-       isLandscape = false;
-       w = screen_w;
-    }
-    else {
-       isLandscape = true;
-       w = h = screen_h;
-    }
-    
-	var w1 = w; // for col 1
-	var w2 = w; // for col 2
-	
-    // now we detect landscape - ending up with to container sizes!
-    if (isLandscape) { // prepare two cols in a row
-		w2  = screen_w - w - 20; // offset due to margin of cssgauge
-		$('#display-col-1').css({
-			'width':w1+'px', // note that display-col-1 can be hidden at the moment
-			'float':'left'
-		});
-		$('#display-col-2').css({
-			'width':w2+'px',      // TODO: adjust and test offset - OR: make everything position absolute!
-			'float':'right'
-		});
-    }
-    else {
-    	$('#display-col-1,#display-col-2').css({
-    		'float':'none'
-    	});
-    }
-    
-    //app.Debug (w2);
-    
-    // let 10px margin
-    // gauge will be centered later (?)
-    $('#cssgauge-wrapper').css({
-    	'width':w-20+'px',
-    	'height':w-20+'px'
-    });
-    gauge.scale();
-
-
-    
-    var timewidth = $('#time').width(); // for geolocation // better .display-frame width
-    
-    // TODO: make all displays visible for calculations of sizes and scales
-    // OR use project global vars for resizing
-    
-    //test ... w = $("#gauge").width();
-    //app.ShowPopup(w+'/'+$('#time').width());
-    
-    
-    
-    
-    // zentriere analog gauge horizontal
-    // TODO: need check if alone!!
-    if (!isLandscape) $('#cssgauge-wrapper').css('left',(screen_w - $('#cssgauge-wrapper').width())/2);
-//    else $('#cssgauge-wrapper').css({
-//    	'left':'10px',
-//    	'top':'10px'
-//    });
-    
-    // zentriere alle Dialoge:
-    // ! z.Z. keine Dialogverarbeitung *außer hori. zentrieren*
-    // - automatische Abfrage ob Dialog größer Bildschirm
-    // - Korrekturwert für border und padding
-    // TODO: man könnte auch wrapper der dialoge mit layout versehen und diesen in Größe variieren lassen
-    //       mit transition dann weiche Übergänge 
-
-    //app.Debug('screen:'+screen_w+'x'+screen_h);
-
-    /*
-    $('.dialog').css('top',function(index,value){
-        var hoff = (screen_h - $(this).outerHeight()) / 2;
-        if (hoff < 10) hoff = 10;
-        var woff = (screen_w - $(this).outerWidth()) / 2;
-        $(this).css('left',woff+'px');
-        return hoff+'px';
-    });
-    */
-	// zur Zeit keine vert. Zentrierung
-	//$('.dialog').css('top','20px');
-	// TODO: center without JS ??
-    $('.dialog').css('left',function(index,value){
-        var woff = (screen_w - $(this).outerWidth()) / 2;
-        return woff+'px';
-    });
-	
-	// jetzt können alle versteckt werden:
-    //$('.dialog').hide(); // TODO: auch wenn nicht initial??
-
-    if (initial) {    
-    
-	    // digital on analog speed size
-	    // now orientated to position and size of #cssgauge (not screen at all!)
-	    // ! note that this is only needed when *initial* since it is scaled together with gauge 
-		var cssgaugewidth = $('#cssgauge').width(); // here NOT outerWidth! 
-	    var wdona = cssgaugewidth * 0.4; 
-	    var newfontsize = wdona/2;
-	    
-	    $("#digital-on-analog").css({
-	        'width':wdona+'px',
-	        'height': newfontsize*1.2+'px',
-	        'border-radius':newfontsize/2+'px'
-	      });
-	    
-	    $("#digital-on-analog").css({
-	        'left': (cssgaugewidth - $('#digital-on-analog').width()) / 2,
-	        'top':  (cssgaugewidth - $('#digital-on-analog').height()) / 2
-		});
-
-	    // size and position of info (km/h) on analog must depend on cssgauge
-	    // TODO: simpler calculation??
-	    $('#info-on-analog').css({
-	        'width':cssgaugewidth/2.7+'px',
-	        'height':'auto',
-	        'top':cssgaugewidth*0.73+'px',
-	        'left':((cssgaugewidth-(cssgaugewidth/2.7))/2)+'px', // must be same ratio like in width
-	        'font-size':cssgaugewidth/20+'px',
-	        'line-height':'1em'
-	    });
-	
-	    //$('#digital-on-analog .speed').css({'font-size':''+newfontsize+'px'});
-	    // position digital
-	    // dona-text is a div inside:
-	    
-	    // dona-text 
-	    // - save width with max. digits (4)
-	    // - make the width fixed
-	    // - now you scale to a) size with 4 digits b) to bigger size with 3 digits
-	    // - for b) you must calculate the difference in width (about 1/4 == 1 digit)
-
-
-        dona_scalebase = $('#dona-text').width(); // must be 0000 in this moment!
-        dona_space = wdona * 0.85; // max width we want the number have to, because need border
-        
-        $('#dona-text').css({
-            // the width will be set her ONCE
-            'width': dona_scalebase + 'px'
-        });
-        
-        // compute scale for 4 digits (0000):
-        dona_scale4 = dona_space / dona_scalebase;
-        dona_scale3 = dona_space / (dona_scalebase*0.75);
-        dona_text_scale(dona_scale3);
-        // replace inital 0000 text
-        $('#dona-text').text('0');
-
-	    // only correct centered position
-	    // - the css width is not changed anymore
-	    // - must take width of #digital-on-analog as ref
-	    $('#dona-text').css({
-	        'left': ($('#digital-on-analog').width() - $('#dona-text').width()) / 2 + 'px', 
-	        'top': ($('#digital-on-analog').height() - $('#dona-text').height()) / 2 + 'px'
-	    });
-	    
-        
-    }
-    
-    if (initial) {
-        // TODO: zuerst alle Displays wieder anzeigen, alle auf font-size 150px
-        // dann funktion setzen, danach je nach settings bestimmte wieder 
-        // verstecken (alles nötig bei *erstem* rotate
-        
-        // wird genau berechnet, da % wegen border+margin zu unsicher
-        // andere Lösung wäre umgebender div
-        // TODO: gerade das nicht nur bei initial !
-        $('#display-col-2 .display-frame').css('width',w2 - 20 + 'px'); // offset -40 due to margin of *both* cols
-        $('.halfsize').css({
-        	'width': (w2 / 2 ) - (w*0.15) + 'px', // 4 *10px margin = 40, durch border-box müsste border mit drin sein.
-        	'margin-top':-w1*0.175 + 'px' // TODO: only when *Portrait*
-        });
-        
-		// Einpassen der Texte in Breite:
-		//var before_w = $('#time>.display-text').width();
-        // - width() scheint immer innere Breite der Blocks zu liefern
-        // f/newf = tw/bw --> f * bw / tw
-        // - scheint Rechenzeit zu verbrauchen!
-        // TODO: extra Behandlung von dona nötig??
-        $('.display-frame').css('font-size',function(index,value){
-            var f = parseFloat(value);
-            var bw = parseFloat($(this).width());
-            var tw = parseFloat($('.display-text',this).width());
-            var size = f * bw / tw;
-            fontsizes[index]=size; //TODO: real use of that! 
-            return size+'px';
-        });
-        
-        
-        //var after_w =  $('#time>.display-text').width();
-        //toastMessage(before_w+'/'+after_w+' ('+$('#time').width());
-        
-        // falls Zoom der Schriftarten in *Geräteeinstellungen*,
-        // wird nach dem scale der Text noch nicht passen, obwohl angepasst.
-		//deshalb nochmal berechnen, dadurch wird Zoom-Offset ausgeglichen
-		// [*] dabei wird der Faktor mit sich multipliziert,
-		// dies bewirkt den Ausgleich des durch den Zoom verfälschten Wertes von f
+	if(displays.noneVisible()) { // TODO: define exceptions as parameter
+		$('#displays-wrapper').hide();
 		
-		
-        $('.display-frame').css('font-size',function(index,value){
-            var f = parseFloat(value);
-            var bw = Math.round(parseFloat($(this).width()));
-            var tw = Math.round(parseFloat($('.display-text',this).width()));
-            var size = f * (bw / tw) *(bw/tw); // hier anders!! [*]
-            //fontsizes[index]=size; //TODO: real use of that! 
-            return size +'px';
-        });
-		// TODO: den Faktor *einmalig* für alle finden! -- wird auch bei dona-text gebraucht (bisher nicht beachtet)
-        
-        // TODO: falls mehrere Breiten mit verschieden großen Schriften, müsste man Höhe anpassen
-        // --> alle auf die niedrigste vorkommende Höhe setzen -- sonst doof aussieht
-        
-        // löscht initiale Werte, die nur zur Größenbestimmung da waren:
-        // jene werden aber bei resize nochmal benötigt
-        // TODO: vielleicht könnte man auch bereits bei init mehrere Varianten
-        // berechnen; Problem: Statuszeile noch da und verfälscht Screen-Maße
-        $('.display-text').text('--');
-        
-        // TODO: gute Basis für allgemeine Routine, auch für kleinere/größere
-        // benötigte Displays
-    }
-    
-    
-}
-
-/* - not easy to find correct calc
- * - you need the (saved) height of the largest version of each display + display-wrapper margins+borders etc.
- * - you could use trial and error on each positionDisplays: first maximize, if not fit scale
- * - TODO: must only be called when display arrangement changes
- */
-function positionDisplays() {
-
-	if(displays.noneVisible()) {
-		$('#display-wrapper').hide();
-	}	
-	else {
-		$('#display-wrapper').show();
-	
-		var hscreen = window.innerHeight
-		|| document.documentElement.clientHeight
-		|| document.body.clientHeight;
-		var screen_w = window.innerWidth
-		|| document.documentElement.clientWidth
-		|| document.body.clientWidth;
-		
-		var hspace = hscreen;
-		if (settings.get('tachoswitch')!='false') {
-			if (displayDigitalspeed.isVisible()) hspace -= $('#digitalspeed-wrapper').outerHeight(true); // beware collapsing margins!
-			else hspace -= $('#cssgauge-wrapper').outerHeight(true);		
+		// landscape digitalspeed full width
+		if (displayDigitalspeed.isVisible()) {		
+			$('#digitalspeed-positioner').css('width',screen_w+'px');
+			// correct scale of number:
+			displays.scaleTo($('#digitalspeed-wrapper').width(),0); // y:0 for receiving maximized heights
+			//TODO: check if y-limit is needed
 		}
 		
-		var w = $('#display-wrapper').width(); // get inner width
-		displays.scaleTo(w,0); // y:0 for receiving maximized heights
+		// TODO: analog speed *zoom* if desired
 		
-		/*$('#ruler').css({
-			'width':'100%',
-			'height':0,
-			'top':hscreen-hspace+'px',
+		// make it centered depending on orientation
+		if(isLandscape) {			
+			$('#cssgauge-wrapper').css({
+				'top':'0px',
+				'left':(screen_w - $('#cssgauge-wrapper').outerWidth())/2+'px'
+			});
+		} 
+		else {
+			
+			$('#cssgauge-wrapper').css({
+				'left':'0px',
+				'top':'0px'
+			//	'top':(hscreen - $('#cssgauge-wrapper').outerHeight())/2+'px'
+			});
+						
+		}
+		
+	}	
+	else {
+		// if more displays visible
+		
+		$('#displays-wrapper').show();
+
+		// analog size == screen -> just make left top
+		$('#cssgauge-wrapper').css({
+			'top':'0px',
+			'left':'0px'	
 		});
-		*/
-		// find border/margin-stuff of display-wrapper to calculate the new inner:
-		// TODO: make it so the bottom border and margins are skipped when hspace < x?
-		var layoutoffset = $('#display-wrapper').outerHeight(true) - $('#display-wrapper').height(); // TODO: make it *once* and save
 		
-		if (hspace < $('#display-wrapper').outerHeight(true)) {
-		 	app.Debug('try to scale smaller');
-			displays.scaleTo(w,hspace-layoutoffset); // not hspace but inner height due to layout of wrapper!!
+		if (isLandscape) {
+			
+			// change width + center digitalspeed vert.
+			$('#digitalspeed-positioner').css({
+				'width':'50%'
+			}); 
+			
+			var wspace = screen_w;
+			
+			if (settings.get('tachoswitch')!='false') { // if tacho at all visible
+				if (displayDigitalspeed.isVisible()) {
+					wspace -= $('#digitalspeed-positioner').width(); // beware collapsing margins!
+				}
+				else wspace -= $('#cssgauge-wrapper').outerWidth(true);		
+				
+
+			}
+			$('#displays-positioner').css({
+				'left':screen_w - wspace +'px', // TODO: check if you can use translate!
+				'top':0,
+				'width':wspace+'px'
+			});
+
+
+			displays.scaleTo($('#displays-wrapper').width(),0); // y:0 for receiving maximized heights
+			
+			// center the scaled displays
+			$('#displays-positioner').css('top',(hscreen-$('#displays-positioner').height())/2);
+			// new: try to resize digitalspeed
+			 
+			$('#digitalspeed-positioner').css({
+				'top':$('#displays-positioner').css('top'),
+				'height':$('#displays-positioner').height()
+			}); 
+			displayDigitalspeed.resize($('#digitalspeed-wrapper').width(),$('#displays-wrapper').height());
+			// very strange correction:
+			/*$('.display-text','#digitalspeed').css(
+				'transform-origin',
+				'50% '+($('#digitalspeed').innerHeight()-$('.display-text','#digitalspeed').height())/2+'px 0'
+			);*/
+		}
+		else {
+			
+			// Portrait
+			
+			$('#digitalspeed-positioner').css({
+				'width':screen_w+'px',
+				'top':0
+			});
+			
+			var hspace = hscreen;
+			if (settings.get('tachoswitch')!='false') {
+				if (displayDigitalspeed.isVisible()) hspace -= $('#digitalspeed-wrapper').outerHeight(true); // beware collapsing margins!
+				else hspace -= $('#cssgauge-wrapper').outerHeight(true);		
+			}
+			// must move displays down (since defined position:absolute):
+			$('#displays-positioner').css({
+				'top':hscreen-hspace+'px', // TODO: check if you can use translate!
+				'left':0,
+				'width':screen_w+'px'
+			});
+			
+			//$('#displays-positioner').css('transform','translateY('+(hscreen-hspace)+'px)'); // TODO: check why translate does not work			 
+			var w = $('#displays-wrapper').width(); // get inner width
+			displays.scaleTo(w,0); // y:0 for receiving maximized heights
+			
+			/*$('#ruler').css({
+				'width':'100%',
+				'height':0,
+				'top':hscreen-hspace+'px',
+			});
+			*/
+			// find border/margin-stuff of displays-wrapper to calculate the new inner:
+			// TODO: make it so the bottom border and margins are skipped when hspace < x?
+			var layoutoffset = $('#displays-wrapper').outerHeight(true) - $('#displays-wrapper').height(); // TODO: make it *once* and save
+			
+			if (hspace < $('#displays-wrapper').outerHeight(true)) {
+			 	app.Debug('try to scale smaller');
+				displays.scaleTo(w,hspace-layoutoffset); // not hspace but inner height due to layout of wrapper!!
+			}
+			
 		}
 	}
 }
@@ -2529,9 +2473,9 @@ function initApp()  {
     
     // ONSTART
     
-    app.GetLanguageCode(); // TODO: make something of it!
-    
-    // zoom problems
+    var lang = (app.GetLanguageCode()).toLowerCase();
+    //if (lang=='de' || lang=='at' || lang=='li') kta.language = 'de'; // ! default language: en
+    $('body').addClass(kta.language); 
 	
     // init gauge before first scaleDisplays!
     //DrawGauge();
@@ -2546,23 +2490,25 @@ function initApp()  {
 		'value':0 // must be < max Range
 	});
 
-	// TODO: enable again:
+	// TODO: enable again:-> add to displays list
 	$('#speedstats').hide();
 	
-
+	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays
+	
 	// init displays
 	displays = new DisplayBoxList('geolocation');
 	// save all in glob vars too
-	// ! important: orde of add must be order in HTML!
-	displayDigitalspeed = displays.add('digitalspeed');// TODO: check whether object is rerefenced or copied!!!
+	// ! order of add must be order in HTML!
+	displayDigitalspeed = displays.add('digitalspeed','--');// TODO: check whether object is rerefenced or copied!!!
 	displayTime = displays.add('time');
-	displayAltitude = displays.add('geoaltitude');
-	displayLocation = displays.add('geolocation');
-	
-	
-	
-	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays
-    
+	displayAltitude = displays.add('geoaltitude','--');
+	displayLocation = displays.add('geolocation','--');
+
+	// object referencing works (changes in displays.[one object] appear in references e.g. displayTime) 
+	//var testobject = displays.get('time');
+	//app.Debug('set new obj str: '+testobject.testString('thomas') );
+	//app.Debug('check obj str in time: '+displayTime.testString() );
+		    
     menustack = new PopupStack();
     settings = new AutoSettings(storage_settings); // string definiert Namen in localstorage // loads saved settings
     
@@ -2584,15 +2530,9 @@ function initApp()  {
     if(settings.get('switchaltitude')=='false') displayAltitude.hide(); else layout_gauges++;
     if(settings.get('switchhudsettings')!='false') {
     	settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
-    }
+    }    
     
-    // TODO: wenn setting "große Schrift" aus,
-    // muss hier scale wiederholt werden, mit settings abfrage
-
-    //siehe unten positionDisplays(displayHints);
-    
-    
-    // prevent accidently back all the time
+    // prevent accidently back 
     app.EnableBackKey( false );
 
     // EVENTS
@@ -2606,6 +2546,8 @@ function initApp()  {
     });    
     
     $(".btn").on('tap',function() {
+        
+        resetMenuFade();
         
         var check = $(this).attr('href');
         //app.ShowPopup(check,"center");
@@ -2628,6 +2570,7 @@ function initApp()  {
     
 
     $(".switcher").on('tap',function() {
+    	resetMenuFade();
         var doPosition = false;
         var check = $(this).attr('id');
         switch (check) {
@@ -2725,6 +2668,25 @@ function initApp()  {
         return false;
     });
     
+    // easy switch tacho layout:
+	$('#tacho-container').click(function() {		
+    	if(settings.get('tachoswitch')!='false') {
+    		var next;
+    		if (settings.get('digitalanalog')!='false') next = 'digital';
+    		else if (settings.get('digital')!='false') next = 'analog';
+    		else next = 'digitalanalog';
+    			
+	       	settings.radio('.radio',$('#'+next));
+	        setTachoLayout();            	
+	        positionDisplays();
+	        switch(next) {
+	        	case 'digitalanalog':showHint('Erneut Tippen für Digital'); break;
+	        	case 'digital': showHint('Erneut Tippen für Analog'); break;
+	        	case 'analog': showHint('Erneut Tippen für Digital & Analog'); break;
+	        }
+    	} 
+	});
+
     // TODO: if id of button stored or can be derived from id of targeted dialog
     // --> you could automate this too
     $("#menubutton").click(function() {
@@ -2739,9 +2701,8 @@ function initApp()  {
     $("#resetsettings").on('tap',function() {
         menustack.push('resetsettingsdialog');
     });
-    $(".switchhud").click(function() {
-        //gpstool.switchHud();
-		if (displayHints) toastMessage('HUD aktivieren ab jetzt im Menü');
+    $("#showinfo").on('tap',function() {
+        menustack.push('infocard');
     });
     $(".switchlocformat").click(function() {
         gpstool.switchLocFormat();
@@ -2803,6 +2764,7 @@ function initApp()  {
     
     app.Debug('num gauges:'+layout_gauges);
     resetHud();
+    resetMenuFade();
 
 	// mechanism to handle the case you don't know whether 
     // OnStart or document ready comes first:
@@ -2823,6 +2785,8 @@ function OnStart() {
 	if (app_browsermode==true) app.Debug('browser mode');
 	
     // frage ob gerade landscape, dann init erst bei resize:
+    // TODO: ungünstig formatierte Inhalte leider kurz zu sehen bevor resize kommt.
+    // TODO: diesen Code bei funktionierendem Landscape deaktivieren
 	if (app.GetOrientation()=="Landscape") {
 	initCounter++; // causes init to be done on resize
 	}

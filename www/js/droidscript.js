@@ -25,6 +25,9 @@ function DroidScriptApp () {
 		// TODO: test what happens when 2 messages shortly after
 	};
 	
+	/* return the probable correct value of screen orientation
+	 * TODO: don't just return "portrait" when screen is not portrait-like 
+	 */
 	this.GetOrientation = function() {
 		return 'Portrait';
 	};
@@ -109,9 +112,14 @@ function DroidScriptApp () {
 	    evt = evt || window.event;
 	    if (evt.keyCode == 27) {
 	    	console.log('ESC detected');
-	        OnBack(); // hope finding the function
+	        OnBack();
+	    }
+	    else if (evt.keyCode == 77) {
+	    	console.log('M detected');
+	        OnMenu();
 	    }
 	};
+
 	// simulate correct exit of App when leavin page
 	// TODO: läuft noch nicht, evtl. weil JS-Code der Seite schon gelöscht - dann aber generell sinnlos
 	// TODO: teste einfacheres Script siehe w3schools.com

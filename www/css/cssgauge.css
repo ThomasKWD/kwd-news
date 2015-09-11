@@ -1,6 +1,7 @@
 /* cssgauge */
 #cssgauge-wrapper {
   position: relative;
+  padding:10px;
 }
 /* the width is for initial adjustment of proportions inside the gauge
    if there are rounding-errors, you should start with higher values
