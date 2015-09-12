@@ -4,7 +4,8 @@
 function DroidScriptApp () {
     //private:
     debug_on = true;
-
+	popuptimeout = false;
+	
 	this.Start = function() {
 		browsermode = true; // global var
 		OnStart();
@@ -18,11 +19,15 @@ function DroidScriptApp () {
 		debug_on = (mode) ? true : false; // better if mode does not contain booleans
 	};
 	
+	this.clearPopup = function() {
+		$('.toastmessage').fadeOut(400);
+	};
 	this.ShowPopup = function(msg) {
+		if(popuptimeout!==false) clearTimeout(popuptimeout);
 		this.Debug("popup: "+msg);
 		$('.toastmessage').text(msg);
-		$('.toastmessage').fadeIn(400).delay(5000).fadeOut(400); //fade out after 3 seconds
-		// TODO: test what happens when 2 messages shortly after
+		$('.toastmessage').show();
+		setTimeout(this.clearPopup,5000);
 	};
 	
 	/* return the probable correct value of screen orientation
@@ -193,12 +198,11 @@ function kwdGeoLocator (options) {
 	};
 	
 	this.Start = function() {
-		timeout_id = setInterval(this.change,timeout); // test if this. call is ok
+		timeout_id = setInterval(this.change,timeout);
 	};
 	
 	this.Stop = function() {
 		if (timeout_id !== false) clearInterval(timeout_id);
-		
 	};
 	
 	// construct code
