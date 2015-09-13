@@ -616,7 +616,7 @@
 		<p>by</p>
 		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
 		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
-		<p lang="en">Use this GPS speedometer with altitude, geolocation, and current time, especially when you are not driving
+		<p lang="en">Use this GPS speedometer with altitude, geolocation and current time, especially when you are not driving
 			 a car but going by bicyle, by train, by boat or even by airplane!</p>
 	  	
 	    <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
@@ -629,16 +629,16 @@
         selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
         Ähnliches gilt für die Geschwindigkeit bei sehr geringen Werten.</p>
         
-        <p lang="en">Note that the <b>accuracy</b> seams limited when observing the height value since it will be the same as 
+        <p lang="en">Note that the <b>accuracy</b> seems very low when observing the height value since it will be the same as 
         	the accuracy of location. While you expect the location to differ for some meters, it looks odd in terms of height 
-        	when there is in error of 5m or even 100 m (depending on GPS signal). This also applies to very low speed values.</p> 
+        	when there is in error of 3m or even 50 m (depending on GPS signal). This also applies to very low speed values.</p> 
         	 
         
         <p lang="de">Ihr Gerät benötigt einen <b>GPS-Sensor</b> für die Geschwindigkeit. Netzempfang ist jedoch nicht nötig.
         	Die App kann auch im "Flugmodus" laufen.
         	Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
         Ihres Gerätes aktivieren müssen.</p>
-        <p lang="en">Your device must have a <b>GPS-sensor</b> enabled to display speed (see under 'Location' in the devices
+        <p lang="en">Your device must have a <b>GPS-sensor</b> enabled to display speed (see under 'Location' in the device's
         	settings). You don't need a network connection and can also use the app in "flight mode". 
         
       	<p lang="de"> <b>Die HUD-Funktion</b>
@@ -2006,7 +2006,7 @@ var menutimeout = false;
 function resetMenuFade() {
 	if(menutimeout!==false) clearTimeout(menutimeout);
 	var newtimeout = 2*1000*60; // 2 miin
-	if(menustack.current=='infocard') newtimeout*=10; // 20 min
+	if(menustack.current()=='infocard') newtimeout*=10; // 20 min
 	menutimeout = setTimeout(fadeMenus,newtimeout);
 }
 var fadetimeout = false;
