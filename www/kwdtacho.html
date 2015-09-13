@@ -300,6 +300,7 @@
         #tacho-container {
         	position:absolute;
         }
+        #display-container,
 		#digitalspeed-wrapper {
 			position:relative;
 		}
@@ -605,35 +606,40 @@
     </div>
     
     <div id="infocard" class="card">
-        <h2><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to the Speedometer and GPS Tool</span></h2>
+        <h2><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to this Speedometer and GPS Tool</span></h2>
       <p>by</p>
 	  <a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
-	  <p>Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
-	  <p> Die HUD-Funktion
-        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen.</p>
+	  <p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
         
-        <p>Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
-        Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden
-        (Auf die Positionsanzeige tippen).</p>
+        <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
+        Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden.</p>
         
-        <p>Die Genauigkeit der Höhenangabe sollte nicht überschätzt werden.
+        <p lang="de">Die Genauigkeit der Höhenangabe sollte nicht überschätzt werden.
         Sie liegt etwa im gleichen Bereich wie die der Position, wo die Ungenauigkeit
         selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
-        Ähnliches gilt für die Geschwindigkeitsangabe bei sehr geringen Geschwindigkeiten (unter 10km/h).</p>
+        Ähnliches gilt für die Geschwindigkeitsangabe bei sehr geringen Geschwindigkeiten.</p>
         
-        <p>Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
+        <p lang="de">Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
         Ihres Gerätes aktivieren müssen.</p>
         
-        <p>Standortdaten werden nicht weiter verarbeitet.</p>
-        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KÜHNE-Webdienste.de</a></p>
-        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
-        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
+      	<p lang="de"> Die HUD-Funktion
+        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen.</p>
         
-        <p>Diese App verzichtet auf Werbe-Einblendungen und ist dennoch kostenlos.
+        <p lang="de">Die Einstellung "Direktauswahl" erlaubt die Änderung einiger Einstellungen, wenn Sie einfach auf die Anzeigen tippen.
+        	Diese Funktion kann abgeschaltet werden.</p>
+        <p lang="en">The option "Direct Config" means you can change some settings by tapping the gauges and values. You can turn of this option in the settings menu.</p>
+        
+        <p lang="de">Standortdaten werden nicht weiter verarbeitet.</p>
+        
+        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KÜHNE-Webdienste.de</a></p>
+        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung / Privacy policy</a></p>
+        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen / Licenses</a></p>
+        
+        <p lang="de">Diese App verzichtet auf Werbe-Einblendungen und ist dennoch kostenlos.
         Falls Ihnen die App gefällt, können Sie ihre Entwicklung voran treiben,
         indem Sie einen kleinen Betrag spenden. Vielen Dank!
         
-        <a href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link">Spenden</a>
+        <a href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link" lang="de">Spenden</a>
         
         </p>
 
@@ -703,6 +709,7 @@
 	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span> ...</a>
        <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show notes on functions</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
+	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
     </div>        
     
     <!--<div id="menubutton"><span class="fa fa-ellipsis-v autofade"></span></div>-->
@@ -732,6 +739,10 @@
 function KwdTachoApp() {
 	// public members
 	this.language = 'en';
+	
+	this.storage = {
+		language : 'tacholanguage'	
+	};
 }
 
 kta = new KwdTachoApp();
@@ -755,6 +766,27 @@ var cssgauge_visible = true; // will be set/unset by setTachoLayout  (performanc
 var app_browsermode = false; 
  
  
+
+/* set language by adding/removing classes
+ * lang: auto|en|de
+ * 
+ */
+function setLanguage(lang) {
+
+	var syslang = (app.GetLanguageCode()).toLowerCase();
+	
+	if(lang=='auto') {
+		lang = syslang; // ! overwrite parameter value
+	    if (lang=='de' || lang=='at' || lang=='li') kta.language = 'de'; // ! default language: en
+	    else lang = en;
+	}
+	$('body').removeClass('en'); // works because multiple addClass do not add more classes :-)
+	$('body').removeClass('de'); // works because multiple addClass do not add more classes :-)
+	$('body').addClass(lang);
+	
+	kta.language = lang; 
+}
+
 
 /* gibt eine message aus
     - kapselt app.ShowPopup, um Layout und Zusatzfunktionen steuern zu können
@@ -1008,16 +1040,14 @@ function GpsTools () {
     
     //public
     
+    /* changes format of position data (longitude, latidue)
+     * return: 'deg'|'decimal'
+     */
     this.switchLocFormat = function() {
         locformat = !locformat;
         refreshLocDisplay();
-    };
-    
-    this.setStep = function() {
-      stepcount++;
-      dspeed += step;
-      $('#digitalspeed').text(Math.round(dspeed));
-      if(stepcount<4) window.setTimeout(that.setStep,250);
+        if (locformat) return 'deg';
+        else return 'decimal';
     };
     
     /*
@@ -1250,7 +1280,8 @@ function GpsTools () {
     
     this.isHud = function() {
     	return hud;
-    }
+    };
+    
     /* switch the hud (mirroring) on and off
     - sets one specific state if parameter setto is set ('on'|'off')
     */
@@ -1263,10 +1294,9 @@ function GpsTools () {
         var scale = hud ? -1 : 1;
 
         $("#display-container").css({
-            'transform' : 'scaleY('+scale+')',
-            '-webkit-transform' : 'scaleY('+scale+')',
-            '-moz-transform' : 'scaleY('+scale+')',
-            '-o-transform' : 'scaleY('+scale+')',
+            'transform' : 'scaleX('+scale+')',
+            '-webkit-transform' : 'scalex('+scale+')',
+            '-moz-transform' : 'scaleX('+scale+')'
         });
 		if (hud) {
 		  $('.skin').addClass('skin-minimal');
@@ -1738,7 +1768,7 @@ function DisplayBox (newid,mode) {
 		
 		if (isfirst) {
 			$(boxRef).addClass('first-display');
-			app.Debug('first set to '+id);
+			//app.Debug('first set to '+id);
 			firstvisible = true;
 		}
 		else {
@@ -1840,7 +1870,10 @@ function DisplayBox (newid,mode) {
 
 /* verwaltet Objekte vom Typ 'displayBox'.
  * - nicht nur List-Funktionen sondern auch visuelle Interaktionen und Abhängigkeiten (z.B. Schriftgrößen)
- * - id_maxwidth: id von HTMl-Element, definiert, welches durch seine Schriftgröße die Größe der anderen bestimmen soll  
+ * - id_maxwidth: id von HTMl-Element, definiert, welches durch seine Schriftgröße die Größe der anderen bestimmen soll
+ * 
+ * TODO: Idee nicht "List", sondern Container, der Tacho, andere Anzeigen enthält (auf der "Wrapper-"Stufe"), abgeleitete Objekte
+ *   je nach Funktion, allgemein vor allem Aufnahme der positionierungs- und Größendaten + Funktionen  
  */
 function DisplayBoxList(id_maxwidth) {
 	var idmaxwidth;
@@ -2022,39 +2055,48 @@ function resetHud() {
 /* setzt analog und digital-Tacho korrekt einzeln oder übereinander
     - da es nur gleiche Aufrufe gab, jetzt keine Parameter mehr- Elemente direkt genutzt
     - settings Struktur muss initialisiert sein!
+    - NEW: sub-elements ar hidden when whole tacho is hidden
 */
 function setTachoLayout() {
      
-    if (settings.get('tachoswitch')!='false') 
+    if (settings.get('tachoswitch')!='false') {
+    	
 	  $('#tacho-container').show();
-	else $('#tacho-container').hide();
-                   	
-    var a;
-    var d;
-    if (settings.get('digitalanalog')!='false') a = d = true;
-    else {
-		a = (settings.get('analog')=='false') ? false:true;
-		d = (settings.get('digital')=='false') ? false:true;
+	 
+	                   	
+	    var a;
+	    var d;
+	    if (settings.get('digitalanalog')!='false') a = d = true;
+	    else {
+			a = (settings.get('analog')=='false') ? false:true;
+			d = (settings.get('digital')=='false') ? false:true;
+		}
+	
+	    if(a && d) {
+	        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
+	        $('#digital-on-analog').show();    
+	        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();   
+	    }
+	    else if (a && !d) {
+	        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
+	        $('#digital-on-analog').hide();
+	        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();   
+	    }
+	    else if (!a && d) {
+	        $('#cssgauge-wrapper').hide(); cssgauge_visible = false;
+	        displayDigitalspeed.show(); $('#digitalspeed-wrapper').show();
+	    }
+	    else {
+	        $('#cssgauge-wrapper').hide();  cssgauge_visible = false;
+	        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();
+	    }
+	}
+	else {
+		$('#tacho-container').hide();
+		cssgauge_visible = false;
+		displayDigitalspeed.hide();
 	}
 
-    if(a && d) {
-        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
-        $('#digital-on-analog').show();    
-        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();   
-    }
-    else if (a && !d) {
-        $('#cssgauge-wrapper').show(); cssgauge_visible = true;
-        $('#digital-on-analog').hide();
-        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();   
-    }
-    else if (!a && d) {
-        $('#cssgauge-wrapper').hide(); cssgauge_visible = false;
-        displayDigitalspeed.show(); $('#digitalspeed-wrapper').show();
-    }
-    else {
-        $('#cssgauge-wrapper').hide();  cssgauge_visible = false;
-        displayDigitalspeed.hide(); $('#digitalspeed-wrapper').hide();
-    }
 }
 
 
@@ -2122,18 +2164,10 @@ function scaleDisplays(initial) {
        w = h = screen_h;
     }
     
-	var w1 = w; // for col 1
-	var w2 = w; // for col 2
-	
 	// set the positioners to a certain initial width:
 	// (otherwise displays can not init to a certain size)
 	if(initial) {
     	$('.positioner').css('width',screen_w); // first set screen width for all
-    	// TODO: make sure that inner wrapper does not set its width
-	    if (isLandscape) {
-	    }
-	    else {
-	    }		
 	}
     
     //app.Debug (w2);
@@ -2248,25 +2282,20 @@ function scaleDisplays(initial) {
 	        'left': ($('#digital-on-analog').width() - $('#dona-text').width()) / 2 + 'px', 
 	        'top': ($('#digital-on-analog').height() - $('#dona-text').height()) / 2 + 'px'
 	    });
-	    
-        
     }
 }    // scaleDisplays
 
 /* adjusts positions, proportions and sizes of displays,
  * depending on which display is currently visible
  * - also perfoms scaling of displays
- * - to check if maximized size fits: first maximize, then scal down, if not fit
- * - TODO: must only be called when display arrangement changes
- * - TODO: rely less on presets
- * - TODO: displays müssten automatisch auch ohne tacho an höhe anpassen da dann hscreen zu klein!
- * - TODO: prüfe Ausrichtung bei hud on
  * 
  * - TODO: Idee: breite,höhe und layoffset in Object DisplayBox integrieren - dort positioner finden lassen (.parent() in jQuery)
  * - ! do not set height of positioner but of wrapper
  */
 function positionDisplays() {
 		
+	debugger;
+	
 	var hscreen = window.innerHeight
 	|| document.documentElement.clientHeight
 	|| document.body.clientHeight;
@@ -2276,51 +2305,58 @@ function positionDisplays() {
 	
 	// TODO inside display objects??
 	// only use this on outer #...-positioner
-	var digitalspeed_height =  hscreen; // only needed later as result value
-	var digitalspeed_width = screen_w;
+	var digitalspeed_height =  0; // only needed later as result value
+	var digitalspeed_width = 0;  // must be set when visible!
 	var digitalspeed_top = 0;
+	
 	var displays_height = hscreen;
 	var displays_width = screen_w;
 	var displays_top = 0;
- 
+  	
+ 	//app.Debug('position screen: '+screen_w+'x'+hscreen);
+ 	
 	// TODO: may be better more complicated "if" but fewer calculations!
 	// - analog: never resize (until ZOOM is introduced) but influences displays
 	// - digitalspeed: always scaleto y=free, depending on displays visible, only height at last
 	// - displays visible: always scaleto y=free/auto, but dependend on width given by tacho
 	
 	// analog (only center or not)
-	
+				
 	if(cssgauge_visible) {
-		var gaugetop = 0;
+		
+		var gaugeleft = 0;
 		if (isLandscape && displays.noneVisible()) {
-			gaugetop = (screen_w - $('#cssgauge-wrapper').outerWidth())/2;
+			gaugeleft = (screen_w - $('#cssgauge-wrapper').outerWidth())/2;
 		}
 		$('#cssgauge-wrapper').css({
 			'top':'0px',
-			'left': gaugetop+'px'
+			'left': gaugeleft+'px'
 		});		
 	}
 	
 	// digital (scale full or half)
 	
 	else if (displayDigitalspeed.isVisible()) {
+		
+		digitalspeed_width = screen_w;
+		
 		if (isLandscape && !displays.noneVisible()) {
 			digitalspeed_width = screen_w / 2;
 		}
 		
-		$('#digitalspeed-positioner').css({
-			'width':digitalspeed_width+'px',
+		$('#digitalspeed-positioner').css({ // you can set with but not height to absolute
+			'width':digitalspeed_width+'px'
 		});
 
-		// screen cannot be so stretched, that resize must depend on height in landscape mode
+		// screen cannot be sooo stretched, that resize must depend on height in landscape mode
 		// you can use scaleto (although it is called twice when displays visible) -> TODO:
 		displays.scaleTo($('#digitalspeed-wrapper').width(),0); 
 		
 		// must be after scale
-		// wrapper doesn't resizes positioner!
 		digitalspeed_height = $('#digitalspeed-wrapper').outerHeight(true);
+		//console.log(digitalspeed_height);
 		// should always be reasonable value
-		app.Debug(digitalspeed_height);
+
 		if(isLandscape) {
 			digitalspeed_top = (hscreen - digitalspeed_height)/2;
 		}
@@ -2330,6 +2366,8 @@ function positionDisplays() {
 	// displays-block
 
 	if(!displays.noneVisible()) {
+		
+		debugger;
 		
 		$('#displays-wrapper').show();
 		
@@ -2352,80 +2390,86 @@ function positionDisplays() {
 			}
 			displays_height -= displays_top;
 		}
-		
-		if (displayDigitalspeed.isVisible() && !isLandscape) {
-			displays_height -= digitalspeed_height;
-		}
+				
+		// left position and width
+		// TODO: more calcs???
+		$('#displays-positioner').css({
+			'width':displays_width+'px',
+			'left':screen_w-displays_width+'px'
+		});
 		
 		// get offset  for layout (borders margin) depending on landscape
 		var layoutoffset_x = $('#displays-positioner').width() - $('#displays-wrapper').width(); // TODO: make it *once* and save
 		var layoutoffset_y = $('#displays-positioner').height() - $('#displays-wrapper').height(); // TODO: make it *once* and save
-		
+		//app.Debug('offsets:'+layoutoffset_x+'-'+layoutoffset_y);
 		displays.scaleTo(displays_width-layoutoffset_x,0); // y:0 for receiving maximized heights 
 		
-		if (displays_height < $('#displays-positioner').height()) { 
+		if (displays_height < $('#displays-wrapper').outerHeight(true)) { 
 		 	app.Debug('try to scale smaller');
 			displays.scaleTo(displays_width-layoutoffset_x,displays_height-layoutoffset_y); // not hspace but inner height due to layout of wrapper!!
 		}
 		
+		// reset the wrapper height (only to be set when aligned with digital in landscape)
+		displays_height = 'auto';
+		
 		// y center the scaled displays if not height > hscreen
 	
-
 		if (isLandscape) { // y center only in landscape now
 			
 			var dp_height = $('#displays-wrapper').outerHeight(true); // must be taken after scaleTo !
 			if (dp_height < hscreen) displays_top = (hscreen - dp_height) / 2;	
-		}
-		
-		$('#displays-positioner').css({
-			'top':displays_top+'px',
-			'left':screen_w - displays_width +'px', // TODO: check if you can use translate!
-		});
-		
+		}				
 		
 		// change vars to adjust digitalspeed-positioning
 		
 	} // displays visible
-	else $('#displays-wrapper').hide();
+	else {
+		// this is always when no displays seen:
+		$('#displays-wrapper').hide();
+		digitalspeed_height = 'auto';
+	}
 	
 	
 	// adjust vertical position + height of displays and digitalspeed
-	// - height can be preset by scaleTo
+	// - height can be preset by scaleTo (but not manually/directly)
 	// - top must not be set already
 	 
-	if(displayDigitalspeed.isVisible()) {
-		
-		var setdigitalspeed_height = false;
-						
-		var	layoutoffset_digi = $('#digitalspeed-wrapper').outerHeight(true) - $('#digitalspeed-wrapper').outerHeight(); // since box-sizing:border-box 
-		if(isLandscape &&  !displays.noneVisible()) {
+	if (isLandscape && displayDigitalspeed.isVisible() && !displays.noneVisible()) {
 
-			// check which is larger!
-			if(displays_height>digitalspeed_height) {				
-				// ! displays_height + top re-written again:
-				digitalspeed_height = $('#displays-wrapper').outerHeight(true);
-				digitalspeed_top = displays_top;
-				
-				setdigitalspeed_height = true;
-			}
-			else {
-				// displays set top
-				$('#displays-positioner').css('top',digitalspeed_top+'px');
-
-				// make displays smaller
-				$('#displays-wrapper').css('height',digitalspeed_height-($('#displays-wrapper').outerHeight(true)-$('#displays-wrapper').outerHeight())+'px');
-			}
-
+		// check which is larger!
+		if(displays_height>digitalspeed_height) {				
+			digitalspeed_height = $('#displays-wrapper').outerHeight(); // does work when both things have same layout
+			digitalspeed_top = displays_top;
+			
+			displays_height = 'auto';
 		}
-		
-		$('#digitalspeed-positioner').css({
-			'top':digitalspeed_top+'px',
-		});
-		var s;
-		if(!setdigitalspeed_height) s = 'auto';
-		else s = digitalspeed_height-layoutoffset_digi+'px';
-		$('#digitalspeed-wrapper').css('height',s);
+		else {				
+			// displays set top to digitalspeed
+			displays_top = digitalspeed_top;
+			displays_height = $('#digitalspeed-wrapper').outerHeight(); // does work when both things have same layout
+			digitalspeed_height= 'auto';
+		}		
 	}
+	else { 
+		// may be double // TODO: remove when else working
+			displays_height = 'auto';
+			digitalspeed_height = 'auto';		
+	}
+	
+	// set top and height of digital + displays
+	
+	$('#digitalspeed-positioner').css({
+		'top':digitalspeed_top+'px',
+		'left':0                           // just to be sure
+	});
+	$('#digitalspeed-wrapper').css('height',digitalspeed_height); // ! height can also be string "auto"
+		
+	$('#displays-positioner').css({
+		'top':displays_top+'px',
+		'left':screen_w - displays_width +'px'
+	});
+	$('#displays-wrapper').css('height',displays_height); // ! height can also be string "auto"
+	
 }
 
 
@@ -2476,13 +2520,8 @@ function initApp()  {
 	if (initCounter<3 || initCounter > 5) return false;
     
     // ONSTART
-    
-    var lang = (app.GetLanguageCode()).toLowerCase();
-    //if (lang=='de' || lang=='at' || lang=='li') kta.language = 'de'; // ! default language: en
-    $('body').addClass(kta.language); 
-	
+	   
     // init gauge before first scaleDisplays!
-    //DrawGauge();
     gauge = new CssGauge( {
 		'wrapper':'cssgauge-wrapper',
 		'gauge':'cssgauge',
@@ -2535,6 +2574,10 @@ function initApp()  {
     if(settings.get('switchhudsettings')!='false') {
     	settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
     }    
+
+	// TODO: activate switcher when browser lang problem solved
+	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
+	//setLanguage('auto');
     
     // prevent accidently back 
     app.EnableBackKey( false );
@@ -2576,6 +2619,7 @@ function initApp()  {
     $(".switcher").on('tap',function() {
     	resetMenuFade();
         var doPosition = false;
+        var notfound = false;
         var check = $(this).attr('id');
         switch (check) {
             case 'tachoswitch' :
@@ -2652,19 +2696,21 @@ function initApp()  {
                 break;                
             case 'switchautorange':
                 resetTachoRange("save",10);  // current minimum
-                showHint('Speedometer auto range reset to 10','Auto-Bereich zurückgesetzt');
+                showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
                 //settings.switchit(this);
                 break;
-            default: settings.switchit(this);
+            default: notfound = true;
                 break;
         }
 
-        if(doPosition) positionDisplays();
+        if (notfound) return true;
+        else {
+        	if(doPosition) positionDisplays();
 
-        // always (cases are checked inside functions)
-		startGps();
-        
-        return false;
+	        // always (cases are checked inside functions)
+			startGps();        
+        	return false;
+        }
     });
     
     // easy switch tacho layout:
@@ -2688,32 +2734,55 @@ function initApp()  {
 
     // TODO: if id of button stored or can be derived from id of targeted dialog
     // --> you could automate this too
+    
     $("#menubutton").click(function() {
         OnBack();
+        return false;
     });
     $("#tachosettings").on('tap',function() {
         menustack.push('tachosettingsdialog');
+        return false;
     });
     $("#moresettings").on('tap',function() {
         menustack.push('moresettingsdialog');
+        return false;
     });
     $("#resetsettings").on('tap',function() {
         menustack.push('resetsettingsdialog');
+        return false;
     });
     $("#showinfo").on('tap',function() {
         menustack.push('infocard');
+        return false;
     });
+    // TODO: alle, die "Direct options" sind in einen Block - ggf. class!
     $(".switchlocformat").click(function() {
-        gpstool.switchLocFormat();
-        gpstool.switchHud('off');
-        // (for nice coloration highlights as well)
+        if(gpstool.switchLocFormat()=='decimal') 
+        	showHint('tap again for degree values','tippen für Grad-Anzeige');
+        else showHint('tap again for decimal values','tippen für Dezimal-Anzeige');
+        gpstool.switchHud('off');        
+        return false;
     });
     // yes no on back
     $('#yes').on('tap',function() {
         Quit();
+        return false;
     });
     $('#no').on('tap',function() {
         $('#yesnodialog').hide(); // TODO: use menustack, but then u must start it with menustack too
+        return false;
+    });
+    $('#setlanguage').on('tap',function() {
+    	if (kta.language=='de') {
+    		setLanguage('en');
+    		showHint ('tap again for German');
+    	}
+    	else {
+    		setLanguage('de');
+    		showHint ('Erneut tippen für Englisch');    		
+    	}
+    	app.SaveNumber(kta.storage.language,kta.language); // new val already in kta.language
+        return false;
     });
 
  
@@ -2755,7 +2824,7 @@ function initApp()  {
     $('#geobearing,#geoaccuracy').hide();
     
     // TODO: hier auch scaleDisplays(), besonders für Landscape
-    positionDisplays(displayHints); // warum geht nicht? - timing problem??
+    positionDisplays(); // warum geht nicht? - timing problem??
     setGpsWarning(); // display warnings until gps works 
     
     
