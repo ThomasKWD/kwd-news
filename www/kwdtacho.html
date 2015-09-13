@@ -30,16 +30,22 @@
 	
 	TODO: for this release
 
+	- LANGUAGE - Webseiten in Englisch erstmal Links auf *verschiedene* Seiten der Website
+	(sicherer als sich darauf verlassen, dass im Browser gleiche Sprache, da Google z.B. Sprache anders ermittelt...,
+	außerdem in allen Ländern außer de/en evtl. Fehler)
+		
+		
+	TODO: for next release:
+	- ZOOM
+	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
+	- more direct options
+	- skin minimal
 	- LANDSCAPE
 		- Zentrieren von box in vergößertem Wrapper
 		- Zentrieren der wrapper
 		- evtl. landscape displays wrapper vergrößern, wenn analog
 		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
-		
-	TODO: for next release:
-	- ZOOM
-	- LANGUAGE - erstmal Links auf *verschiedene* Seiten der Website (sicherer als sich darauf verlassen, dass im Browser gleiche Sprache, da Google z.B. Sprache anders ermittelt...)	
-	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
+	
 	
 	TODO: nach nächstem Release:
 
@@ -78,6 +84,8 @@
 	  abschalten, wenn Uhr alleine sichtbar)
 	  
 	- BEENDEN bei Landscape möglichst immer sichtbar (einfach nach oben?)
+	
+	TODO: emulator: position des browsers nehmen + network
 -->
 
 
@@ -429,6 +437,7 @@
         }
         #splashscreen img {
             width:100%;
+            max-width:360px;
         }
         #wait {
             width:200px;
@@ -439,6 +448,7 @@
             position:absolute;
             top:0;
             width:100%;
+            min-height:100%;
             overflow:scroll;
             background-color:white;
             color:black;
@@ -592,42 +602,58 @@
 
     <div id="title" class="autofade">
         
-	  <p id="no-gauges"><a class="btn" href="#settings">Anzeigen zuschalten</a></p>
+	  <p id="no-gauges"><a class="btn" href="#settings"><span lang="en">Add meters</span><span lang="de">Anzeigen zuschalten</span></a></p>
 	  
   	</div>
 
     <div id="menu">
         <a class="btn" href="#info">Info</a>
-        <a class="btn" href="#settings">Einstellungen</a>
+        <a class="btn" href="#settings">Einstellungen / Settings</a>
     </div>
     
     <div id="infocard" class="card">
         <h2><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to this Speedometer and GPS Tool</span></h2>
-      <p>by</p>
-	  <a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
-	  <p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
-        
-        <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
+		<p>by</p>
+		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
+		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
+		<p lang="en">Use this GPS speedometer with altitude, geolocation, and current time, especially when you are not driving
+			 a car but going by bicyle, by train, by boat or even by airplane!</p>
+	  	
+	    <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
         Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden.</p>
+        <p lang="en">Sometimes it is useful or even essential to display the current geoloation quickly
+          - even without a network connection -  	e.g. in an emergency.</p>
         
-        <p lang="de">Die Genauigkeit der Höhenangabe sollte nicht überschätzt werden.
+        <p lang="de"><b>Die Genauigkeit</b> der Höhenangabe sollte nicht überschätzt werden.
         Sie liegt etwa im gleichen Bereich wie die der Position, wo die Ungenauigkeit
         selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
-        Ähnliches gilt für die Geschwindigkeitsangabe bei sehr geringen Geschwindigkeiten.</p>
+        Ähnliches gilt für die Geschwindigkeit bei sehr geringen Werten.</p>
         
-        <p lang="de">Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
+        <p lang="en">Note that the <b>accuracy</b> seams limited when observing the height value since it will be the same as 
+        	the accuracy of location. While you expect the location to differ for some meters, it looks odd in terms of height 
+        	when there is in error of 5m or even 100 m (depending on GPS signal). This also applies to very low speed values.</p> 
+        	 
+        
+        <p lang="de">Ihr Gerät benötigt einen <b>GPS-Sensor</b> für die Geschwindigkeit. Netzempfang ist jedoch nicht nötig.
+        	Die App kann auch im "Flugmodus" laufen.
+        	Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
         Ihres Gerätes aktivieren müssen.</p>
+        <p lang="en">Your device must have a <b>GPS-sensor</b> enabled to display speed (see under 'Location' in the devices
+        	settings). You don't need a network connection and can also use the app in "flight mode". 
         
-      	<p lang="de"> Die HUD-Funktion
+      	<p lang="de"> <b>Die HUD-Funktion</b>
         ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen.</p>
+        <p lang="en">With <b>"HUD" (head up display)</b> turned on you can put your device in front of mirroring glass (of an vehicle) to read the 
+        	reflected displays. Note that the brightness of your device ist not high enough for daylight use in most cases.</p>
         
-        <p lang="de">Die Einstellung "Direktauswahl" erlaubt die Änderung einiger Einstellungen, wenn Sie einfach auf die Anzeigen tippen.
+<!--
+	        <p lang="de">Die Einstellung "<b>Direktauswahl</b>" erlaubt die Änderung einiger Einstellungen, wenn Sie einfach auf die Anzeigen tippen.
         	Diese Funktion kann abgeschaltet werden.</p>
         <p lang="en">The option "Direct Config" means you can change some settings by tapping the gauges and values. You can turn of this option in the settings menu.</p>
-        
+-->    
         <p lang="de">Standortdaten werden nicht weiter verarbeitet.</p>
         
-        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KÜHNE-Webdienste.de</a></p>
+        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
         <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung / Privacy policy</a></p>
         <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen / Licenses</a></p>
         
@@ -766,10 +792,10 @@ var app_browsermode = false;
  */
 function setLanguage(lang) {
 
-	var syslang = (app.GetLanguageCode()).toLowerCase();
-	
-	if(lang=='auto') {
-		lang = syslang; // ! overwrite parameter value
+	app.Debug('lang loaded: '+lang);
+	if(!lang || lang=='auto') {
+		lang = (app.GetLanguageCode()).toLowerCase(); // ! overwrite parameter value
+		app.Debug('lang sys: '+lang);	
 	    if (lang=='de' || lang=='at' || lang=='li') kta.language = 'de'; // ! default language: en
 	    else lang = en;
 	}
@@ -1191,7 +1217,7 @@ function GpsTools () {
     };
     
     this.change = function(newlocdata) {
-		app.Debug('loc change');        
+		//app.Debug('loc change');        
 
         // if provider == network, speed has no reasonible value
         // so keep old value unless gps
@@ -1979,8 +2005,8 @@ function fadeMenus() {
 var menutimeout = false;
 function resetMenuFade() {
 	if(menutimeout!==false) clearTimeout(menutimeout);
-	var newtimeout = 2*1000*60;
-	if(menustack.current=='infocard') newtimeout*=5;
+	var newtimeout = 2*1000*60; // 2 miin
+	if(menustack.current=='infocard') newtimeout*=10; // 20 min
 	menutimeout = setTimeout(fadeMenus,newtimeout);
 }
 var fadetimeout = false;
@@ -2773,7 +2799,7 @@ function initApp()  {
     		setLanguage('de');
     		showHint ('Erneut tippen für Englisch');    		
     	}
-    	app.SaveNumber(kta.storage.language,kta.language); // new val already in kta.language
+    	app.SaveText(kta.storage.language,kta.language); // new val already in kta.language
         return false;
     });
 
@@ -2846,11 +2872,12 @@ function OnStart() {
 	
     // frage ob gerade landscape, dann init erst bei resize:
     // TODO: ungünstig formatierte Inhalte leider kurz zu sehen bevor resize kommt.
-    // TODO: diesen Code bei funktionierendem Landscape deaktivieren
-	if (app.GetOrientation()=="Landscape") {
-	initCounter++; // causes init to be done on resize
-	}
-	else initCounter+=2; 
+    // TODO: teste ob code wieder aktiviert werden muss, wenn landscape/portrait als fest gespeichert werden  
+	//if (app.GetOrientation()=="Landscape") {
+	//initCounter++; // causes init to be done on resize
+	//}
+	//else
+		initCounter+=2; 
 	
 	// force portrait until layout is more flexible:
 	//app.SetOrientation( "Portrait" ); 
