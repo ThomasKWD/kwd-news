@@ -20,10 +20,13 @@
 .icon-picture:before { content: '\e812'; } /* '' */
 .icon-picture-1:before { content: '\e813'; } /* '' */
 .icon-android-landscape-512px:before { content: '\e814'; } /* '' */
+.icon-left-big:before { content: '\e815'; } /* '' */
 .icon-moon:before { content: '\e816'; } /* '' */
 .icon-bell-alt:before { content: '\e817'; } /* '' */
 .icon-bell-off:before { content: '\e818'; } /* '' */
 .icon-right:before { content: '\e819'; } /* '' */
+.icon-lock:before { content: '\e81a'; } /* '' */
 .icon-sort-numeric:before { content: '\e81b'; } /* '' */
+.icon-lock-open:before { content: '\e81c'; } /* '' */
 .icon-attention:before { content: '\e81d'; } /* '' */
 .icon-info-circled:before { content: '\e81e'; } /* '' */

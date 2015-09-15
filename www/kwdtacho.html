@@ -30,30 +30,51 @@
 	
 	TODO: for this release
 
-	- LANGUAGE - Webseiten in Englisch erstmal Links auf *verschiedene* Seiten der Website
-	(sicherer als sich darauf verlassen, dass im Browser gleiche Sprache, da Google z.B. Sprache anders ermittelt...,
-	außerdem in allen Ländern außer de/en evtl. Fehler)
-		
-		
+    - TEXTE:
+        - Stil verbessern und kürzen
+    
+	- LANDSCAPE
+		- evtl. landscape displays wrapper vergrößern, wenn analog
+		- position Fehler nach hud korrigieren checke Größen nach resize!
+		  (evtl. gleiches Problem wie bei menu: reagiert nicht beim ersten mal
+		  prüfe auch wieviele resize-Events!)
+	
+	- EINHEITEN
+	    - mph
+	    - knots
+	    - feet
+	
 	TODO: for next release:
+
+	- HUD
 	- ZOOM
+		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
 	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
 	- more direct options
 	- skin minimal
-	- LANDSCAPE
-		- Zentrieren von box in vergößertem Wrapper
-		- Zentrieren der wrapper
-		- evtl. landscape displays wrapper vergrößern, wenn analog
-		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
 	
+	- EMULATOR: simuliere Statusbar und ihr wegschalten (Problem: screen größe
+        -> screen größe grundsätzlich mit droidscript Funktionen 
+        statt reinen webview Variablen, testen!	
+	
+	- .skin-hud von skin-minimal trennen (nur ähnlich)
+	- nachtmodus oder wenigstens minimal skan manuell verfügbar machen
 	
 	TODO: nach nächstem Release:
 
-	- .skin-hud von skin-minimal trennen (nur ähnlich)
+    - PORTRAIT
+        - wieder zentrieren wie früher
+	- bei landscape immer Menüs/Cards zweigeteilt nebeneinander (innen float Blöcke ähnlich bootstrap)
+	    - aber Abfrage auf sehr kompakte displays (Quadrate)
+    
 	- was tun bei sehr quadrat-nahen Bildschirmen? -> evtl. analog Tacho kleiner -> oder einige displays verbergen 
 	andere nicht zu klein werden lassen (Problem tritt bei nur-digital nicht auf)
 	-> Treshhold als ratio w/h einfach im Browser ausprobieren 
-	- untere Ecken von displays-wrapper nicht rund und Rand außerhalb	
+	- untere Ecken von displays-wrapper nicht rund und Rand außerhalb
+	
+	LAYOUT: 
+	- css reduziert und background-color(!) wenn OSVersion < 14 (teste Sebi Handy)
+	- menüs zweispaltig, mit internem scroll, evtl. rand weg oder außerhalb des screens positionieren bei sehr kleinen displays	
 	 
 	TODO:
 	
@@ -76,13 +97,12 @@
 		- wenn 2 immer untereinander	  
 		- gilt für landscape ohne gauge und portrait unter gauge
 		- Länge wird im Objekt bei init gespeichert, genau wie der init-string
-		
 	- bei Tablet Menüs (immer rechts und )immer 90% Höhe und *immer extra Fenster mit Hinweisen*
 	- Tablet Menüs evtl. auch Untermenüs rechts von Hauptmenüs (grundsätzlich Platz für drei Menüs nebeneinander, bei Portrait 2)
 	  - Hilfedialog zuschaltbar (abh. vo Hinweise??)- auch bei phones/portrait (hier Breite des normalen Menüs abh. von *Höhe* in Landsacpe damit nict so breit aussieht...)
 	- im menu einstellbar ob max unt mittel im Hintergrund genommen werden, wenn Tacho aus (dann könnte man ggf. GPS
 	  abschalten, wenn Uhr alleine sichtbar)
-	  
+	
 	- BEENDEN bei Landscape möglichst immer sichtbar (einfach nach oben?)
 	
 	TODO: emulator: position des browsers nehmen + network
@@ -324,6 +344,9 @@
         }
         .speed {
             line-height:1.25em;
+        }
+        .valuefract {
+        	font-size:65%;
         }
         /* kmh wird jetzt unabhängig gesetzt, da es bei analog die Anzeige
         von canvgauge verdeckt.
@@ -571,7 +594,7 @@
 					<!-- change order  when testing finished -->
 					<div class="g-center g-item"></div>
 	            <div id="digital-on-analog" class="hud skin"><div id="dona-text" class="speed gps">0000</div></div>
-	            <div id="info-on-analog"><div class="units-kmh gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
+	            <div id="info-on-analog"><div class="tachounit gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
 		</div>
         <div id="speedstats" class="2-in-a-row">
@@ -581,7 +604,7 @@
 
 		<!-- möglicherweise ungünstig, dies im tachocontainer zu haben-->
 		<div id="digitalspeed-positioner" class="positioner">
-			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade">km/h</div></div></div>
+			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit">km/h</div></div></div>
 		</div>
 		
 	</div><!--tacho-container-->
@@ -617,20 +640,20 @@
 		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
 		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
 		<p lang="en">Use this GPS speedometer with altitude, geolocation and current time, especially when you are not driving
-			 a car but going by bicyle, by train, by boat or even by airplane!</p>
+			 a car but going by bicycle, by train, by boat or even by airplane!</p>
 	  	
 	    <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
         Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden.</p>
         <p lang="en">Sometimes it is useful or even essential to display the current geoloation quickly
           - even without a network connection -  	e.g. in an emergency.</p>
         
-        <p lang="de"><b>Die Genauigkeit</b> der Höhenangabe sollte nicht überschätzt werden.
-        Sie liegt etwa im gleichen Bereich wie die der Position, wo die Ungenauigkeit
+        <p lang="de"><b>Die Genauigkeit</b> der Höhenangabe über NN sollte nicht überschätzt werden.
+        Sie liegt im gleichen Bereich wie die der Position, wo die Ungenauigkeit
         selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
         Ähnliches gilt für die Geschwindigkeit bei sehr geringen Werten.</p>
         
-        <p lang="en">Note that the <b>accuracy</b> seems very low when observing the height value since it will be the same as 
-        	the accuracy of location. While you expect the location to differ for some meters, it looks odd in terms of height 
+        <p lang="en">Note that sometimes the <b>accuracy</b> seems very low when observing the altitude (above sea level) since it will be the same as 
+        	the accuracy of location. While you expect the location to differ for several meters, it looks odd in terms of altitude
         	when there is in error of 3m or even 50 m (depending on GPS signal). This also applies to very low speed values.</p> 
         	 
         
@@ -651,11 +674,14 @@
         	Diese Funktion kann abgeschaltet werden.</p>
         <p lang="en">The option "Direct Config" means you can change some settings by tapping the gauges and values. You can turn of this option in the settings menu.</p>
 -->    
-        <p lang="de">Standortdaten werden nicht weiter verarbeitet.</p>
+        <p lang="de">Standortdaten werden nicht gespeichert, gesendet  oder anders weitergegeben.</p>
+        <p lang="en">Geo location data are not stored, send or shared in any way.</p>
+        <p lang="de"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
+        <p lang="en"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=52">Privacy policy</a></p>
         
-        <p>KWD Tacho Version 1.10 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
-        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung / Privacy policy</a></p>
-        <p><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen / Licenses</a></p>
+        <p>KWD Tacho Version 1.30 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
+        <p lang="de"><a lang="de" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
+        <p lang="en"><a lang="en" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=51">Licenses</a></p>
         
         <p lang="de">Diese App verzichtet auf Werbe-Einblendungen und ist dennoch kostenlos.
         Falls Ihnen die App gefällt, können Sie ihre Entwicklung voran treiben,
@@ -691,11 +717,11 @@
 
       <a id="tachoswitch" class="switcher switched-on" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
 	  <a id="switchtime" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhrzeit</span><span lang="en">Time</span></a>
-	  <a id="switchaltitude" class="switcher switched-on" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="en">Altitude above sea level</span><span lang="de">Höhe über NN</span></a>
+	  <a id="switchaltitude" class="switcher switched-on" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="en">Altitude</span><span lang="de">Höhe</span></a>
 	  <a id="switchposition" class="switcher switched-on" href="#"><span class="fa icon-location"></span><span lang="en">Geo-location</span><span lang="de">Position</span></a>
 	  <a id="switchhudsettings" class="switcher" href="#"><span class="fa icon-sort-numeric mirror"></span>HUD</a>
-      <a id="moresettings" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="en">Settings ...</span><span lang="de">Einstellungen ...</span></a>
-	  <a id="showinfo" class="switcher menuitem" href="#"><span class="fa icon-info-circled"></span>Info ...</a>
+      <a id="moresettings" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="en">Settings</span><span lang="de">Einstellungen</span></a>
+	  <a id="showinfo" class="switcher menuitem" href="#"><span class="fa icon-info-circled"></span>Info</a>
 	  <!--<a id="switchbackkey" class="switcher switched-on" href="#"><span class="fa icon-ok"></span> Beenden mit Zurück-Taste</a>-->
 	  
 
@@ -709,7 +735,8 @@
 
 	      <a id="digitalanalog" class="switcher switched-on radio" href="#"><span class="fa icon-gauge-2"></span>Digital + Analog</a>
 	      <a id="digital" class="switcher radio" href="#"><span class="fa icon-sort-numeric"></span><span lang="de">Nur </span>Digital<span lang="en"> only</span></a>
-		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span><span lang="de">Nur </span>Analog<span lang="en"> only</span></a>        
+		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span><span lang="de">Nur </span>Analog<span lang="en"> only</span></a>
+		  <a id="switchunits" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="de">Maßeinheit</span><span lang="en">Units</span> (<span class="tachounit">km/h</span>)</a> 
 	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span><span lang="de">Wertebereich zurücksetzen</span><span lang="en">Reset speedometer range</span></a>	  
 		  <!--
 		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
@@ -722,11 +749,22 @@
 		  -->
     </div>
 
+    <div id="unitsettings" class="dialog">
+        <h3><span lang="en">Measure of Speedometer</span><span lang="de">Tachometer Einheit</span></h3>
+
+	      <a id="setkmh" class="switcher switched-on unitradio" href="#"><span class="fa icon-dot-circled"></span>km/h</a>
+	      <a id="setmph" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>mph</a>
+	      <a id="setkn" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>kn</a>
+	      <a id="setms" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>m/s</a>
+    </div>
+
+	
     <div id="moresettingsdialog" class="dialog">
         <h3><span lang="en">Settings</span><span lang="de">Einstellungen</span></h3>
 
-	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span> ...</a>
-       <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show notes on functions</span></a>
+	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
+        <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">1-Click-Auswahl</span><span lang="en">One touch settings</span></a>
+        <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
 	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
     </div>        
@@ -758,9 +796,12 @@
 function KwdTachoApp() {
 	// public members
 	this.language = 'en';
+	this.tachounit = 'kmh';
+	this.fastoptions = true;
 	
 	this.storage = {
-		language : 'tacholanguage'	
+		language : 'tacholanguage',
+		altunits : 'tachoaltitudeunits'
 	};
 }
 
@@ -803,6 +844,11 @@ function setLanguage(lang) {
 	$('body').removeClass('de'); // works because multiple addClass do not add more classes :-)
 	$('body').addClass(lang);
 	
+    // make some dialogs height depending on main menu
+	// outerheight -> corresponds to box-sizing!
+	// must be done here because on initApp are both languages displayed + height could change with language
+	$('#moresettingsdialog,#tachosettingsdialog,#unitsettings').css('min-height',$('#settingsdialog').outerHeight()+'px');
+
 	kta.language = lang; 
 }
 
@@ -1010,6 +1056,7 @@ function loc_OnChange( data )
 function GpsTools () {
     //private:
     var speed =0.0;
+    var speedfactor = 3.6;
     var lastspeed = 0.0;
     var dspeed = 0.0;
     var step = 0.0;
@@ -1036,6 +1083,13 @@ function GpsTools () {
     var average_groupsize = 2;
     var average_treshhold = 5400;
  
+ 	this.speedFactor = function(newfactor) {
+ 		if (newfactor) {
+ 			speedfactor = newfactor;
+ 		}	
+ 		return speedfactor;
+ 	};
+ 	
     function ConvertDDToDMS(D, lng){
         return {
             dir : D<0?lng?'W':'S':lng?'E':'N',
@@ -1077,7 +1131,8 @@ function GpsTools () {
         - makes timestamp from hours
         - stores timestamp internally
         - does NOT auto save averagespeed persisently (must be done seperately, eg. on resetAutoFade/resetHud, or OnPause)
-
+		- TODO: save also pure m/s-speed for compare maxvalue + average value -> unit change must not change results
+		
         akt. Implementation: 
         - gleich bei Beginn Gruppe mit 2, dadurch alle 2 s ein neuer Wert
         - dann Gruppen gestaffelt 2,4,8,16 
@@ -1216,6 +1271,9 @@ function GpsTools () {
         
     };
     
+    /* call back for change by GPS
+      * - uses displayspeed for tachoRange... and speed (raw) for max and average
+     */
     this.change = function(newlocdata) {
 		//app.Debug('loc change');        
 
@@ -1232,10 +1290,6 @@ function GpsTools () {
             speed =  newlocdata.speed;
             if (speed < 0) speed = 0; // for the case of calculation or rounding errors
             //(if speed is momentarily <0 this can disturb statictic/display functions of app)
-            speed *= 3.6; // km/h
-            // kmhspeed = speed * 3.6;  // planned
-            // mphspeed = speed * 0.44704; // planned
-            // knspeed = speed * 0.514444; // planned
             
             //currently not used $('#bearingtext').text(newlocdata.bearing+'°');
             //currently not used $('#bearinginfo').text('GPS');
@@ -1243,26 +1297,39 @@ function GpsTools () {
 
 	        //if (speedtest<50) speedtest+=0.9;
 	        //else speedtest+=9;
-	        //speed=speedtest;// test value for debug
-	        //speed=42;
+	        //speed=speedtest;
+	        
 	        
 	        //TODO: turn on: this.averageSpeed(speed);
 	        this.maxSpeed(speed);
 	        
+	        var displayspeed = speed * speedfactor;
+	        
+	        // for screenshots
+	        //displayspeed=42;
+	        
 	        var ss = "";
 	        //sieht Scheiße aus: if (speed < 10) ss = speed.toFixed(1); //eine Kommastelle bei <10 km/h
-	        // Kommastelle nur wenn hinterer Teil ganz kleine Schrift
-	        ss = Math.round(speed);
+	        // Kommastelle nur wenn hinterer Teil kleinere Schrift , dazu zusätzliches html einfügen
+	        if(displayspeed < 20 && speedfactor < 3.6) {
+	        	
+	        	var sss = ""+displayspeed.toFixed(1);
+	        	sss = sss.replace('.','<span class="valuefract">.');	        	
+				$('.speed').html(sss+'</span>');
+			}
+			else {
+				ss = Math.round(displayspeed);	        
+				$('.speed').html(ss);
+			}
 	        
-	        $('.speed').text(ss);
 	
 	        if (cssgauge_visible) { // flag for performance
 		        // correct scale if >1000 or <1000
-		        if (speed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
-		        else if (speed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
+		        if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
+		        else if (displayspeed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
 		        
-	        	if (speed > 0) this.tachoRange(speed); // must not be <= 0  (accidently)
-	        	gauge.setValue(speed); // hier den exakten float value nutzen
+	        	if (displayspeed > 0) this.tachoRange(displayspeed); // must not be <= 0  (accidently)
+	        	gauge.setValue(displayspeed); // hier den exakten float value nutzen
 	        }
         }
         else {
@@ -1278,8 +1345,10 @@ function GpsTools () {
         //currently not used  $('#accuracytext').text(newlocdata.accuracy); 
         // analog speed testing: 
         
-
-
+        // for screenshots:
+        //lat = 52.5162731;
+        //lon = 13.3777052;
+        
         //step = (speed - lastspeed) / 4;
         //stepcount=0;
         //dspeed = lastspeed;
@@ -2229,11 +2298,7 @@ function scaleDisplays(initial) {
         var woff = (screen_w - $(this).outerWidth(true)) / 2;
         return woff+'px';
     });
-    
-    // make some dialogs height depending on main menu
-	// outerheight -> corresponds to box-sizing!
-	$('#moresettingsdialog,#tachosettingsdialog').css('min-height',$('#settingsdialog').outerHeight()+'px');
-	
+    	
 	// jetzt können alle versteckt werden:
     //$('.dialog').hide(); // TODO: auch wenn nicht initial??
 
@@ -2355,7 +2420,6 @@ function positionDisplays() {
 	
 	else if (displayDigitalspeed.isVisible()) {
 		
-		debugger;
 		digitalspeed_width = screen_w;
 		
 		if (isLandscape && !displays.noneVisible()) {
@@ -2452,7 +2516,6 @@ function positionDisplays() {
 	// - top must not be set already
 	 
 	if (isLandscape && displayDigitalspeed.isVisible() && !displays.noneVisible()) {
-			debugger;				
 
 		// check which is larger!
 		if(displays_height>digitalspeed_height) {				
@@ -2527,7 +2590,18 @@ zählt bis 2 oder 3 (mit resize) um initApp() zu starten
 10: init bereits ausgeführt */
 var initCounter = 0;
 
-    
+function setTachoUnits(newunits) {
+	var txt = '';
+	var factor = 1;
+	switch(newunits) {
+		case 'mph' : txt = 'mph'; factor = 2.236936; showHint('Miles per hour','Meilen je Stunde'); break;
+		case 'ms'  : txt = 'm/s'; factor = 1; showHint('Meters per second','Meter je Sekunde'); break;
+		case 'kn'  : txt = 'kn'; factor =  1.9438445; showHint('Knots','Knoten'); break;
+		default : txt = 'km/h'; factor =   3.6; showHint('Kilometers per hour','Kilometer je Stunde'); break;
+	}
+	gpstool.speedFactor(factor);
+	$('.tachounit').text(txt);
+}    
 
 /* vereint alle Programmstartfunktionen
 (sinn siehe caller)
@@ -2592,11 +2666,12 @@ function initApp()  {
     if(settings.get('switchhudsettings')!='false') {
     	settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
     }    
-
-	// TODO: activate switcher when browser lang problem solved
-	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
-	//setLanguage('auto');
     
+	if (settings.get('switchfastoptions')!='false') kta.fastoptions = true;
+	else kta.fastoptions = false;
+		
+	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
+        
     // prevent accidently back 
     app.EnableBackKey( false );
 
@@ -2628,6 +2703,7 @@ function initApp()  {
 				// TODO: check if another menu COULD come in between!
 				OnBack();
 				break;
+			default: return true;
 	        }
         
         return false;
@@ -2637,7 +2713,7 @@ function initApp()  {
     $(".switcher").on('tap',function() {
     	resetMenuFade();
         var doPosition = false;
-        var notfound = false;
+        var unittext = '';
         var check = $(this).attr('id');
         switch (check) {
             case 'tachoswitch' :
@@ -2717,23 +2793,47 @@ function initApp()  {
                 showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
                 //settings.switchit(this);
                 break;
-            default: notfound = true;
+            case 'switchunits':
+            	menustack.push('unitsettings');
+				break;
+            case 'setkmh': unittext = 'kmh'; break;      	
+            case 'setmph': unittext = 'mph'; break;    	
+            case 'setms':  unittext = 'ms'; break;   	
+            case 'setkn':  unittext = 'kn'; break;   	
+            case 'switchfastoptions':
+            	if(settings.switchit(this)) {
+            		showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
+         			$('.fa',this).addClass('icon-lock-open');
+         			$('.fa',this).removeClass('icon-lock');
+         			kta.fastoptions = true;
+            	}
+            	else {
+            		showHint('Go to settings to change anything','Alle Änderugnen in den Einstellungen');
+         			$('.fa',this).removeClass('icon-lock-open');
+         			$('.fa',this).addClass('icon-lock');
+         			kta.fastoptions = false;
+            	}
+            	break;
+            default: return true;
                 break;
         }
 
-        if (notfound) return true;
-        else {
-        	if(doPosition) positionDisplays();
-
-	        // always (cases are checked inside functions)
-			startGps();        
+        if (unittext) {
+        	settings.radio('.unitradio',this);
+        	setTachoUnits(unittext);
+        	OnBack(); // proceed like Android select menu
         	return false;
         }
+        else if(doPosition) positionDisplays();
+
+        // always (cases are checked inside functions)
+		startGps();        
+    	return false;
     });
     
     // easy switch tacho layout:
 	$('#tacho-container').click(function() {		
-    	if(settings.get('tachoswitch')!='false') {
+    	if(kta.fastoptions && settings.get('tachoswitch')!='false') {
     		var next;
     		if (settings.get('digitalanalog')!='false') next = 'digital';
     		else if (settings.get('digital')!='false') next = 'analog';
@@ -2743,13 +2843,28 @@ function initApp()  {
 	        setTachoLayout();            	
 	        positionDisplays();
 	        switch(next) {
-	        	case 'digitalanalog':showHint('tap again for Digital display','Erneut Tippen für Digital'); break;
-	        	case 'digital': showHint('tap again for Analog display','Erneut Tippen für Analog'); break;
-	        	case 'analog': showHint('tap again for both displays','Erneut Tippen für Digital + Analog'); break;
+	        	case 'digitalanalog':showHint('Touch again for Digital display','Erneut Tippen für Digital'); break;
+	        	case 'digital': showHint('Touch again for Analog display','Erneut Tippen für Analog'); break;
+	        	case 'analog': showHint('Touch again for both displays','Erneut Tippen für Digital + Analog'); break;
 	        }
+	        return false;
     	} 
+    	else return true;
 	});
 
+
+	$('.tachounit').click(function(){
+		if (kta.fastoptions) {
+			var newunit = 'kmh';
+			if(settings.get('setkmh')=='true') newunit = 'mph';
+			if(settings.get('setmph')=='true') newunit = 'kn';
+			if(settings.get('setkn')=='true') newunit = 'ms';
+			setTachoUnits(newunit);
+			settings.radio('.unitradio',$('#set'+newunit));
+			return false;
+		}
+		else return true;
+	});
     // TODO: if id of button stored or can be derived from id of targeted dialog
     // --> you could automate this too
     
@@ -2775,11 +2890,14 @@ function initApp()  {
     });
     // TODO: alle, die "Direct options" sind in einen Block - ggf. class!
     $(".switchlocformat").click(function() {
-        if(gpstool.switchLocFormat()=='decimal') 
-        	showHint('tap again for degree values','tippen für Grad-Anzeige');
-        else showHint('tap again for decimal values','tippen für Dezimal-Anzeige');
-        //gpstool.switchHud('off');        
-        return false;
+    	if(kta.fastoptions) {    		
+	        if(gpstool.switchLocFormat()=='decimal') 
+	        	showHint('Touch again for degree values','Tippen für Grad-Anzeige');
+	        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
+	        //gpstool.switchHud('off');        
+	        return false;
+    	}
+    	else return true;
     });
     // yes no on back
     $('#yes').on('tap',function() {
@@ -2793,7 +2911,7 @@ function initApp()  {
     $('#setlanguage').on('tap',function() {
     	if (kta.language=='de') {
     		setLanguage('en');
-    		showHint ('tap again for German');
+    		showHint ('Touch again for German');
     	}
     	else {
     		setLanguage('de');
@@ -2819,6 +2937,12 @@ function initApp()  {
     
     gpstool = new GpsTools(); //global var speed now named: gpstool
    
+	var units = 'kmh';
+	if(settings.get('setmph')=='true') units = 'mph';
+	else if(settings.get('setms')=='true') units = 'ms';
+	else if(settings.get('setkn')=='true') units = 'kn';
+	setTachoUnits(units); // must be after gpstool init
+
     //Create and start location sensor. 
     //(Achievable update rate is hardware specific) 
     loc = app.CreateLocator( "GPS,Network" ); 
@@ -2895,12 +3019,18 @@ $(document).ready(function() {
 	
 	 // more reliable than onconfig ! :-)
 	 $(window).resize(function() {
+
+	 	var rc; // check if closure works
+	 	
+	 	if (typeof rc == 'undefined') rc = 0;
+	 	else rc++;
         // TODO: only if really needed: 
         //      handle problem with possible multiple trigger resize events in some cases
         
         // TODO: warum reagiert nicht, wenn Statusbar des Gerätes weg ??
         // TODO: teste ob OnConfig bei Statusbar-weg reagiert !
-        app.Debug("on window resize");
+        app.Debug("window resize "+rc);
+        
 		initCounter++;
 		if (initApp()==false) {
             // resize after init
