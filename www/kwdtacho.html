@@ -197,13 +197,20 @@
         .lastswitcher {
             border-bottom:1px solid white;
         }
-        .fa {
-            color:#dd0000;
+        .fa,
+        .fa-black {
             display:inline-block;
             width:40px;
             padding-right:20px;
         }
-        .switched-on .fa {
+        .switcher .fa {
+            color:#dd0000;
+        }        
+        .switcher .fa-black {
+        	color:#000000;
+        }
+        .switched-on .fa,
+        .switched-on .fa-black {
 			color :#00dd00;
 		}
 		.menuitem .fa
@@ -425,7 +432,7 @@
             color:white;
             border-color:#CC0000;
         }
-        #warningdialog h1 {
+        #warningdialog h3 {
             color:red;
             text-align:center;
         }
@@ -691,8 +698,8 @@
     </div>
 
   <div id="warningdialog" class="dialog">
-    <h1 lang="de">Warnung!</h1>
-    <h1 lang="en">Warning!</h1>
+    <h3 lang="de">Warnung!</h3>
+    <h3 lang="en">Warning!</h3>
     
     <p  lang="de">Verwendung auf eigene Gefahr!</p>
     <p  lang="en">Use this app at your own risk!</p>
@@ -701,6 +708,8 @@
     	<p lang="de">Bedienen Sie diese App nicht,
       während Sie ein Fahrzeug oder eine Maschine steuern! Starten Sie die App vor Beginn der Fahrt/Tätigkeit!</p>
       
+    <p lang="en">The use of the HUD (projecting a display on to a windscreen or window of a vehicle) may not be allowed when used in vehicles in traffic in some countries, states or regions.</p>
+
     <p lang="en">The display timeout of your device is disabled. Don't let the device unattended!</p>
     <p lang="de"> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert.
       Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
@@ -708,6 +717,15 @@
 	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Proceed</span></a></p>
   </div>
 
+	<div id="newsdialog" class="dialog">
+		<h3 lang="en">News</h3>
+		<h3 lang="de">Neu</h3>
+		<p lang="en">Now you can change units of measure (e.g. km/h or mph) directly by touching the unit text. You can also change the type of speedometer directly.
+			Turn off these "One touch settings" in the settings.</p>
+		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden.</p>
+		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+	</div>
+	
     <div id="settingsdialog" class="dialog">
         <h3 lang="de">Auswahl</h3>
         <h3 lang="en">Options</h3>
@@ -723,7 +741,7 @@
 	  
 
         <!--<a class="btn" href="#info">Info</a>-->
-        <a class="btn" href="#exit"><span lang="en">EXIT app</span><span lang="de">App BEENDEN</span></a>
+        <a class="btn" href="#exit"><span lang="en">EXIT APP</span><span lang="de">APP BEENDEN</span></a>
         <!--<a class="btn" href="#cancel">Abbrechen</a>-->
     </div>
     
@@ -2690,6 +2708,10 @@ function initApp()  {
     if(settings.get('switchwarning')=='false')  {
         displayHints = false;
     }
+    if(settings.get('switchnews1')!=='false') {
+    	menustack.push('newsdialog');
+    }
+    
     // this is the WARNING
     if(settings.get('switchredwarning')!='false')  {
     	menustack.push('warningdialog'); // note: all dialogs hidden by default!
@@ -2854,6 +2876,9 @@ function initApp()  {
             	setAltimeterUnits(check);
             	OnBack();
             	break;
+            case 'switchnews1':
+            	settings.switchit(this);
+            	break;
             default: return true;
                 break;
         }
@@ -2993,7 +3018,10 @@ function initApp()  {
     
     gpstool = new GpsTools(); //global var speed now named: gpstool
    
-	var units = 'kmh';
+	var units = 'setalt-m';
+	if(settings.get('setalt-ft')=='true') units = 'setalt-ft';
+	setAltimeterUnits(units);
+	units = 'kmh';
 	if(settings.get('setmph')=='true') units = 'mph';
 	else if(settings.get('setms')=='true') units = 'ms';
 	else if(settings.get('setkn')=='true') units = 'kn';
