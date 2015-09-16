@@ -39,10 +39,7 @@
 		  (evtl. gleiches Problem wie bei menu: reagiert nicht beim ersten mal
 		  prüfe auch wieviele resize-Events!)
 	
-	- EINHEITEN
-	    - mph
-	    - knots
-	    - feet
+	- EINHEITEN für Höhe m / ft
 	
 	TODO: for next release:
 
@@ -613,7 +610,7 @@
     
     <div id="displays-wrapper" class="skin">    	
 	    <div id="time" class="hud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
-	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade">m</div> </div>
+	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit">m</div> </div>
 		<div id="geolocation" class="hud switchlocformat display-box skin"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
     </div>
    </div>
@@ -758,11 +755,19 @@
 	      <a id="setms" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>m/s</a>
     </div>
 
+    <div id="altitudeunitsettings" class="dialog">
+        <h3><span lang="en">Measure of Altimeter</span><span lang="de">Höhen-Einheit</span></h3>
+
+	      <a id="setalt-m" class="switcher switched-on altunits" href="#"><span class="fa icon-dot-circled"></span>m (Meter<span lang="en">s</span>)</a>
+	      <a id="setalt-ft" class="switcher altunits" href="#"><span class="fa icon-dot-circled"></span>ft (<span lang="en">Feet</span><span lang="de">Fuß</span>)</a>
+    </div>
+
 	
     <div id="moresettingsdialog" class="dialog">
         <h3><span lang="en">Settings</span><span lang="de">Einstellungen</span></h3>
 
 	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
+	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Höhenanzeige</span><span lang="en">Altimeter</span></a>
         <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">1-Click-Auswahl</span><span lang="en">One touch settings</span></a>
         <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
@@ -801,7 +806,6 @@ function KwdTachoApp() {
 	
 	this.storage = {
 		language : 'tacholanguage',
-		altunits : 'tachoaltitudeunits'
 	};
 }
 
@@ -847,7 +851,8 @@ function setLanguage(lang) {
     // make some dialogs height depending on main menu
 	// outerheight -> corresponds to box-sizing!
 	// must be done here because on initApp are both languages displayed + height could change with language
-	$('#moresettingsdialog,#tachosettingsdialog,#unitsettings').css('min-height',$('#settingsdialog').outerHeight()+'px');
+	// TODO: extra class or search for .dialog except #settingsdialog :-)
+	$('#moresettingsdialog,#tachosettingsdialog,#unitsettings,#altitudeunitsettings').css('min-height',$('#settingsdialog').outerHeight()+'px');
 
 	kta.language = lang; 
 }
@@ -1065,6 +1070,7 @@ function GpsTools () {
     var lon = 0;
     var locformat = true; // if true format in ° ' ", otherwise float val
     var alt = 0;
+    var altfactor = 1;
     var hud = false;
     var that=this;
     var maxspeed = 0; 
@@ -1088,6 +1094,13 @@ function GpsTools () {
  			speedfactor = newfactor;
  		}	
  		return speedfactor;
+ 	};
+ 	
+ 	this.altitudeFactor = function(newfactor) {
+ 		if (newfactor) {
+ 			altfactor = newfactor;
+ 		}	
+ 		return altfactor;
  	};
  	
     function ConvertDDToDMS(D, lng){
@@ -1341,7 +1354,7 @@ function GpsTools () {
 		// but only set if not 0
         if (newlocdata.latitude!=0) lat = newlocdata.latitude; // TODO: check if you should round!
         if (newlocdata.longitude!=0) lon = newlocdata.longitude;    // TODO: check if you should round!
-        if (newlocdata.altitude!=0) alt = newlocdata.altitude; // TODO: check if you should round!
+        if (newlocdata.altitude!=0) alt = newlocdata.altitude * altfactor; // TODO: save alt * factor seperatly if storage of data needed
         //currently not used  $('#accuracytext').text(newlocdata.accuracy); 
         // analog speed testing: 
         
@@ -2603,6 +2616,23 @@ function setTachoUnits(newunits) {
 	$('.tachounit').text(txt);
 }    
 
+function setAltimeterUnits(newunits) {
+	var txt = '';
+	var factor = 1;
+	if(newunits=='setalt-ft') {
+		txt = 'ft';
+		factor = 3.280839;
+		showHint('Feet','Fuß');
+	}
+	else {
+		txt = 'm';
+		factor = 1;
+		showHint('Meters','Meter');
+	}
+	gpstool.altitudeFactor(factor);
+	$('.altitudeunit').text(txt);
+}    
+
 /* vereint alle Programmstartfunktionen
 (sinn siehe caller)
 - returns: true: Code ausgeführt,
@@ -2612,7 +2642,11 @@ function initApp()  {
 	if (initCounter<3 || initCounter > 5) return false;
     
     // ONSTART
-	   
+	
+	// add back arrow to each menu except warning, 
+	$('.dialog').prepend(function() {
+		
+	}); 
     // init gauge before first scaleDisplays!
     gauge = new CssGauge( {
 		'wrapper':'cssgauge-wrapper',
@@ -2814,11 +2848,18 @@ function initApp()  {
          			kta.fastoptions = false;
             	}
             	break;
+            case 'setalt-ft':
+            case 'setalt-m':
+            	settings.radio('.altunits',this);
+            	setAltimeterUnits(check);
+            	OnBack();
+            	break;
             default: return true;
                 break;
         }
 
         if (unittext) {
+        	// TODO: eleganter: set von 'check' abschneiden und Aufruf (siehe setAltimeterUnits())
         	settings.radio('.unitradio',this);
         	setTachoUnits(unittext);
         	OnBack(); // proceed like Android select menu
@@ -2865,6 +2906,17 @@ function initApp()  {
 		}
 		else return true;
 	});
+	$('.altitudeunit').click(function() {
+		if (kta.fastoptions) {
+			var newunit = 'setalt-m';
+			if(settings.get('setalt-ft')=='true') newunit = 'setalt-m'; // TODO: getter of set element of a radio group
+			else newunit = 'setalt-ft';
+			setAltimeterUnits(newunit);
+			settings.radio('.altunits',$('#'+newunit));
+			return false;
+		}
+		else return true;		
+	});
     // TODO: if id of button stored or can be derived from id of targeted dialog
     // --> you could automate this too
     
@@ -2876,6 +2928,10 @@ function initApp()  {
         menustack.push('tachosettingsdialog');
         return false;
     });
+    $("#altitudesettings").on('tap',function() {
+        menustack.push('altitudeunitsettings');
+        return false;
+    });    
     $("#moresettings").on('tap',function() {
         menustack.push('moresettingsdialog');
         return false;
