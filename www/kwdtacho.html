@@ -176,6 +176,18 @@
         /*  switcher must not have .btn
             can have class "switched-on" to determine state
         */
+        a.back-arrow,
+        a.back-arrow:link,
+        a.back-arrow:visited,
+        a.back-arrow:hover,
+        a.back-arrow:focus,
+        a.back-arrow:active {
+       		color:white;
+       		display:inline-block;
+       		margin-left:-0.25em;
+       		margin-right:0.75em;
+       	}
+       	
         a.switcher,
         a.switcher:link,
         a.switcher:visited,
@@ -714,7 +726,7 @@
     <p lang="de"> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert.
       Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
       
-	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Proceed</span></a></p>
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
   </div>
 
 	<div id="newsdialog" class="dialog">
@@ -722,7 +734,8 @@
 		<h3 lang="de">Neu</h3>
 		<p lang="en">Now you can change units of measure (e.g. km/h or mph) directly by touching the unit text. You can also change the type of speedometer directly.
 			Turn off these "One touch settings" in the settings.</p>
-		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden.</p>
+		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden unter "Schnellauswahl".</p>
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
 		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
 	
@@ -785,8 +798,8 @@
         <h3><span lang="en">Settings</span><span lang="de">Einstellungen</span></h3>
 
 	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
-	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Höhenanzeige</span><span lang="en">Altimeter</span></a>
-        <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">1-Click-Auswahl</span><span lang="en">One touch settings</span></a>
+	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Einheit der Höhenanzeige</span><span lang="en">Altimeter units</span> (<span class="altitudeunit"></span>)</a>
+        <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">Schnellauswahl</span><span lang="en">One touch settings</span></a>
         <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
 	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
@@ -1822,7 +1835,7 @@ function PopupStack() {
 		if (stack.length) {
 		  var e = stack[stack.length-1];
 		  if (e.id) {
-		      app.Debug(e.id);
+		      //app.Debug(e.id);
 		      return e.id; // TODO: check if can be written like that!
 		  }
 		}
@@ -2098,6 +2111,7 @@ function DisplayBoxList(id_maxwidth) {
 // in browser global var important:
 var gauge = null;
 
+//TODO: stop timeout by scroll event
 function fadeMenus() {
 	//if(menustack.current()!==false) $('.dialog').fadeOut();// TODO: fade mit complete function
 	menustack.clear();
@@ -2105,8 +2119,8 @@ function fadeMenus() {
 var menutimeout = false;
 function resetMenuFade() {
 	if(menutimeout!==false) clearTimeout(menutimeout);
-	var newtimeout = 2*1000*60; // 2 miin
-	if(menustack.current()=='infocard') newtimeout*=10; // 20 min
+	var newtimeout = 1000*60; // 60s
+	if(menustack.current()=='infocard') newtimeout*=4; // 4 min
 	menutimeout = setTimeout(fadeMenus,newtimeout);
 }
 var fadetimeout = false;
@@ -2662,8 +2676,8 @@ function initApp()  {
     // ONSTART
 	
 	// add back arrow to each menu except warning, 
-	$('.dialog').prepend(function() {
-		
+	$('.dialog>h3,.card>h2').not('#warningdialog>h3,#newsdialog>h3').prepend(function() {
+		return '<a href="#back" class="back-arrow"><span class="icon-left-big"></span></a> ';  
 	}); 
     // init gauge before first scaleDisplays!
     gauge = new CssGauge( {
@@ -2708,9 +2722,10 @@ function initApp()  {
     if(settings.get('switchwarning')=='false')  {
         displayHints = false;
     }
-    if(settings.get('switchnews1')!=='false') {
+    if(settings.get('switchnews1')!=='true') { // ! here: hide when true
     	menustack.push('newsdialog');
     }
+    
     
     // this is the WARNING
     if(settings.get('switchredwarning')!='false')  {
@@ -2874,7 +2889,7 @@ function initApp()  {
             case 'setalt-m':
             	settings.radio('.altunits',this);
             	setAltimeterUnits(check);
-            	OnBack();
+            	//OnBack();
             	break;
             case 'switchnews1':
             	settings.switchit(this);
@@ -2887,7 +2902,7 @@ function initApp()  {
         	// TODO: eleganter: set von 'check' abschneiden und Aufruf (siehe setAltimeterUnits())
         	settings.radio('.unitradio',this);
         	setTachoUnits(unittext);
-        	OnBack(); // proceed like Android select menu
+        	//OnBack(); // proceed like Android select menu
         	return false;
         }
         else if(doPosition) positionDisplays();
@@ -3002,10 +3017,26 @@ function initApp()  {
         return false;
     });
 
+ 	$('.back-arrow').on('tap',function() {
+ 		OnBack();
+ 		return false;
+ 	});
  
-   
+   	//TODO: evtl. nötig wenn nur im Dialograhmen gescrollt
+   	/*$('.dialog,.card').scroll(function() {
+   		//resetMenuFade();
+   		console.log('scroll');
+   	});
+	*/
+	// TODO: timeout wie bei resize bei tangara
+	$(window).scroll(function() {
+		//console.log('window scroll');
+		resetMenuFade();
+	});
+
+
 	//Zeug von OnStart:
-	
+
 
     //settings.init('backkey',true); // init bewirkt, dass true nur gesetzt wird, wenn es nicht geladen werden konnte
     // init ist meist nicht nötig, wenn im html der gewünschte Anfangsstatus gesetzt ist
