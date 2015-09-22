@@ -695,7 +695,7 @@
         <p lang="de"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
         <p lang="en"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=52">Privacy policy</a></p>
         
-        <p>KWD Tacho Version 1.30 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
+        <p>KWD Tacho Version 1.42 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
         <p lang="de"><a lang="de" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
         <p lang="en"><a lang="en" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=51">Licenses</a></p>
         
@@ -1037,7 +1037,7 @@ function OnResume()
     app.PreventScreenLock(true);
     
     startGps(); // check if error when start twice!!!
-    if (typeof gpstool !== undefined) 
+    if (typeof gpstool !== 'undefined') 
     	if (gpstool.isHud())
     		app.SetScreenMode('Full');
     resetHud();
@@ -1670,7 +1670,7 @@ function AutoSettings(newstoragename,newsetclass) {
             }
         }
         
-        return undefined; // TODO: lieber String 'unset'
+        return; // ! automatically returns 'undfined' TODO: lieber String 'unset'
     };
     
     /*  setzt einen Status und erzeugt Element, wenn nicht vorhanden
@@ -1678,7 +1678,7 @@ function AutoSettings(newstoragename,newsetclass) {
     */
     this.set = function(name,value) {
         
-        if(name!=undefined) {
+        if(typeof name !== 'undefined') {
             var i = this.added(name);
             if(i!=-1) {
                 data[i]['value'] = value;
@@ -1873,7 +1873,7 @@ function KwdAutoSettings(newstoragename,newsetclass) {
             }
         }
         
-        return undefined; // TODO: lieber String 'unset'
+        return; //always returns undefined when pure return; // TODO: lieber String 'unset'
     };
     
     /*  setzt einen Status und erzeugt Element, wenn nicht vorhanden
@@ -1881,7 +1881,7 @@ function KwdAutoSettings(newstoragename,newsetclass) {
     */
     this.set = function(name,value) {
         
-        if(name!=undefined) {
+        if(typeof name!== 'undefined') {
             var i = this.added(name);
             if(i!=-1) {
                 data[i]['value'] = value;
