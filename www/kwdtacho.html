@@ -29,18 +29,13 @@
 	NOTES:
 	
 	TODO: for this release
-
-    - TEXTE:
-        - Stil verbessern und kürzen
     
 	- LANDSCAPE
 		- evtl. landscape displays wrapper vergrößern, wenn analog
 		- position Fehler nach hud korrigieren checke Größen nach resize!
 		  (evtl. gleiches Problem wie bei menu: reagiert nicht beim ersten mal
 		  prüfe auch wieviele resize-Events!)
-	
-	- EINHEITEN für Höhe m / ft
-	
+		
 	TODO: for next release:
 
 	- HUD
@@ -71,7 +66,10 @@
 	
 	LAYOUT: 
 	- css reduziert und background-color(!) wenn OSVersion < 14 (teste Sebi Handy)
-	- menüs zweispaltig, mit internem scroll, evtl. rand weg oder außerhalb des screens positionieren bei sehr kleinen displays	
+	- menüs zweispaltig, mit internem scroll, evtl. rand weg oder außerhalb des screens positionieren bei sehr kleinen displays
+	 - zweispaltig nicht bei sehr großen displays oder wenn menüs klein genug!
+	- HINTS: bei großen Bildschirmen evtl. Hints als Fenster rechts, oder zusäzliche ausführliche Hints rechts, die bei
+	  kleinen Screens als Fragezeichen mit selbst zu öffnendem popup erscheinen	
 	 
 	TODO:
 	
@@ -230,6 +228,7 @@
             color:#FFFFFF;
         }
 		.mirror {
+		    -webkit-transform:scale(-1,1);
 			transform:scale(-1,1);
             padding-right:0;
             padding-left:1em;
@@ -410,7 +409,7 @@
 		#digitalspeed-wrapper {
 			margin:10px;
             color:white;
-            background-image:-webkit-linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
+            background-image:-webkit-linear-gradient(top,rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
             background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
             /*box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;*/
             box-shadow: 5px 5px 10px #000 inset;
@@ -681,7 +680,8 @@
         	settings). You don't need a network connection and can also use the app in "flight mode". 
         
       	<p lang="de"> <b>Die HUD-Funktion</b>
-        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen.</p>
+        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen. (Beachten Sie bitte,
+        dass es in einigen Ländern/Gebieten möglicherweise nicht gestattet ist, ein nicht fest verbautes HUD im Straßenverkehr zu nutzen!)</p>
         <p lang="en">With <b>"HUD" (head up display)</b> turned on you can put your device in front of mirroring glass (of an vehicle) to read the 
         	reflected displays. Note that the brightness of your device ist not high enough for daylight use in most cases.</p>
         
@@ -690,8 +690,8 @@
         	Diese Funktion kann abgeschaltet werden.</p>
         <p lang="en">The option "Direct Config" means you can change some settings by tapping the gauges and values. You can turn of this option in the settings menu.</p>
 -->    
-        <p lang="de">Standortdaten werden nicht gespeichert, gesendet  oder anders weitergegeben.</p>
-        <p lang="en">Geo location data are not stored, send or shared in any way.</p>
+        <p lang="de">Standortdaten werden von dieser App nicht gespeichert, gesendet  oder anders weitergegeben.</p>
+        <p lang="en">Geo location data are not stored, send or shared in any way by this app.</p>
         <p lang="de"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
         <p lang="en"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=52">Privacy policy</a></p>
         
@@ -732,8 +732,8 @@
 	<div id="newsdialog" class="dialog">
 		<h3 lang="en">News</h3>
 		<h3 lang="de">Neu</h3>
-		<p lang="en">Now you can change units of measure (e.g. km/h or mph) directly by touching the unit text. You can also change the type of speedometer directly.
-			Turn off these "One touch settings" in the settings.</p>
+		<p lang="en">Now you can change units of measure (km/h, mph, m/s, kn - for altitude m, ft) directly by touching the unit text. You can also change the type of speedometer directly.
+			You can turn off these "One touch settings" in the settings.</p>
 		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden unter "Schnellauswahl".</p>
 	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
 		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
@@ -799,6 +799,7 @@
 
 	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
 	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Einheit der Höhenanzeige</span><span lang="en">Altimeter units</span> (<span class="altitudeunit"></span>)</a>
+	    <a id="settimeformat" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhr mit Sekunden</span><span lang="en">Clock with seconds</span></a>
         <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">Schnellauswahl</span><span lang="en">One touch settings</span></a>
         <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
@@ -834,6 +835,7 @@ function KwdTachoApp() {
 	this.language = 'en';
 	this.tachounit = 'kmh';
 	this.fastoptions = true;
+	this.clockseconds = true;
 	
 	this.storage = {
 		language : 'tacholanguage',
@@ -868,12 +870,11 @@ var app_browsermode = false;
  */
 function setLanguage(lang) {
 
-	app.Debug('lang loaded: '+lang);
+	//app.Debug('lang loaded: '+lang);
 	if(!lang || lang=='auto') {
 		lang = (app.GetLanguageCode()).toLowerCase(); // ! overwrite parameter value
-		app.Debug('lang sys: '+lang);	
-	    if (lang=='de' || lang=='at' || lang=='li') kta.language = 'de'; // ! default language: en
-	    else lang = en;
+	    if (lang=='de' || lang=='at' || lang=='li') lang = 'de'; // ! default language: en
+	    else lang = 'en';
 	}
 	$('body').removeClass('en'); // works because multiple addClass do not add more classes :-)
 	$('body').removeClass('de'); // works because multiple addClass do not add more classes :-)
@@ -885,7 +886,7 @@ function setLanguage(lang) {
 	// TODO: extra class or search for .dialog except #settingsdialog :-)
 	$('#moresettingsdialog,#tachosettingsdialog,#unitsettings,#altitudeunitsettings').css('min-height',$('#settingsdialog').outerHeight()+'px');
 
-	kta.language = lang; 
+	kta.language = lang;
 }
 
 
@@ -981,10 +982,11 @@ function changeTime() {
 	
     var date = new Date();
     
-    var s = date.getSeconds();
-    s = ":"+((s < 10) ? "0" + s : s);
-    $('#seconds-text').text(s);
-
+    if(kta.clockseconds) {
+    	var s = date.getSeconds();
+	    s = ":"+((s < 10) ? "0" + s : s);
+	    $('#seconds-text').text(s);
+	}
     // minutes and hours are only formatted + displayed when changed:
     var m = date.getMinutes();
     if(m!=previous_minutes) {
@@ -1089,7 +1091,7 @@ function loc_OnChange( data )
 /* TODO: better receive gauge as var instead of using the global var
 */
 // class
-function GpsTools () {
+function KwdGpsTools () {
     //private:
     var speed =0.0;
     var speedfactor = 3.6;
@@ -1545,7 +1547,7 @@ function GpsTools () {
     this.loadAverage();
     
 
-} // GpsTools
+} // KwdGpsTools
 
 
 /*  AutoSettings
@@ -1741,6 +1743,209 @@ function AutoSettings(newstoragename,newsetclass) {
     if(this.load()) this.initall();
 }
 
+/*  KwdAutoSettings
+    definiert per add-Funktion Elemente aus dem DOM, deren Zustand in 
+    localStorage gespeichert wird, um z.B. Programmeinstellungen
+    wiederherstellen zu können.
+    - callback Funktionen für Aktion bei Setzen/Löschen/Toggle/Radio-Toggle
+    - automatisches Laden/Speichern der Zustände
+    - Init jedoch nur durch 'add()'
+    - frühere settings aus localstorage werden gelesen, aber neue zum Speichern verwendet
+      (Abfrage ob neue schon da)
+	
+	TODO: extern (interface) alles mit boolean!
+          
+    TODO:  
+        - Verhalten von get (kann auch *undefined* liefern!) wurde repariert??
+        - besser wäre, alle switcher bei Programmstart in Array aufzunehmen, wenn
+          load scheitert, dies würde auch Array-Vergrößern bei erstem Switch 
+          sparen
+    TODO: teste ohne jQuery
+*/
+//class
+function KwdAutoSettings(newstoragename,newsetclass) {
+    //private
+    var data = new Array();
+    var storagename = '';
+    var setclass = 'switched-on';
+    var check = "";
+    
+    var that = this;
+    
+    //public
+    
+    
+    /*  speichert in storage wenn möglich
+        - gibt false zurück, wenn speichern nicht möglich
+        - verändert Struktur 'data' nicht
+    */
+    this.save = function() {
+        
+        if(storagename!='' && data.length!=0) {
+            var str = JSON.stringify(data);
+            window.localStorage.setItem(storagename,str);
+            return true;
+        }    
+        return false;        
+        
+    };
+    
+    /*  lädt von storage wenn möglich
+        - gibt false zurück, wenn laden nicht möglich
+        - verändert Struktur 'data' nicht, wenn laden nicht möglich
+    */
+    this.load = function() {
+        
+        if(storagename!='') {
+            var str = window.localStorage.getItem(storagename);
+            if(str!==null) {
+                data = JSON.parse(str);
+                return true;
+            }            
+        }    
+        return false;        
+    };
+
+    /* findet Element oder fügt es hinzu
+        - gibt index des Elementes zurück oder -1 im Fehlerfall
+    */
+    this.added = function(name) {
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['name'] == name) {
+                return i;
+            }
+        }
+        
+        if(i>=data.length) {
+            var a = new Object();
+            a['name'] = name;
+            a['value'] = 'false';
+            data[i] = a;
+
+            return i;
+        }
+        
+        return -1;
+    };
+  
+	/* fügt Element hinzu und prüft Status, der früher gespeichert wurde
+	 * - type: switcher|menuitem|radio
+	 * - ids: jQUery-konformer Selektor
+	 * - class: Klasse für Gruppe für radio-buttons (jQuery-Selektor), oder für switched-on Status für switcher
+	 * 
+	 * - setzt den Status nicht auf bestimmten Startwert sondern richtet sich nach gespeicherten
+	 * - führt jedoch Code für den aktuellen Status aus (je nach Def. im HTML)
+	*/
+	this.add = function(type,ids,setclass) {
+		// check ob in geladenen Werten
+		// speichere 
+	};
+	
+    /*  initialisiert alle Switches
+        - ändert HTML der entsprechenden Elemente
+        - liest aktuelles 'data', versucht intern keinen 'load' oder 'generate'
+    */        
+    this.initall = function() {
+        
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['value'] == 'false') {
+                $('#'+data[i]['name']).removeClass(setclass);
+            }
+            else {
+                $('#'+data[i]['name']).addClass(setclass);
+            }
+        }
+    };
+
+    /*  liest einen Wert aus Settings liste
+        liefert undefined wenn Wert nicht vorhanden
+    */
+    this.get = function(name) {
+        var i;
+        var l = data.length;
+        for(i=0;i<l;i++) {
+            if(data[i]['name'] == name) {
+                return data[i]['value'];
+            }
+        }
+        
+        return undefined; // TODO: lieber String 'unset'
+    };
+    
+    /*  setzt einen Status und erzeugt Element, wenn nicht vorhanden
+        - value string!! 'true' und 'false' werden behandelt
+    */
+    this.set = function(name,value) {
+        
+        if(name!=undefined) {
+            var i = this.added(name);
+            if(i!=-1) {
+                data[i]['value'] = value;
+                return true;
+            }           
+        }
+        return false;
+    };
+    
+    
+    /* return: true: on, false: off
+ 		- value: if given sets to this (must be string 'true'|'false') (TODO: test!)
+ 		TODO: alles mit normalem true|false (keine Strings)
+	       TODO: id statt elem, da eh wieder zurück referenziert werden muss
+     */
+    
+    this.switchit = function(elem,value) {
+        
+        var id = $(elem).attr('id');
+        var sw = $(elem).hasClass(setclass);
+        var setto = (value == 'true') ? true : false; // value undefined also leads to false
+        
+        if (sw && setto) return true; // prevent multiple set of class
+        
+        if(sw && !setto) {
+        	// remove class may sometimes be called when there is nor more class - without effect
+            $(elem).removeClass(setclass);
+            this.set(id,'false');
+        }
+        else {
+            $(elem).addClass(setclass);
+            this.set(id,'true');
+        }
+
+        this.save();
+        return !sw;
+    };
+    
+    /* im Gegensatz zum switch muss bei radio bei allen
+       betreffenden Elementen (klasse) das Element gesetzt/erzeugt werden
+       TODO: id statt elem, da eh wieder zurück referenziert werden muss
+    */
+    this.radio = function(klasse,elem) {
+        
+        // alle der klasse auf false
+        $(klasse).removeClass('switched-on');
+        $(klasse).each(function() {
+            that.set($(this).attr('id'),'false');
+        });
+        
+        // gesetztes auf true
+        $(elem).addClass('switched-on');
+        this.set($(elem).attr('id'),'true');
+        
+        this.save();
+    };
+
+    
+    //construct
+    if(newstoragename) storagename = newstoragename;
+    if(newsetclass) setclass = newsetclass;
+    if(this.load()) this.initall();
+}
+
 
 /* manages Visibility of menus or cards or any HTML elements given by id (always called 'menu' here)
  * - 
@@ -1751,7 +1956,7 @@ function AutoSettings(newstoragename,newsetclass) {
  * - TODO: find error while OnBack (if any)
  */
 // class
-function PopupStack() {
+function KwdPopupStack() {
 	
 	// private:
 	
@@ -2710,7 +2915,7 @@ function initApp()  {
 	//app.Debug('set new obj str: '+testobject.testString('thomas') );
 	//app.Debug('check obj str in time: '+displayTime.testString() );
 		    
-    menustack = new PopupStack();
+    menustack = new KwdPopupStack();
     settings = new AutoSettings(storage_settings); // string definiert Namen in localstorage // loads saved settings
     
     // TODO: layout_gauges sollte man evtl. auch mit einem stack steuern !!
@@ -2734,13 +2939,22 @@ function initApp()  {
     if(settings.get('switchtime')=='false') displayTime.hide(); else { layout_gauges++; startClock(); }
     if(settings.get('switchposition')=='false') displayLocation.hide(); else layout_gauges++;
     if(settings.get('switchaltitude')=='false') displayAltitude.hide(); else layout_gauges++;
-    if(settings.get('switchhudsettings')!='false') {
-    	settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
-    }    
+    if(settings.get('switchhudsettings')!='false') settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
+	if (settings.get('settimeformat')=='false') {
+		$('#seconds-text').hide();
+		kta.clockseconds = false;
+	} 
+        
     
-	if (settings.get('switchfastoptions')!='false') kta.fastoptions = true;
-	else kta.fastoptions = false;
-		
+	if (settings.get('switchfastoptions')!='false') {
+		kta.fastoptions = true;
+	}
+	else {
+		$('.fa','#switchfastoptions').removeClass('icon-lock-open');
+		$('.fa','#switchfastoptions').addClass('icon-lock');
+		kta.fastoptions = false;
+	}
+	
 	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
         
     // prevent accidently back 
@@ -2873,6 +3087,8 @@ function initApp()  {
             case 'setkn':  unittext = 'kn'; break;   	
             case 'switchfastoptions':
             	if(settings.switchit(this)) {
+            		//TODO: repeat this on init
+            		//TODO: test it on new concept of settings!
             		showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
          			$('.fa',this).addClass('icon-lock-open');
          			$('.fa',this).removeClass('icon-lock');
@@ -2957,6 +3173,22 @@ function initApp()  {
 		}
 		else return true;		
 	});
+	// TODO: make menu entry + hints or disable
+	//TODO: if tap has nor more multiple-trigger problems: use an all others again!
+	// TODO: use this new concept of menu+1-touch-setting also on others
+	$('#time,#settimeformat').on('tap',function() {
+		if (kta.clockseconds) {
+			$('#seconds-text').hide();
+			kta.clockseconds = false;
+		}
+		else {
+			$('#seconds-text').show();
+			kta.clockseconds = true;
+		}
+		settings.switchit($('#settimeformat'));
+		return false;
+	});
+	
     // TODO: if id of button stored or can be derived from id of targeted dialog
     // --> you could automate this too
     
@@ -3047,7 +3279,7 @@ function initApp()  {
 
     tablet = app.IsTablet(); // returns boolean
     
-    gpstool = new GpsTools(); //global var speed now named: gpstool
+    gpstool = new KwdGpsTools(); //global var speed now named: gpstool
    
 	var units = 'setalt-m';
 	if(settings.get('setalt-ft')=='true') units = 'setalt-ft';
@@ -3099,7 +3331,7 @@ function initApp()  {
 
 
 function OnStart() {
-	//app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
+	app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
 	//mydebug = app.CreateDebug();
 	//app.ShowDebug(true);
 	
