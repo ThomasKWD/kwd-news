@@ -695,7 +695,7 @@
         <p lang="de"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
         <p lang="en"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=52">Privacy policy</a></p>
         
-        <p>KWD Tacho Version 1.42 &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
+        <p>KWD Tacho Version 1.42 <span id="internalinfo"> </span> &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
         <p lang="de"><a lang="de" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
         <p lang="en"><a lang="en" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=51">Licenses</a></p>
         
@@ -766,6 +766,7 @@
 		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span><span lang="de">Nur </span>Analog<span lang="en"> only</span></a>
 		  <a id="switchunits" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="de">Maßeinheit</span><span lang="en">Units</span> (<span class="tachounit">km/h</span>)</a> 
 	       <a id="resetmaxspeed" class="switcher menuitem" href="#"><span class="fa text-icon">MAX</span><span lang="de">Max. Geschwindigkeit löschen</span><span lang="en">Reset max speed</span></a>	  
+	       <a id="resetaveragespeed" class="switcher menuitem" href="#"><span class="fa text-icon">AVR</span><span lang="de">Mittlere Geschwindigkeit löschen</span><span lang="en">Reset average speed</span></a>	  
 	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span><span lang="de">Wertebereich zurücksetzen</span><span lang="en">Reset speedometer range</span></a>	  
 		  <!--
 		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
@@ -813,8 +814,14 @@
   
 	<div id="askresetmaxspeed" class="dialog yesnodialog  sub-dialog">
 		<h3><span lang="en">Reset max speed?</span> <span lang="de">Höchstgeschwindigkeit zurücksetzen?</span> </h3>
-		<a class="btn btn-yes" href="#"><span lang="en">Reset</span><span lang="de">Zurücksetzen</span></a>
-		<a class="btn btn-cancel" href="#"><span lang="en">Cancel</span><span lang="de">Abbrechen</span></a>
+		<a class="btn btn-yes" href="#confirmresetmaxspeed"><span lang="en">Reset</span><span lang="de">Zurücksetzen</span></a>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Cancel</span><span lang="de">Abbrechen</span></a>
+	</div>
+
+	<div id="askresetaveragespeed" class="dialog yesnodialog  sub-dialog">
+		<h3><span lang="en">Reset average speed?</span> <span lang="de">Mittlere Geschwindigkeit zurücksetzen?</span> </h3>
+		<a class="btn btn-yes" href="#confirmresetaveragespeed"><span lang="en">Reset</span><span lang="de">Zurücksetzen</span></a>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Cancel</span><span lang="de">Abbrechen</span></a>
 	</div>
 
     <div id="splashscreen" class="screencard">
@@ -829,6 +836,66 @@
     
 	<script type="text/javascript">
 	/* start javascript */
+
+
+// still faster than ...Html -> nodeValue
+function kwd_setElementText(element,str) {
+	if(kta.nojquery) {
+		
+		if (element.charAt(0)=='.') {
+			element = element.substr(1);
+			//app.Debug('found class: '+element);
+			var els = document.getElementsByClassName(element);
+			//app.Debug(els.length);
+			//var content;
+			for(var i=els.length-1;i>=0;i--) {
+				//content = els[i].innerHTML;
+				//app.Debug(content);
+				els[i].childNodes[0].nodeValue = str;
+			}
+		}
+		else {
+			// TODO: check if there are more possibilities than # at start!!
+			element = element.substr(1);
+			app.Debug(element);
+			var el = document.getElementById(element);
+			if (el) el.childNodes[0].nodeValue = str;		
+		}
+	}
+	else {
+		$(element).html(str);
+	}
+}
+
+// TODO: still faster when already known whether class or id
+function kwd_setElementHtml(element,str) {
+	if(kta.nojquery) {
+		
+		if (element.charAt(0)=='.') {
+			element = element.substr(1);
+			//app.Debug('found class: '+element);
+			var els = document.getElementsByClassName(element);
+			//app.Debug(els.length);
+			//var content;
+			for(var i=els.length-1;i>=0;i--) {
+				//content = els[i].innerHTML;
+				//app.Debug(content);
+				els[i].innerHTML = str;
+			}
+		}
+		else {
+			// TODO: check if there are more possibilities than # at start!!
+			element = element.substr(1);
+			app.Debug(element);
+			var el = document.getElementById(element);
+			if (el) el.innerHTML = str;		
+		}
+	}
+	else {
+		$(element).html(str);
+	}
+}
+
 
 // class for global vars
 function KwdTachoApp() {
@@ -1157,18 +1224,19 @@ function KwdGpsTools () {
 	/* makes the correct speed value *only for output*
 	*/
 	function displaySpeedWithFactor(dspeed,dest_element) {
-		var ss;
 		
 		dspeed *= speedfactor;
 		
+//		if(kta.nojquery!==undefined)
+	//		app.Debug('nojquery: '+kta.nojquery);
+			
         if(dspeed < 20 && speedfactor < 3.6) {	        	
         	var sss = ""+dspeed.toFixed(1);
-        	sss = sss.replace('.','<span class="valuefract">.');	        	
-			$(dest_element).html(sss+'</span>');
+        	sss = (sss.replace('.','<span class="valuefract">.'))+'</span>';
+       		kwd_setElementHtml(dest_element,sss); // ! setElementHtml is already existent !	        	
 		}
 		else {
-			ss = Math.round(dspeed);	        
-			$(dest_element).html(ss);
+       		kwd_setElementText(dest_element,Math.round(dspeed)); // ! setElementHtml is already existent !	        	
 		}
 		
 		return dspeed;
@@ -1192,21 +1260,10 @@ function KwdGpsTools () {
           resettime: value != 0 defines max time span (value in hours!), in this case reset the average collection! 
         
         - makes timestamp from hours
-        - stores timestamp internally
+        - stores timestamp internally (must be saved!)
         - does NOT auto save averagespeed persisently (must be done seperately, eg. on resetAutoFade/resetHud, or OnPause)
 		- TODO: save also pure m/s-speed for compare maxvalue + average value -> unit change must not change results
-		
-        akt. Implementation: 
-        - gleich bei Beginn Gruppe mit 2, dadurch alle 2 s ein neuer Wert
-        - dann Gruppen gestaffelt 2,4,8,16 
-        - Gruppenerweiterung nur, wenn treshhold == gewünschte max. Länge der Liste erreicht. (z.B. 5400)
-        - wenn max. Länge der höchsten Stufe (16) erreicht, werden alte Werte gelöscht.
-        - der einzige Sinn der Gruppierung ist Performance-Einbruch des JS zu verhindern,
-          durch Tests könnte der treshhold bestimmt werden
-        - wenn bei Basisgruppe =2 bleibt --> Werte von 3 Stunden
-        - NICHT beachtet ist bisher, dass alte Werte gelöscht werden sollten, wenn 24h oder mehr um sind, OHNE dass Tachometer benutzt wurde
-          (ist vielleicht erstmal ganz gut so :-)
-          
+		          
          TODO: neue Implementation: 
          - einfach 2 Werte speichern: summe und Anzahl. fertig!.
          - man bräuchte aber 2 Summen, nämlich die gesamte und die bis vor Ablauf der Gleitwerte
@@ -1219,7 +1276,7 @@ function KwdGpsTools () {
  		var i,cas,clength; // used several times
  		
 		
-		if (resettime && resettime > 0) {
+		if (resettime && resettime > 0) { // TODO: check if works when manual reset needed
 		
 			// time value not yet used
 			
@@ -1227,6 +1284,7 @@ function KwdGpsTools () {
 		}
 		else {
 			// TODO: völlig neue Berechnung!
+			
 			// first collect values
 			average_grouplist.push(Math.round(s*100)/100);		
 			// check if group is full
@@ -1323,7 +1381,7 @@ function KwdGpsTools () {
         ! uses always raw m/s until display!
     */
     this.maxSpeed = function(newmaxspeed) {
-        
+        var closi = 0;
         
         if(newmaxspeed && (newmaxspeed > maxspeed || newmaxspeed < 0)) {
             maxspeed = (newmaxspeed<0) ? -newmaxspeed  : newmaxspeed;
@@ -1331,7 +1389,8 @@ function KwdGpsTools () {
             
 			displaySpeedWithFactor(maxspeed,'#maxspeedtext');
         }
-       
+       	closi++;
+       	app.Debug('closi:'+closi);
         return maxspeed;
         
     };
@@ -2153,6 +2212,9 @@ function DisplayBox (newid,mode) {
 		// TODO: should also work with transform-origin 50% 50% 0 and center text by top/left values
 		
 		$(textRef).css({
+			'-webkit-transform-origin':'50% 0 0',
+			'-webkit-transform':'scale('+scale+','+scale+')',
+			
 			'transform-origin':'50% 0 0',
 			'transform':'scale('+scale+','+scale+')'
 		});		
@@ -2907,7 +2969,10 @@ function initApp()  {
 	// TODO: enable again:-> add to displays list
 	if(!kta.browsermode) {
 		$('#speedstats').hide();
-		$('#setmaxspeed').hide();
+		$('#resetmaxspeed').hide();
+		$('#resetaveragespeed').hide();
+		$('#maxspeed').hide();
+		$('#averagespeed').hide();
 	}
 	
 	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays
@@ -2920,8 +2985,10 @@ function initApp()  {
 	displayTime = displays.add('time');
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
-	displayAverage = displays.add('averagespeed','--');
-	displayMaxspeed = displays.add('maxspeed','--');
+	if(kta.browsermode) {
+		displayAverage = displays.add('averagespeed','--');
+		displayMaxspeed = displays.add('maxspeed','--');
+	}
 	
 	//digitalDisplays = newDigitalSpeedBoxList();
 	//displayDigitalspeed2 = displays.add('digitalspeed','--');// TODO: check whether object is rerefenced or copied!!!
@@ -3005,6 +3072,16 @@ function initApp()  {
 				// TODO: check if another menu COULD come in between!
 				OnBack();
 				break;
+			case '#confirmresetmaxspeed' : 				
+				gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+				showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
+				OnBack();
+				break;				
+			case '#confirmresetaveragespeed' : 				
+				gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+				showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
+				OnBack();
+				break;				
 			default: return true;
 	        }
         
@@ -3264,17 +3341,7 @@ function initApp()  {
 		menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
 		return false;
 	});
-	$('#askresetmaxspeed .btn-yes').on('tap',function() {
-		gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
-		showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
-		OnBack();
-		return false;		
-	});	
 
-	$('.btn-cancel').on('tap',function() {
-		OnBack();
-		return false;
-	});
  	$('.back-arrow').on('tap',function() {
  		OnBack();
  		return false;
@@ -3371,9 +3438,15 @@ function OnStart() {
 	else app.Debug('droidscript mode');
 	
 	if(app.GetOSVersion()>=14) { // 14 == Android 4.0.1
-		kta.nojquery = true; // TODO: better ask the functions you need e.g. getElementsByClassname
 		kta.advancedstyles = true;
+		app.Debug('modern Android version found');
 	}
+	if(typeof document.getElementsByTagName != 'undefined' && typeof document.getElementsByClassName  != 'undefined') {		
+		kta.nojquery = true; // TODO: better ask the functions you need e.g. getElementsByClassname
+		app.Debug('modern javascript found');
+		kwd_setElementText('#internalinfo','(x)');
+	}
+		
     // frage ob gerade landscape, dann init erst bei resize:
     // TODO: ungünstig formatierte Inhalte leider kurz zu sehen bevor resize kommt.
     // TODO: teste ob code wieder aktiviert werden muss, wenn landscape/portrait als fest gespeichert werden  
