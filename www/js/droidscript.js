@@ -6,8 +6,9 @@ function DroidScriptApp () {
     debug_on = true;
 	popuptimeout = false;
 	
+	this.kwd_droidscript_emulator = true; // to check in contrast to real DroidScript
+	
 	this.Start = function() {
-		browsermode = true; // global var
 		OnStart();
 	};
 	
@@ -58,6 +59,9 @@ function DroidScriptApp () {
 		window.onbeforeunload = function (e) {};
 		
 		location.href='index.html';
+	};
+	this.GetOSVersion = function() {
+		return 22; // is Android 5.1
 	};
 	this.IsTablet = function() {
 		return true;
@@ -111,7 +115,7 @@ function DroidScriptApp () {
 	
 	
 	// concstruct code
-	
+		
 	// simulate BACK BUTTON with ESC key
 	document.onkeydown = function(evt) {
 	    evt = evt || window.event;

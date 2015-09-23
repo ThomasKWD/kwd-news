@@ -237,7 +237,9 @@
 		.icon-zoom-out {
 			font-size:65%;
 		}
-        
+        .text-icon {
+        	font-size:65%;
+        }
 		/* marks elements to be changed when no-gps
 		 */
 		.gps {
@@ -450,13 +452,6 @@
         #warningdialog p {
         	font-weight:bold;
         }
-        #yesnodialog {
-            text-align:center;
-            top:25%;
-        }
-        #yesnodialog * {
-            font-size:1.2em;
-        }        
         #splashscreen {
         	display:table;
             background-color: #83C2FD;
@@ -596,31 +591,33 @@
 </head>
 
 <body onload="app.Start()">
-<!-- start html -->
+
 <div id="hg"></div>
 
 <div id="display-container">
     <div id="tacho-container">
   
-        <div id="cssgauge-wrapper"> <!--flexible size planned-->
+        <div id="cssgauge-wrapper">
 			<div id="cssgauge" class="gauge skin">
 				<div class="g-scale"></div>
 					<div id="g-pointer" class="g-pointer g-item"></div>
-					<!-- change order  when testing finished -->
 					<div class="g-center g-item"></div>
 	            <div id="digital-on-analog" class="hud skin"><div id="dona-text" class="speed gps">0000</div></div>
 	            <div id="info-on-analog"><div class="tachounit gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
 		</div>
-        <div id="speedstats" class="2-in-a-row">
-            <div id="averagespeed" class="display-frame hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
-            <div id="maxspeed" class="display-frame hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
+<!--        <div id="speedstats">
+            <div id="averagespeed" class="display-box hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
+            <div id="maxspeed" class="display-box hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
         </div>
-
-		<!-- möglicherweise ungünstig, dies im tachocontainer zu haben-->
+-->
 		<div id="digitalspeed-positioner" class="positioner">
 			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit">km/h</div></div></div>
 		</div>
+		
+		<!--you will need 2 versions for display in digital OR analog
+			TODO: make flag instead of setting both (performance)
+		-->
 		
 	</div><!--tacho-container-->
 
@@ -630,6 +627,9 @@
 	    <div id="time" class="hud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
 	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit">m</div> </div>
 		<div id="geolocation" class="hud switchlocformat display-box skin"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
+
+        <div id="averagespeed" class="display-box hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
+        <div id="maxspeed" class="display-box hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
     </div>
    </div>
 	
@@ -758,13 +758,14 @@
         <!--<a class="btn" href="#cancel">Abbrechen</a>-->
     </div>
     
-    <div id="tachosettingsdialog" class="dialog">
+    <div id="tachosettingsdialog" class="dialog sub-dialog">
         <h3><span lang="en">Speedometer</span><span lang="de">Tachometer</span></h3>
 
 	      <a id="digitalanalog" class="switcher switched-on radio" href="#"><span class="fa icon-gauge-2"></span>Digital + Analog</a>
 	      <a id="digital" class="switcher radio" href="#"><span class="fa icon-sort-numeric"></span><span lang="de">Nur </span>Digital<span lang="en"> only</span></a>
 		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span><span lang="de">Nur </span>Analog<span lang="en"> only</span></a>
 		  <a id="switchunits" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="de">Maßeinheit</span><span lang="en">Units</span> (<span class="tachounit">km/h</span>)</a> 
+	       <a id="resetmaxspeed" class="switcher menuitem" href="#"><span class="fa text-icon">MAX</span><span lang="de">Max. Geschwindigkeit löschen</span><span lang="en">Reset max speed</span></a>	  
 	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span><span lang="de">Wertebereich zurücksetzen</span><span lang="en">Reset speedometer range</span></a>	  
 		  <!--
 		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
@@ -777,7 +778,7 @@
 		  -->
     </div>
 
-    <div id="unitsettings" class="dialog">
+    <div id="unitsettings" class="dialog sub-dialog">
         <h3><span lang="en">Measure of Speedometer</span><span lang="de">Tachometer Einheit</span></h3>
 
 	      <a id="setkmh" class="switcher switched-on unitradio" href="#"><span class="fa icon-dot-circled"></span>km/h</a>
@@ -786,7 +787,7 @@
 	      <a id="setms" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>m/s</a>
     </div>
 
-    <div id="altitudeunitsettings" class="dialog">
+    <div id="altitudeunitsettings" class="dialog sub-dialog">
         <h3><span lang="en">Measure of Altimeter</span><span lang="de">Höhen-Einheit</span></h3>
 
 	      <a id="setalt-m" class="switcher switched-on altunits" href="#"><span class="fa icon-dot-circled"></span>m (Meter<span lang="en">s</span>)</a>
@@ -794,7 +795,7 @@
     </div>
 
 	
-    <div id="moresettingsdialog" class="dialog">
+    <div id="moresettingsdialog" class="dialog sub-dialog">
         <h3><span lang="en">Settings</span><span lang="de">Einstellungen</span></h3>
 
 	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
@@ -810,11 +811,11 @@
     
   <div id="gpswarning" class="gps-warning"><small><span lang="de">kein</span><span lang="en">no</span> </small>GPS</div>
   
-    <div id="yesnodialog" class="dialog">
-    <p> test </p>
-    <a class="btn" id="yes" href="#">JA</a>
-    <a class="btn" id="no" href="#">Nein</a>
-    </div>
+	<div id="askresetmaxspeed" class="dialog yesnodialog  sub-dialog">
+		<h3><span lang="en">Reset max speed?</span> <span lang="de">Höchstgeschwindigkeit zurücksetzen?</span> </h3>
+		<a class="btn btn-yes" href="#"><span lang="en">Reset</span><span lang="de">Zurücksetzen</span></a>
+		<a class="btn btn-cancel" href="#"><span lang="en">Cancel</span><span lang="de">Abbrechen</span></a>
+	</div>
 
     <div id="splashscreen" class="screencard">
     	<p>
@@ -836,6 +837,8 @@ function KwdTachoApp() {
 	this.tachounit = 'kmh';
 	this.fastoptions = true;
 	this.clockseconds = true;
+	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
+	this.nojquery = false;
 	
 	this.storage = {
 		language : 'tacholanguage',
@@ -859,8 +862,6 @@ var gpswarning_active = false; // saves state of warning (performance)
 var cssgauge_visible = true; // will be set/unset by setTachoLayout  (performance)
 
 // recognize browser
-// ask var app_browsermode
-var app_browsermode = false; 
  
  
 
@@ -884,7 +885,7 @@ function setLanguage(lang) {
 	// outerheight -> corresponds to box-sizing!
 	// must be done here because on initApp are both languages displayed + height could change with language
 	// TODO: extra class or search for .dialog except #settingsdialog :-)
-	$('#moresettingsdialog,#tachosettingsdialog,#unitsettings,#altitudeunitsettings').css('min-height',$('#settingsdialog').outerHeight()+'px');
+	$('.sub-dialog').css('min-height',$('#settingsdialog').outerHeight()+'px');
 
 	kta.language = lang;
 }
@@ -1046,7 +1047,7 @@ function OnResume()
 // back button hides open dialogs or screen modes like hud
 function OnBack()
 {
-    if (app_browsermode) app.Debug('OnBack'); // why cannot see this msg??
+    if (kta.browsermode) app.Debug('OnBack'); // why cannot see this msg??
     
 	// just check if there is any open menu
 	// otherwise show main menu
@@ -1065,11 +1066,6 @@ function OnBack()
 function Quit() {
     OnPause();  // nach neuesten Tests nicht automatisch
     app.Exit();
-}
-
-function confirmYesNo(str) {
-    $('#yesnodialog p').text(str);
-    $('#yesnodialog').show();
 }
 
 /* hardware menu button
@@ -1156,7 +1152,28 @@ function KwdGpsTools () {
         }
         else $('#positiontext').html(lat+',<br />'+lon);
     }
-    
+
+
+	/* makes the correct speed value *only for output*
+	*/
+	function displaySpeedWithFactor(dspeed,dest_element) {
+		var ss;
+		
+		dspeed *= speedfactor;
+		
+        if(dspeed < 20 && speedfactor < 3.6) {	        	
+        	var sss = ""+dspeed.toFixed(1);
+        	sss = sss.replace('.','<span class="valuefract">.');	        	
+			$(dest_element).html(sss+'</span>');
+		}
+		else {
+			ss = Math.round(dspeed);	        
+			$(dest_element).html(ss);
+		}
+		
+		return dspeed;
+	}
+
     //public
     
     /* changes format of position data (longitude, latidue)
@@ -1303,17 +1320,19 @@ function KwdGpsTools () {
         - newmaxspeed: only accepted if > current maxspeed
         - newmaxspeed: < 0: reset maxspeed with value (like in this.tachoRange)
         - auto saves maxspeed persisently
+        ! uses always raw m/s until display!
     */
     this.maxSpeed = function(newmaxspeed) {
         
         
-        if(newmaxspeed > maxspeed || newmaxspeed < 0) {
+        if(newmaxspeed && (newmaxspeed > maxspeed || newmaxspeed < 0)) {
             maxspeed = (newmaxspeed<0) ? -newmaxspeed  : newmaxspeed;
             app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
-            $('#maxspeedtext').text(maxspeed);
+            
+			displaySpeedWithFactor(maxspeed,'#maxspeedtext');
         }
        
-        return (maxspeed);
+        return maxspeed;
         
     };
     
@@ -1349,26 +1368,9 @@ function KwdGpsTools () {
 	        //TODO: turn on: this.averageSpeed(speed);
 	        this.maxSpeed(speed);
 	        
-	        var displayspeed = speed * speedfactor;
+	        var displayspeed = displaySpeedWithFactor(speed,'.speed'); // already sets the output, but returns calculated as number
 	        
-	        // for screenshots
-	        //displayspeed=42;
-	        
-	        var ss = "";
-	        //sieht Scheiße aus: if (speed < 10) ss = speed.toFixed(1); //eine Kommastelle bei <10 km/h
-	        // Kommastelle nur wenn hinterer Teil kleinere Schrift , dazu zusätzliches html einfügen
-	        if(displayspeed < 20 && speedfactor < 3.6) {
 	        	
-	        	var sss = ""+displayspeed.toFixed(1);
-	        	sss = sss.replace('.','<span class="valuefract">.');	        	
-				$('.speed').html(sss+'</span>');
-			}
-			else {
-				ss = Math.round(displayspeed);	        
-				$('.speed').html(ss);
-			}
-	        
-	
 	        if (cssgauge_visible) { // flag for performance
 		        // correct scale if >1000 or <1000
 		        if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
@@ -1666,7 +1668,8 @@ function AutoSettings(newstoragename,newsetclass) {
         var l = data.length;
         for(i=0;i<l;i++) {
             if(data[i]['name'] == name) {
-                return data[i]['value'];
+                if(data[i]['value']=='true') return true;
+                else return false;
             }
         }
         
@@ -1863,13 +1866,16 @@ function KwdAutoSettings(newstoragename,newsetclass) {
 
     /*  liest einen Wert aus Settings liste
         liefert undefined wenn Wert nicht vorhanden
+        
+        ! now returns boolean or undefined if name not found
     */
     this.get = function(name) {
         var i;
         var l = data.length;
         for(i=0;i<l;i++) {
             if(data[i]['name'] == name) {
-                return data[i]['value'];
+                if(data[i]['value']=='true') return true;
+                else return false;
             }
         }
         
@@ -2397,17 +2403,17 @@ function resetHud() {
 */
 function setTachoLayout() {
      
-    if (settings.get('tachoswitch')!='false') {
+    if (settings.get('tachoswitch')!=false) {
     	
 	  $('#tacho-container').show();
 	 
 	                   	
 	    var a;
 	    var d;
-	    if (settings.get('digitalanalog')!='false') a = d = true;
+	    if (settings.get('digitalanalog')!=false) a = d = true;
 	    else {
-			a = (settings.get('analog')=='false') ? false:true;
-			d = (settings.get('digital')=='false') ? false:true;
+			a = (settings.get('analog')==false) ? false:true;
+			d = (settings.get('digital')==false) ? false:true;
 		}
 	
 	    if(a && d) {
@@ -2445,7 +2451,7 @@ logarray = new Array(); // global
 function Log( msg ) 
 { 
     logarray.push(msg);
-    if (app_browsermode) app.Debug(msg);
+    if (kta.browsermode) app.Debug(msg);
     /*
 if( txt.GetLineTop( txt.GetLineCount() ) >= 0.2 )  
         log.shift(); 
@@ -2622,9 +2628,10 @@ function scaleDisplays(initial) {
 /* adjusts positions, proportions and sizes of displays,
  * depending on which display is currently visible
  * - also perfoms scaling of displays
- * 
- * - TODO: Idee: breite,höhe und layoffset in Object DisplayBox integrieren - dort positioner finden lassen (.parent() in jQuery)
  * - ! do not set height of positioner but of wrapper
+ * 
+ * - TODO: nimm Höhe und Breite von app.DisplayWidth/Height, da sonst software backbutton höhe nicht beachtet wird (Test)
+ * - TODO: Idee: breite,höhe und layoffset in Object DisplayBox integrieren - dort positioner finden lassen (.parent() in jQuery)
  */
 function positionDisplays() {
 		
@@ -2851,6 +2858,7 @@ function setTachoUnits(newunits) {
 	}
 	gpstool.speedFactor(factor);
 	$('.tachounit').text(txt);
+	gpstool.maxSpeed(-gpstool.maxSpeed()); // the max-value display with current value 
 }    
 
 function setAltimeterUnits(newunits) {
@@ -2897,7 +2905,10 @@ function initApp()  {
 	});
 
 	// TODO: enable again:-> add to displays list
-	$('#speedstats').hide();
+	if(!kta.browsermode) {
+		$('#speedstats').hide();
+		$('#setmaxspeed').hide();
+	}
 	
 	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays
 	
@@ -2909,6 +2920,12 @@ function initApp()  {
 	displayTime = displays.add('time');
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
+	displayAverage = displays.add('averagespeed','--');
+	displayMaxspeed = displays.add('maxspeed','--');
+	
+	//digitalDisplays = newDigitalSpeedBoxList();
+	//displayDigitalspeed2 = displays.add('digitalspeed','--');// TODO: check whether object is rerefenced or copied!!!
+	
 
 	// object referencing works (changes in displays.[one object] appear in references e.g. displayTime) 
 	//var testobject = displays.get('time');
@@ -2921,32 +2938,32 @@ function initApp()  {
     // TODO: layout_gauges sollte man evtl. auch mit einem stack steuern !!
     // TODO: oder integriert in display-objekt-verwaltung
     setTachoLayout();
-	if (settings.get('tachoswitch')!='false') layout_gauges++;
+	if (settings.get('tachoswitch')!=false) layout_gauges++;
 	
     // this are the normal hints!
-    if(settings.get('switchwarning')=='false')  {
+    if(settings.get('switchwarning')==false)  {
         displayHints = false;
     }
-    if(settings.get('switchnews1')!=='true') { // ! here: hide when true
+    if(settings.get('switchnews1')!=true) { // ! here: hide when true
     	menustack.push('newsdialog');
     }
     
     
     // this is the WARNING
-    if(settings.get('switchredwarning')!='false')  {
+    if(settings.get('switchredwarning')!==false)  {
     	menustack.push('warningdialog'); // note: all dialogs hidden by default!
     }
-    if(settings.get('switchtime')=='false') displayTime.hide(); else { layout_gauges++; startClock(); }
-    if(settings.get('switchposition')=='false') displayLocation.hide(); else layout_gauges++;
-    if(settings.get('switchaltitude')=='false') displayAltitude.hide(); else layout_gauges++;
-    if(settings.get('switchhudsettings')!='false') settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
-	if (settings.get('settimeformat')=='false') {
+    if(settings.get('switchtime')==false) displayTime.hide(); else { layout_gauges++; startClock(); }
+    if(settings.get('switchposition')==false) displayLocation.hide(); else layout_gauges++;
+    if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
+    if(settings.get('switchhudsettings')!=false) settings.switchit($('#switchhudsettings')); // auto saved will be overidden here
+	if (settings.get('settimeformat')==false) {
 		$('#seconds-text').hide();
 		kta.clockseconds = false;
 	} 
         
     
-	if (settings.get('switchfastoptions')!='false') {
+	if (settings.get('switchfastoptions')!=false) {
 		kta.fastoptions = true;
 	}
 	else {
@@ -3002,7 +3019,7 @@ function initApp()  {
         var check = $(this).attr('id');
         switch (check) {
             case 'tachoswitch' :
-            	if(settings.get(check)=='false') {
+            	if(settings.get(check)==false) {
             		layout_gauges ++;
             	}      
             	else layout_gauges --;
@@ -3014,7 +3031,7 @@ function initApp()  {
             case 'digital' :
             case 'analog' :
             	settings.radio('.radio',this);
-            	if(settings.get('tachoswitch')!='true') settings.switchit($('#tachoswitch')); // always activate tacho as well
+            	if(settings.get('tachoswitch')!=true) settings.switchit($('#tachoswitch')); // always activate tacho as well
                 setTachoLayout();            	
                 doPosition=true;
                 break;
@@ -3069,7 +3086,7 @@ function initApp()  {
 				}  
                 
                 break;
-            case 'switchredwarning':// TODO get new state as return so you can use it for switch reacting without the need of settings.get
+            case 'switchredwarning':
                 if(settings.switchit(this)) showHint('Warnings active','Warnhinweise wieder eingeschaltet.');
                 else showHint('Warnings disabled','Warnhinweise ausgeschaltet.');
                 break;                
@@ -3130,10 +3147,10 @@ function initApp()  {
     
     // easy switch tacho layout:
 	$('#tacho-container').click(function() {		
-    	if(kta.fastoptions && settings.get('tachoswitch')!='false') {
+    	if(kta.fastoptions && settings.get('tachoswitch')!=false) {
     		var next;
-    		if (settings.get('digitalanalog')!='false') next = 'digital';
-    		else if (settings.get('digital')!='false') next = 'analog';
+    		if (settings.get('digitalanalog')!=false) next = 'digital';
+    		else if (settings.get('digital')!=false) next = 'analog';
     		else next = 'digitalanalog';
     			
 	       	settings.radio('.radio',$('#'+next));
@@ -3153,9 +3170,9 @@ function initApp()  {
 	$('.tachounit').click(function(){
 		if (kta.fastoptions) {
 			var newunit = 'kmh';
-			if(settings.get('setkmh')=='true') newunit = 'mph';
-			if(settings.get('setmph')=='true') newunit = 'kn';
-			if(settings.get('setkn')=='true') newunit = 'ms';
+			if(settings.get('setkmh')) newunit = 'mph';
+			if(settings.get('setmph')) newunit = 'kn';
+			if(settings.get('setkn')) newunit = 'ms';
 			setTachoUnits(newunit);
 			settings.radio('.unitradio',$('#set'+newunit));
 			return false;
@@ -3165,7 +3182,7 @@ function initApp()  {
 	$('.altitudeunit').click(function() {
 		if (kta.fastoptions) {
 			var newunit = 'setalt-m';
-			if(settings.get('setalt-ft')=='true') newunit = 'setalt-m'; // TODO: getter of set element of a radio group
+			if(settings.get('setalt-ft')) newunit = 'setalt-m'; // TODO: getter of set element of a radio group
 			else newunit = 'setalt-ft';
 			setAltimeterUnits(newunit);
 			settings.radio('.altunits',$('#'+newunit));
@@ -3177,13 +3194,17 @@ function initApp()  {
 	//TODO: if tap has nor more multiple-trigger problems: use an all others again!
 	// TODO: use this new concept of menu+1-touch-setting also on others
 	$('#time,#settimeformat').on('tap',function() {
-		if (kta.clockseconds) {
-			$('#seconds-text').hide();
-			kta.clockseconds = false;
-		}
-		else {
-			$('#seconds-text').show();
-			kta.clockseconds = true;
+		if(kta.fastoptions) {			
+			if (kta.clockseconds) {
+				$('#seconds-text').hide();
+				kta.clockseconds = false;
+				showHint('Seconds off','Sekunden aus');
+			}
+			else {
+				$('#seconds-text').show();
+				kta.clockseconds = true;
+				showHint('Seconds on','Sekunden an');
+			}
 		}
 		settings.switchit($('#settimeformat'));
 		return false;
@@ -3227,15 +3248,6 @@ function initApp()  {
     	}
     	else return true;
     });
-    // yes no on back
-    $('#yes').on('tap',function() {
-        Quit();
-        return false;
-    });
-    $('#no').on('tap',function() {
-        $('#yesnodialog').hide(); // TODO: use menustack, but then u must start it with menustack too
-        return false;
-    });
     $('#setlanguage').on('tap',function() {
     	if (kta.language=='de') {
     		setLanguage('en');
@@ -3248,18 +3260,31 @@ function initApp()  {
     	app.SaveText(kta.storage.language,kta.language); // new val already in kta.language
         return false;
     });
+	$('#resetmaxspeed').on('tap',function() {
+		menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
+		return false;
+	});
+	$('#askresetmaxspeed .btn-yes').on('tap',function() {
+		gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+		showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
+		OnBack();
+		return false;		
+	});	
 
+	$('.btn-cancel').on('tap',function() {
+		OnBack();
+		return false;
+	});
  	$('.back-arrow').on('tap',function() {
  		OnBack();
  		return false;
  	});
  
    	//TODO: evtl. nötig wenn nur im Dialograhmen gescrollt
-   	/*$('.dialog,.card').scroll(function() {
-   		//resetMenuFade();
-   		console.log('scroll');
+   	$('.card').scroll(function() {
+   		resetMenuFade();
    	});
-	*/
+	
 	// TODO: timeout wie bei resize bei tangara
 	$(window).scroll(function() {
 		//console.log('window scroll');
@@ -3282,12 +3307,12 @@ function initApp()  {
     gpstool = new KwdGpsTools(); //global var speed now named: gpstool
    
 	var units = 'setalt-m';
-	if(settings.get('setalt-ft')=='true') units = 'setalt-ft';
+	if(settings.get('setalt-ft')) units = 'setalt-ft';
 	setAltimeterUnits(units);
 	units = 'kmh';
-	if(settings.get('setmph')=='true') units = 'mph';
-	else if(settings.get('setms')=='true') units = 'ms';
-	else if(settings.get('setkn')=='true') units = 'kn';
+	if(settings.get('setmph')) units = 'mph';
+	else if(settings.get('setms')) units = 'ms';
+	else if(settings.get('setkn')) units = 'kn';
 	setTachoUnits(units); // must be after gpstool init
 
     //Create and start location sensor. 
@@ -3302,7 +3327,7 @@ function initApp()  {
     // ! now always load (no switching) !
 	resetTachoRange("load",10); // default==10, if no value found
     
-    //if(settings.get('switchautorange')=='false') {
+    //if(settings.get('switchautorange')==false) {
     //    resetTachoRange("save",tacho_defaultrange);
     //}
     //else {
@@ -3331,7 +3356,7 @@ function initApp()  {
 
 
 function OnStart() {
-	app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
+	//app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
 	//mydebug = app.CreateDebug();
 	//app.ShowDebug(true);
 	
@@ -3339,8 +3364,16 @@ function OnStart() {
     //app.SetScreenMode( "Full"); // TODO: probleme mit Schriftgrößen und Tap-Events 
     app.PreventScreenLock(true);
 
-	if (app_browsermode==true) app.Debug('browser mode');
+	if (app.kwd_droidscript_emulator) {
+		kta.browsermode = true;
+		app.Debug('browser mode');
+	} 
+	else app.Debug('droidscript mode');
 	
+	if(app.GetOSVersion()>=14) { // 14 == Android 4.0.1
+		kta.nojquery = true; // TODO: better ask the functions you need e.g. getElementsByClassname
+		kta.advancedstyles = true;
+	}
     // frage ob gerade landscape, dann init erst bei resize:
     // TODO: ungünstig formatierte Inhalte leider kurz zu sehen bevor resize kommt.
     // TODO: teste ob code wieder aktiviert werden muss, wenn landscape/portrait als fest gespeichert werden  
@@ -3348,7 +3381,7 @@ function OnStart() {
 	//initCounter++; // causes init to be done on resize
 	//}
 	//else
-		initCounter+=2; 
+	initCounter+=2; 
 	
 	// force portrait until layout is more flexible:
 	//app.SetOrientation( "Portrait" ); 
