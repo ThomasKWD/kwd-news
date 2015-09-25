@@ -12,10 +12,12 @@
   height: 300px;
   border: 10px solid #eee;
   background-color: black;
-  background-image:-webkit-linear-gradient(top,#777 0%, #000 50%);
-  background-image:linear-gradient(#777 0%, #000 50%);
-  /* box-shadow: 5px 5px 10px #000 inset,5px 5px 10px #000;*/
-  box-shadow: 5px 5px 10px #000 inset;
+}
+.gauge.skin-plastic {
+	background-image:-webkit-linear-gradient(top,#777 0%, #000 50%);
+	background-image:linear-gradient(#777 0%, #000 50%);
+	/* box-shadow: 5px 5px 10px #000 inset,5px 5px 10px #000;*/
+	box-shadow: 5px 5px 10px #000 inset;
 }
 /* this may be changed by JS: */
 .gauge {

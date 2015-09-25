@@ -185,6 +185,10 @@ function kwdGeoLocator (options) {
 		//if (geodata.speed > 5) geodata.provider = 'network';
 		geodata.speed += r; //= (geodata.speed<20000) ? geodata.speed * 1.1 : geodata.speed * 0.9; // nice simu
 		if (geodata.speed<0) geodata.speed = 0;
+		//geodata.speed=170/3.6;
+		
+		// set an altitude
+		geodata.altitude = Math.random() * 300;
 		
 		//console.log (geodata);
 		if (callback_name !== null) callback_name.call(this,geodata);
