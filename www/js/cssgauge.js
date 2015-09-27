@@ -20,6 +20,7 @@ function CssGauge(init_settings) {
 	// private
 	var wrapperRef = null;
 	var gaugeRef = null;
+	var tickscontainerRef = null;
 	
 	var initial = true;
 	var gauge_width = 0;
@@ -92,38 +93,45 @@ function CssGauge(init_settings) {
 			'transform-origin': 'center ' +gauge_height/2 +'px 0' // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
 		});*/
 		
-		// make some major ticks
+		// clear previous:
+		if(!initial) // for performance 
+			tickscontainerRef.innerHTML = '';
+			//$('.g-tick,.g-tickval,.g-minor').remove(); // TODO: geht einfach g-scale.innerHTML = "" ;?
+			
+
+
+		// make some ticks
 		//var step = 20;
 		var step = parseFloat(settings.majorStep);
 		var majorcount = parseFloat(settings.maxRange) / step + 1;
 		
-		// clear previous:
-		if(!initial) // for performance 
-			$('.g-tick,.g-tickval,.g-minor').remove(); // TODO: geht einfach g-scale.innerHTML = "" ;?
-			
-		//generate:
-		var gscale = document.getElementsByClassName('g-scale')[0];
-		for(var i=0;i<majorcount;i++) {
-			gscale.insertAdjacentHTML('beforeend',
-				'<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
-		}
-		
+
 		// make minor ticks
 		var minorcount = parseInt(settings.minorTicks) * (majorcount -1);
 		//console.log(minorcount);
 		if (minorcount>0) {
 			for(var i=0;i<minorcount;i++) {
-				gscale.insertAdjacentHTML('beforeend',
+				tickscontainerRef.insertAdjacentHTML('beforeend',
 					'<div id="minor'+i+'" class="g-item g-minor"></div>');
 			}
 		}
+
+		//generate major ticks
+		//var gscale = document.getElementsByClassName('g-scale')[0];
+		for(var i=0;i<majorcount;i++) {
+			tickscontainerRef.insertAdjacentHTML('beforeend',
+				'<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
+		}
+		
+		// TODO: try to make minors befor majors ! then you don't need z-index
+		
 		
 		// position major ticks
 		// to the left edge, vert. centered
 		// the left edge is given by the html since border of gauge is outside
 		var tickbordergap = 10; // means px
 			
-		var allmajors = gscale.getElementsByClassName('g-majortick');
+		var allmajors = tickscontainerRef.getElementsByClassName('g-majortick');
 		var majorHeight = allmajors[0].offsetHeight; // take the first, they should be all the same!
 		var majorWidth = allmajors[0].offsetWidth;
 		
@@ -146,7 +154,7 @@ function CssGauge(init_settings) {
 		var correct1000 = 0;
 		//if(settings.maxRange>=1000) correct1000 = 10;// need this for large numbers (4 digits)
 		
-		var allTickvals = gscale.getElementsByClassName('g-tickval'); // TODO: check if you havt to WAIT
+		var allTickvals = tickscontainerRef.getElementsByClassName('g-tickval'); // TODO: check if you havt to WAIT
 		var tickvalHeight = allTickvals[0].offsetHeight;
 		for(var i = 0;i < allTickvals.length;i++) {
 			var e  = allTickvals[i];
@@ -195,16 +203,15 @@ function CssGauge(init_settings) {
 			});*/
 		}
 
-
 		// pre-position minor ticks
-		var allminors = gscale.getElementsByClassName('g-minor');
+		var allminors = tickscontainerRef.getElementsByClassName('g-minor');
 		var minorHeight = allminors[0].offsetHeight;
 		for(var i = 0;i < allminors.length;i++) {
 			var e  = allminors[i];
 			e.style.top = gauge_height/2-(minorHeight/2) + 'px';
 			e.style.left = tickbordergap + 'px';
-			e.style.webkitTranformOrigin = (gauge_width/2-tickbordergap)+'px center';
-			e.style.tranformOrigin = (gauge_width/2-tickbordergap)+'px center';
+			e.style.webkitTransformOrigin = (gauge_width/2-tickbordergap)+'px center';
+			e.style.transformOrigin = (gauge_width/2-tickbordergap)+'px center';
 		}
 		/*$('.g-minor').css ({
 			'top' :  gauge_height/2-($('.g-minor').outerHeight()/2),
@@ -279,6 +286,7 @@ function CssGauge(init_settings) {
 	
 	// construct
 	
+	tickscontainerRef = document.getElementById('g-ticks-container');
 	if (typeof init_settings == "object") { 
 		this.config(init_settings);  // includes draw, and scale since initial
 		this.setValue(settings.value);

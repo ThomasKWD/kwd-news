@@ -65,7 +65,7 @@ http://blog.michelledinan.com/08/2012/drawing-triangles-with-css/
 	width: 10px;
 	height:1px;
   	background-color: #83C2FD;
-  	z-index: -500;
+  	/*z-index: -500;*/
 }
 /* initial rotate for all majors: */
 .g-tickval {

@@ -534,6 +534,8 @@
 		}
 		.dona .g-pointer {
 			border-bottom-width: 85px !important;
+			border-left-width:8px !important;
+			border-right-width:8px !important;
 		}
 
 		/* 
@@ -605,6 +607,7 @@
         <div id="cssgauge-wrapper">
 			<div id="cssgauge" class="gauge skin">
 				<div class="g-scale"></div>
+					<div id="g-ticks-container" class="g-item"></div>
 					<div id="g-pointer" class="g-pointer g-item"></div>
 					<div id="g-center" class="g-center g-item"></div>
 	            <div id="digital-on-analog" class="hud skin"><div id="dona-text" class="speed gps">0000</div></div>
@@ -2182,7 +2185,6 @@ function DisplayBox (newid,mode) {
 	};
 	
 	// construct displayBox
-
 	id=newid;
 	boxRef = document.getElementById(newid);
 	//jquery:textRef = $('.display-text',boxRef);
@@ -2452,11 +2454,11 @@ function setTachoLayout() {
 	    }
 	    else if (a && !d) {
 	        cssgauge_visible = true;
-	        $('#cssgauge-wrapper').show(); 
-	        $('#digital-on-analog').hide();
-	        $('#cssgauge').removeClass('dona');
+	        kwd_showById('cssgauge-wrapper'); // $('#cssgauge-wrapper').show(); 
+	        kwd_hideById('digital-on-analog'); //$('#digital-on-analog').hide();
+	        document.getElementById('cssgauge').classList.remove('dona'); //$('#cssgauge').removeClass('dona');
 	        displayDigitalspeed.hide();
-	        $('#digitalspeed-wrapper').hide();   
+	        kwd_hideById('digitalspeed-wrapper'); //$('#digitalspeed-wrapper').hide();   
 	    }
 	    else if (!a && d) {
 	        cssgauge_visible = false;
@@ -2468,9 +2470,9 @@ function setTachoLayout() {
 	    }
 	    else {
 	        cssgauge_visible = false;
-	        $('#cssgauge-wrapper').hide();
+	        kwd_hideById('cssgauge-wrapper'); //$('#cssgauge-wrapper').hide();
 	        displayDigitalspeed.hide();
-	        $('#digitalspeed-wrapper').hide();
+	        kwd_hideById('digitalspeed-wrapper'); //$('#digitalspeed-wrapper').hide();
 	    }
 	}
 	else {
@@ -2777,16 +2779,21 @@ function positionDisplays() {
 	
 	// analog (only center or not)
 				
+	var cssgaugewrapper = document.getElementById('cssgauge-wrapper');
+
+
 	if(cssgauge_visible) {
 		
 		var gaugeleft = 0;
 		if (isLandscape && displays.noneVisible()) {
-			gaugeleft = (screen_w - $('#cssgauge-wrapper').outerWidth())/2;
+			gaugeleft = (screen_w - cssgaugewrapper.offsetWidth)/2;
 		}
-		$('#cssgauge-wrapper').css({
+		cssgaugewrapper.style.top = 0;
+		cssgaugewrapper.style.left = gaugeleft + 'px';
+		/*$('#cssgauge-wrapper').css({
 			'top':'0px',
 			'left': gaugeleft+'px'
-		});		
+		});*/		
 	}
 	
 	// digital (scale full or half)
@@ -2831,7 +2838,6 @@ function positionDisplays() {
 		//$('#displays-wrapper').show();
 		displayswrapper.style.display = 'block';
 		
-		var cssgaugewrapper = document.getElementById('cssgauge-wrapper');
 		
 		// width only cut in landscape
 		if(isLandscape) {
@@ -3203,11 +3209,10 @@ function initApp()  {
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
     if(settings.get('switchhudsettings')!=false) settings.switchit('switchhudsettings'); // auto saved will be overidden here
 	if (settings.get('settimeformat')==false) {
-		$('#seconds-text').hide();
+		kwd_hideById('seconds-text'); //$('#seconds-text').hide();
 		kta.clockseconds = false;
 	} 
-        
-    
+            
 	if (settings.get('switchfastoptions')!=false) {
 		kta.fastoptions = true;
 	}
