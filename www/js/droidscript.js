@@ -21,14 +21,14 @@ function DroidScriptApp () {
 	};
 	
 	this.clearPopup = function() {
-		$('.toastmessage').fadeOut(400);
+		//$('.toastmessage').fadeOut(400);
 	};
 	this.ShowPopup = function(msg) {
-		if(popuptimeout!==false) clearTimeout(popuptimeout);
+		//if(popuptimeout!==false) clearTimeout(popuptimeout);
 		this.Debug("popup: "+msg);
-		$('.toastmessage').text(msg);
-		$('.toastmessage').show();
-		setTimeout(this.clearPopup,5000);
+		//$('.toastmessage').text(msg);
+		//$('.toastmessage').show();
+		//setTimeout(this.clearPopup,5000);
 	};
 	
 	/* return the probable correct value of screen orientation
