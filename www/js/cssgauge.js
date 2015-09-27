@@ -1,9 +1,4 @@
 /*
-TODO: 
-* make a "class" (prototype)
-*/
-
-/*
 Erzeugt eine analoge Anzeige, bisher nur optimiert für Tachometer
 (positive Werte, 1 Zeiger)
 FEATURES:
@@ -16,13 +11,16 @@ FEATURES:
 TODO: 
 - Farbige Bereiche (Balken) wie Canvas Gauges
 - Zeitkritische Routinen: direkt DOM-Manipulation ohne jQuery und addClass wenn möglich
- 
+
 */
 
 // class
 function CssGauge(init_settings) {
 	
 	// private
+	var wrapperRef = null;
+	var gaugeRef = null;
+	
 	var initial = true;
 	var gauge_width = 0;
 	var gauge_height = 0;
@@ -45,15 +43,19 @@ function CssGauge(init_settings) {
 		// - the width, height of .gauge is expected to be constant (since not changed by scale)
 		// - ! the unscaled size of .gauge can disturb the size of the body tag !
 		// - checks if width or height is limiting ("bounding box")
-		var ws =  $('#'+settings.wrapper).width() /  $('#'+settings.gauge).outerWidth();
-		var hs =  $('#'+settings.wrapper).height() /  $('#'+settings.gauge).outerHeight();
+		var ws = wrapperRef.clientWidth / gaugeRef.offsetWidth;
+		//var ws =  $('#'+settings.wrapper).width() /  $('#'+settings.gauge).outerWidth();
+		var hs = wrapperRef.clientHeight / gaugeRef.offsetHeight;
+		//var hs =  $('#'+settings.wrapper).height() /  $('#'+settings.gauge).outerHeight();
 		//console.log(ws+'x'+hs);
 		scale = (ws < hs) ? ws : hs;
 			
-		$('#'+settings.gauge).css({
+		gaugeRef.style.transformOrigin = '0 0 0'; // TODO make this once
+		gaugeRef.style.transform = 'scale('+scale+','+scale+')';
+		/*$('#'+settings.gauge).css({
 			'transform-origin':'0 0 0',
 			'transform':'scale('+scale+','+scale+')'
-		});		
+		});*/		
 	};
 	
 	/* aktualisiert die als "beweglich" definierten Komponenten
@@ -61,26 +63,34 @@ function CssGauge(init_settings) {
 	   - prüft oder korrigiert NICHT die "unbeweglichen" Komponenten
 	*/
 	this.draw = function() {
-
+		
 		// get size and use it to scale and position contents:
 		// TODO: wenn nötig, zwischen initial und später unterscheiden
-		if (gauge_width==0) gauge_width = $('.gauge').width();
-		if (gauge_height==0) gauge_height = $('.gauge').height();
+		if (gauge_width==0) gauge_width = gaugeRef.clientWidth;
+		if (gauge_height==0) gauge_height = gaugeRef.clientHeight;
 		//alert (gauge_height);
-
+		
 		// center
-		$('.g-center').css( { 
-			'left' : gauge_width/2-($('.g-center').outerWidth()/2),
+		var gcenter = document.getElementById('g-center');
+		gcenter.style.left = gauge_width/2 - gcenter.offsetWidth / 2 +'px'; // ! px doch wichtig!
+		gcenter.style.top = gauge_height/2 - gcenter.offsetHeight / 2 +'px';
+		/*$('.g-center').css( { 
+			'left' : gauge_width/2-($('.g-center').outerWidth()/2), // check if is with border!!
 			'top' : gauge_height/2-($('.g-center').outerHeight()/2)
-		});
+		});*/
 
 		// pointer position; left middle  = rotation center
-		$('.g-pointer').css({
+		var gpointer = document.getElementById('g-pointer');
+		gpointer.style.top = 0;
+		gpointer.style.left = '130px';
+		gpointer.style.webkitTransformOrigin = 'center ' +gauge_height/2 +'px 0'; // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
+		gpointer.style.transformOrigin = 'center ' +gauge_height/2 +'px 0'; // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
+		/*$('.g-pointer').css({
 			'top' : '0px',
-		/*	'left' : gauge_height/2-($('.g-pointer').outerWidth()/2) + 'px',*/
+		//	'left' : gauge_height/2-($('.g-pointer').outerWidth()/2) + 'px',
 			'left' : '130px', // hard coded because error not found :-(
 			'transform-origin': 'center ' +gauge_height/2 +'px 0' // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
-		});
+		});*/
 		
 		// make some major ticks
 		//var step = 20;
@@ -89,10 +99,13 @@ function CssGauge(init_settings) {
 		
 		// clear previous:
 		if(!initial) // for performance 
-			$('.g-tick,.g-tickval,.g-minor').remove();
+			$('.g-tick,.g-tickval,.g-minor').remove(); // TODO: geht einfach g-scale.innerHTML = "" ;?
+			
 		//generate:
+		var gscale = document.getElementsByClassName('g-scale')[0];
 		for(var i=0;i<majorcount;i++) {
-			$('.g-scale').append('<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
+			gscale.insertAdjacentHTML('beforeend',
+				'<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
 		}
 		
 		// make minor ticks
@@ -100,7 +113,8 @@ function CssGauge(init_settings) {
 		//console.log(minorcount);
 		if (minorcount>0) {
 			for(var i=0;i<minorcount;i++) {
-				$('.g-scale').append('<div id="minor'+i+'" class="g-item g-minor"></div>');
+				gscale.insertAdjacentHTML('beforeend',
+					'<div id="minor'+i+'" class="g-item g-minor"></div>');
 			}
 		}
 		
@@ -108,21 +122,41 @@ function CssGauge(init_settings) {
 		// to the left edge, vert. centered
 		// the left edge is given by the html since border of gauge is outside
 		var tickbordergap = 10; // means px
+			
+		var allmajors = gscale.getElementsByClassName('g-majortick');
+		var majorHeight = allmajors[0].offsetHeight; // take the first, they should be all the same!
+		var majorWidth = allmajors[0].offsetWidth;
 		
-		$('.g-majortick').css ({
+		for(var i = 0;i < allmajors.length;i++) {
+			var e  = allmajors[i];
+			e.style.top = (gauge_height/2-majorHeight/2) + 'px';
+			e.style.left = tickbordergap + 'px';
+			e.style.webkitTransformOrigin = (gauge_width/2-tickbordergap)+'px center 0';
+			e.style.transformOrigin = (gauge_width/2-tickbordergap)+'px center 0';
+		}
+		/*$('.g-majortick').css ({
 			'top' :  (gauge_height/2-($('.g-majortick').outerHeight()/2)) + 'px',
 			'left': tickbordergap + 'px',
 			'transform-origin': (gauge_width/2-tickbordergap)+'px center 0'
-		});
+		});*/
+		
+		
 		// pre-position tick values
 		// left +3 is layout gap between stroke and number
 		var correct1000 = 0;
 		//if(settings.maxRange>=1000) correct1000 = 10;// need this for large numbers (4 digits)
 		
-		$('.g-tickval').css ({
+		var allTickvals = gscale.getElementsByClassName('g-tickval'); // TODO: check if you havt to WAIT
+		var tickvalHeight = allTickvals[0].offsetHeight;
+		for(var i = 0;i < allTickvals.length;i++) {
+			var e  = allTickvals[i];
+			e.style.top = (gauge_height/2-(tickvalHeight/2)) + 'px';			
+			e.style.left = (majorWidth +correct1000 + tickbordergap) + 'px';
+		}
+		/*$('.g-tickval').css ({
 			'top' :  (gauge_height/2-($('.g-tickval').outerHeight()/2)) + 'px',
 			'left' : ($('.g-majortick').outerWidth()+ +correct1000 + tickbordergap) + 'px'
-		});
+		});*/
 
 		// rotate majorticks, tickvalues
 		var rotate_offset =  parseFloat(settings.overallAngle) / 2 - 90; 
@@ -132,36 +166,63 @@ function CssGauge(init_settings) {
 			// TODO: Verhältnisgleichung, wegen: 360°:100% 
 			// 1/4 = 90° = space; 360-90° = 270:10 = 27 = step; 90°/2 = offset
 			var rotate = i * rotate_step - rotate_offset;
-			$('#tick'+i).css( {
+			
+			var thistick = document.getElementById('tick'+i);
+			thistick.style.webkitTransformOrigin = ((gauge_width/2) - 20 - correct1000 - tickbordergap) +'px center';
+			thistick.style.transformOrigin = ((gauge_width/2) - 20 - correct1000 - tickbordergap) +'px center';
+			/*$('#tick'+i).css( {
 				'transform-origin': ((gauge_width/2) - 20 - correct1000 - tickbordergap) +'px center'			
-			});
+			});*/
+			
+			var thismajor = document.getElementById('major'+i);
+			thismajor.style.webkitTransform = 'rotate('+rotate+'deg)';
+			thismajor.style.transform = 'rotate('+rotate+'deg)';
+			thistick.style.webkitTransform = 'rotate('+rotate+'deg)';
+			thistick.style.transform = 'rotate('+rotate+'deg)';
+			/*			
 			$('#major'+i+',#tick'+i).css( {
 				'transform':'rotate('+rotate+'deg)'
-			});
+			});*/
+			
 			// correct number rotate; note the minus rotate
 			// Problem: Numbers widths
 			rotate = -rotate;
-			$('#inner'+i).css( {
+			var thisinner =  document.getElementById('inner'+i);
+			thisinner.style.webkitTransform = 'rotate('+rotate+'deg)';
+			thisinner.style.transform =  'rotate('+rotate+'deg)';
+			/*$('#inner'+i).css( {
 				'transform':'rotate('+rotate+'deg)'
-			});
+			});*/
 		}
 
 
 		// pre-position minor ticks
-		$('.g-minor').css ({
+		var allminors = gscale.getElementsByClassName('g-minor');
+		var minorHeight = allminors[0].offsetHeight;
+		for(var i = 0;i < allminors.length;i++) {
+			var e  = allminors[i];
+			e.style.top = gauge_height/2-(minorHeight/2) + 'px';
+			e.style.left = tickbordergap + 'px';
+			e.style.webkitTranformOrigin = (gauge_width/2-tickbordergap)+'px center';
+			e.style.tranformOrigin = (gauge_width/2-tickbordergap)+'px center';
+		}
+		/*$('.g-minor').css ({
 			'top' :  gauge_height/2-($('.g-minor').outerHeight()/2),
 			'left': tickbordergap + 'px',			
 			'transform-origin': (gauge_width/2-tickbordergap)+'px center'
-		});
+		});*/
+		
 		// rotate minor ticks
-
 		var rotate_step_minor = parseFloat(settings.overallAngle) / (minorcount);
 		
 		for(var i=0;i<minorcount;i++) {
 			var rotate = i * rotate_step_minor - rotate_offset;
-			$('#minor'+i).css( {
+			var thisminor = document.getElementById('minor'+i);
+			thisminor.style.webkitTransform = 'rotate('+rotate+'deg)';
+			thisminor.style.transform = 'rotate('+rotate+'deg)';
+			/*$('#minor'+i).css( {
 				'transform':'rotate('+rotate+'deg)'
-			});
+			});*/
 		}
 		
 		initial = false;
@@ -180,7 +241,9 @@ function CssGauge(init_settings) {
 			previous_value=v;
 			//andere Berechnung als oben, da senkrecht = 0;
 			var offset = v * angle_range_ratio + zero_angle;
-			$('#g-pointer').css('transform','rotate('+offset+'deg)'); // TODO: performance: save DOM element reference??
+			var pointerRef = document.getElementById('g-pointer'); // TODO: save once
+			pointerRef.style.transform = 'rotate('+offset+'deg)';
+			//$('#g-pointer').css('transform','rotate('+offset+'deg)'); // TODO: performance: save DOM element reference??
 			return true;
 		}
 		return false;
@@ -196,9 +259,17 @@ function CssGauge(init_settings) {
 	this.config = function(new_config) {
 		if (typeof new_config == 'object') {
 			settings = new_config;
-			console.log(settings);
+			
+			try {
+				wrapperRef = document.getElementById(settings.wrapper);
+				gaugeRef = document.getElementById(settings.gauge);
+			}
+			catch (e) {
+				throw "Error on init gauge";
+			}
 			angle_range_ratio = parseFloat(settings.overallAngle) / parseFloat(settings.maxRange); // loc. var for performance
 			zero_angle = - parseFloat(settings.overallAngle) / 2;
+			
 			this.draw();
 			this.scale();
 			previous_value = -1; // force value reset

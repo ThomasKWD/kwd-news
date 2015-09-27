@@ -32,6 +32,7 @@
 	- INTERNAL
 		- alle sicherheits-'if' weg, wenn fehlschlagen nur von meinen Inputs abhängt, also z.B. nicht vom Gerät/Umgebung
 		-> im Zweifel mehr throws
+		- suche Stellen wo css größen ohne px gesetzt -> Probleme!
     
 	- LANDSCAPE
 		- evtl. landscape displays wrapper vergrößern, wenn analog
@@ -605,7 +606,7 @@
 			<div id="cssgauge" class="gauge skin">
 				<div class="g-scale"></div>
 					<div id="g-pointer" class="g-pointer g-item"></div>
-					<div class="g-center g-item"></div>
+					<div id="g-center" class="g-center g-item"></div>
 	            <div id="digital-on-analog" class="hud skin"><div id="dona-text" class="speed gps">0000</div></div>
 	            <div id="info-on-analog"><div class="tachounit gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
@@ -2161,7 +2162,6 @@ function DisplayBox (newid,mode) {
 	
 	this.resize = function(x,y,dim) {
 		
-		debugger;
 		/*jquery: $(boxRef).css({
 			'width':x+'px',
 			'height':y+'px'
@@ -2182,7 +2182,7 @@ function DisplayBox (newid,mode) {
 	};
 	
 	// construct displayBox
-debugger;
+
 	id=newid;
 	boxRef = document.getElementById(newid);
 	//jquery:textRef = $('.display-text',boxRef);
