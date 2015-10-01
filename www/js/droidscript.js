@@ -120,11 +120,11 @@ function DroidScriptApp () {
 	document.onkeydown = function(evt) {
 	    evt = evt || window.event;
 	    if (evt.keyCode == 27) {
-	    	console.log('ESC detected');
+	    	//console.log('ESC detected');
 	        OnBack();
 	    }
 	    else if (evt.keyCode == 77) {
-	    	console.log('M detected');
+	    	//console.log('M detected');
 	        OnMenu();
 	    }
 	};
