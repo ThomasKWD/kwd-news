@@ -684,7 +684,7 @@
     </div>
     
     <div id="infocard" class="card">
-        <h2><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to this Speedometer and GPS Tool</span></h2>
+        <h2><a href="#back" class="back-arrow ext-link"><span class="icon-left-big"></span></a><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to this Speedometer and GPS Tool</span></h2>
 		<p>by</p>
 		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
 		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
@@ -965,7 +965,7 @@ function KwdTachoApp() {
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.nojquery = false;
-	this.version = 1.43;  // da re-implement nur intern was großes
+	this.version = 1.50; 
 	this.defaultMargin = 10;
 	
 	this.storage = {
@@ -3413,7 +3413,7 @@ function initApp()  {
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
 	
-	// TODO: actually we don't need this anymore
+	// ACHTUNG ! plastic skin deaktiviert!
 	if(0 && kta.advancedstyles) {
 		//$('.skin').addClass('skin-plastic');
 		var skinelements = document.getElementsByClassName('skin');
@@ -3909,6 +3909,33 @@ function initApp()  {
     
 
 
+    // findet alle ext-link, wenn bubble
+    document.getElementById('infocard').addEventListener('click',function(evt) { // bewusst hier click!
+		
+		var e = evt.target;
+		var found = false;
+		while (!found && e) {
+			found = e.classList.contains('ext-link');
+			if (!found) {
+				e = e.parentElement; // == parentNode?
+				if(!e || e.tagName.toLowerCase() == 'body') break;
+			}
+		}					
+		
+		if (e) {
+			var lhash = e.hash; // hoffentlich hash nicht undefined
+			if(lhash && lhash == '#back') OnBack();
+			else {
+		        var linktarget = e.href;
+		        app.OpenUrl( linktarget );
+		        evt.preventDefault();
+		        evt.stopPropagation();
+		        return false;
+			} 
+		}
+		
+		return true;    	
+    });
     
    	var els = document.getElementsByClassName('card');
    	for(var i=els.length-1;i>=0;i--) {
@@ -3916,6 +3943,9 @@ function initApp()  {
    			resetMenuFade();
    		});
    	}
+   	
+   	
+   	
    	//TODO: check if works!!!
 	kwd_addEvent( window, 'scroll', function() {
 		resetMenuFade();
