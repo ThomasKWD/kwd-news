@@ -36,8 +36,10 @@
 		- suche Stellen wo css größen ohne px gesetzt -> Probleme!
 		- verwende auch classList.toggle!
 		- kein 'absolute' Element sollte 'margin' haben (verwirrt nur), für Abstände kann der äußere 'padding' haben
-		- bei fehlern displays verwende getComputedStyle!
+		- bei fehlern displays verwende getComputedStyle! + versuche scrollLeft property!
 		- bei weiter Fehlern: neue Ideen der Umsetzung anstatt einfach jQuery-Ansatz übertragen!
+		
+		- es scheint wirklich möglich zu sein, in DOM-Objekten zusäzliche Daten zwischen zu speichern !! :-)
     
 	- LANDSCAPE
 		- evtl. landscape displays wrapper vergrößern, wenn analog
@@ -260,8 +262,9 @@
         /* some properties are set by JS */
         #digital-on-analog {
             position:absolute;
-            outline:1px solid red;
             letter-spacing:0;
+            padding-left:0 !important;
+            padding-right:0 !important;
         }
 
         #info-on-analog {
@@ -288,7 +291,7 @@
        .display-box {
 			position:relative;
 			overflow:hidden;
-            font-size:150px;
+            font-size:100px;
             line-height:1em;
             font-weight:bold;
 			padding:5px 15px 0 15px;
@@ -304,6 +307,13 @@
        }
 		.positioner {
 			position:absolute;
+		}
+		/* alle displays scrollen nicht! */
+		#display-container {
+			width:100%;
+			height:100%;
+			overflow:hidden;
+			position:fixed;
 		}
 		#displays-positioner {
 			/*outline: 1px solid green;*/
@@ -324,7 +334,6 @@
         #tacho-container {
         	position:absolute;
         }
-        #display-container,
 		#digitalspeed-wrapper {
 			position:relative;
 		}
@@ -406,6 +415,7 @@
 		#digitalspeed-wrapper {
             color:white;
             /*box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;*/
+           	background-color:black;
             border:10px solid #ddd;
             border-radius:3em;
             font-size:1em;
@@ -424,7 +434,7 @@
 			display:block;
 	        width:90%;
 	        max-width:30em;
-	        max-height:95%;
+	        /* das verursacht leider bad performance element scroll: max-height:95%; */
 			background-color:black;
 			overflow:auto;
 			display:none;
@@ -605,7 +615,6 @@
 		#digitalspeed-wrapper.skin-minimal,
 		#displays-wrapper.skin-minimal {
 			background-image:none;
-			background-color:black;
 			border-color:black;
 			box-shadow:none;
 			border-radius:0;
@@ -620,8 +629,10 @@
 
 <div id="hg"></div>
 
+<div id="touch-wrapper">
+	
 <div id="display-container">
-    <div id="tacho-container">
+    <div id="tacho-container" class="fast-option">
   
         <div id="cssgauge-wrapper">
 			<div id="cssgauge" class="gauge skin">
@@ -630,7 +641,7 @@
 					<div id="g-pointer" class="g-pointer g-item"></div>
 					<div id="g-center" class="g-center g-item"></div>
 	            <div id="digital-on-analog" class="hud skin display-box"><div id="dona-text" class="speed gps display-text">0000</div></div>
-	            <div id="info-on-analog"><div class="tachounit gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
+	            <div id="info-on-analog"><div id="dona-tachounit" class="tachounit fast-option gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
 		</div>
 <!--        <div id="speedstats">
@@ -639,7 +650,7 @@
         </div>
 -->
 		<div id="digitalspeed-positioner" class="positioner">
-			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit">km/h</div></div></div>
+			<div id="digitalspeed-wrapper" class="skin"><div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit fast-option">km/h</div></div></div>
 		</div>
 		
 		<!--you will need 2 versions for display in digital OR analog
@@ -651,9 +662,9 @@
 	<div id="displays-positioner" class="positioner">
     
     <div id="displays-wrapper" class="skin">    	
-	    <div id="time" class="hud display-box skin"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
-	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit">m</div> </div>
-		<div id="geolocation" class="hud display-box skin"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
+	    <div id="time" class="hud display-box skin fast-option"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
+	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit fast-option">m</div> </div>
+		<div id="geolocation" class="hud display-box skin fast-option"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
 
 <!--        <div id="averagespeed" class="display-box hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
         <div id="maxspeed" class="display-box hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
@@ -665,6 +676,7 @@
         <div id="geoaccuracy" class="hud display-frame"><span id="accuracytext skin" class="display-text gps">0000</span><div id="accuracyinfo" class="unitlabel">m</div></div>
 -->
 
+<div id="dialogs-blender"></div>
 
     <div id="menu">
         <a class="btn" href="#info">Info</a>
@@ -725,14 +737,13 @@
         Falls Ihnen die App gefällt, können Sie ihre Entwicklung voran treiben,
         indem Sie einen kleinen Betrag spenden. Vielen Dank!
         
-        <a href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link" lang="de">Spenden</a>
+        <a id="donate-button" href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link"><span lang="de">Spenden</span></a>
         
         </p>
 
     </div>
 
 <!--wraps all dialogs: -->
-<div id="dialogs-blender"></div>
 <div id="dialogs-wrapper">
 
     <div id="title" class="autofade">
@@ -859,6 +870,8 @@
 
 </div> <!--dialogs-wrapper-->
 
+</div> <!-- touch-wrapper -->
+
     <div id="splashscreen" class="screencard">
     	<p>
          <img src="res/kwd-4-title.png" />
@@ -883,13 +896,14 @@ function kwd_showByClass(setclass) {
 
 function kwd_hideById(setid) {
 	
-	document.getElementById(setid).style.display = 'none'; 
-	// TODO: save old state in member inside this
+	// TODO: Teste, ob dies konsistent!!: 
+	//document.getElementById(setid).kwdLastDisplay = 'andreas';
+	document.getElementById(setid).style.display = 'none';	 
+
 }
-function kwd_showById(setid) {
-	// TODO: problem if was inline - > use stored value
-	document.getElementById(setid).style.display = 'block'; 
-	// TODO: save old state in member inside this
+function kwd_showById(setid,reset_to) {
+	if(!reset_to) reset_to = 'block';
+	document.getElementById(setid).style.display = reset_to;
 }
 
 
@@ -951,7 +965,7 @@ function KwdTachoApp() {
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.nojquery = false;
-	this.version = 1.50;
+	this.version = 1.43;  // da re-implement nur intern was großes
 	this.defaultMargin = 10;
 	
 	this.storage = {
@@ -1581,8 +1595,8 @@ function KwdGpsTools () {
 	        	
 	        if (cssgauge_visible) { // flag for performance
 		        // correct scale if >1000 or <1000
-		        if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
-		        else if (displayspeed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
+		        //if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
+		        //else if (displayspeed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
 		        
 	        	if (displayspeed > 0) this.tachoRange(displayspeed); // must not be <= 0  (accidently)
 	        	gauge.setValue(displayspeed); // hier den exakten float value nutzen
@@ -2085,7 +2099,8 @@ function KwdPopupStack() {
 	this.clear = function() {
  		if(stack.length) {
  			//$('#'+stack[stack.length-1].id).hide();
- 			kwd_HideById(stack[stack.length-1].id);
+			var el = document.getElementById(stack[stack.length-1].id);
+ 			if (el) el.style.display = 'none';
  			stack.length = 0; // clear all
  		}
 	};
@@ -2119,6 +2134,7 @@ function DisplayBox (newid,mode) {
 
 	var id;
 	var boxRef = null; // element in DOM
+	var boxRef_padding = 0; // TODO: 2 Werte: jedes Padding einzeln!
 	var textRef = null; 
 	var text_w = 0;
 	var text_h = 0;
@@ -2184,7 +2200,7 @@ function DisplayBox (newid,mode) {
 	/* passt die Größe dem umgebenden div (settings.wrapper) an
 	 * - unabhängig, da bei jedem resize benötigt.
 	 */
-	this.scale = function(dim) {
+	this.scale = function(x,y,dim) {
 		// manage scale + corrected position!
 		// TODO: CSS scale origin des .gauge oben links
 		// - the width, height of wrapper are always the innermost value 
@@ -2192,10 +2208,9 @@ function DisplayBox (newid,mode) {
 		if (boxRef==null || textRef==null) return;
 		
 		// TODO: save values on construct if scroll-dims not work!
-		var testw = boxRef.clientWidth;
-		var testh = boxRef.clientHeight;
-		var ws =  boxRef.clientWidth /  text_w; 
-		var hs =  boxRef.clientHeight / text_h;
+		// ! manuell padding hinzugefügt :-(())
+		var ws =  x /  text_w; 
+		var hs =  y / text_h;
 		var scale = 1;
 		
 		if(dim) {
@@ -2207,11 +2222,7 @@ function DisplayBox (newid,mode) {
 			}			
 		}
 		else scale = (ws < hs) ? ws : hs;
-		
-		// move to proper position too
-		// einmalig in die Mitte des umgebenden div translaten und dann scale-origin in der Mitte lassen? 
-		var x = y =0; 
-		
+				
 		// TODO: should also work with transform-origin 50% 50% 0 and center text by top/left values
 		// TODO: you could ask a global flag and decide whether to use webkit or not
 		/*jquery: $(textRef).css({
@@ -2257,14 +2268,15 @@ function DisplayBox (newid,mode) {
 			'left':($(boxRef).innerWidth() - $(textRef).width()) / 2 + 'px' 
 		});*/
 		
-
-		this.scale(dim);
+		if(x!=0) x-= boxRef_padding*2;
+		//if(y!=0) y-= boxRef;
+		this.scale(x,y,dim);
 		
 		// TODO: make work
 		// - cannot work since text_w is unscaled ori size
 		//var diffw = textRef.getBoundingClientRect().width;
 		var leftpos = (boxRef.clientWidth - text_w) /2;
-		textRef.style.marginLeft = leftpos + 'px';
+		textRef.style.marginLeft = leftpos - boxRef_padding + 'px'; //Hier manuell die padding der  Box hinzugerechnet :-(
 	};
 	
 	// construct displayBox
@@ -2280,6 +2292,10 @@ function DisplayBox (newid,mode) {
 	//jquery: $(boxRef).show(); 
 	boxRef.style.display = 'block'; // in case it is disabled initially // hide depending on app settings is done later
 	if(mode) primary = true;
+	
+	// padding speichern:
+	boxRef_padding = parseFloat(getComputedStyle(boxRef,null).paddingLeft);
+	//app.Debug('padding found '+newid+': '+boxRef_padding);
 	
 	// fix inner text box size to preset text
 	// change to block important for scale (must be inline before for getting text size) 
@@ -2324,14 +2340,15 @@ function DisplayBoxList(id_maxwidth) {
 		
 		//jquery: if(reset_text)	$('.display-text','#'+id).text(reset_text); 
 			
-		// ! with this code only *one* child of the 'id' is processed!:
-		var el = document.getElementById(id);
-		if (el) {
-			
-			var dts = el.getElementsByClassName('display-text');
-			if(dts && dts.length) dts[0].innerHtml = reset_text;
-			else throw 'kwd: cannot reset text to "'+reset_text+'"';
+		if(reset_text) {
+			var el = document.getElementById(id);
+			if (el) {
+				
+				var dts = el.getElementsByClassName('display-text');
+				if(dts && dts.length) dts[0].innerHTML = reset_text;
+			}
 		}	
+		
 		return box;			
 	};
 	
@@ -2378,7 +2395,7 @@ function DisplayBoxList(id_maxwidth) {
 			var c = 0;
 			// ! only works when #digitalspeed is first in list !
 			// ! counts from second entry 
-			for(i=1;i<list.length;i++) { // always loop forward here!
+			for(i=0;i<list.length;i++) { // always loop forward here!
 				if (list[i].isVisible()) {
 					c++;
 				}
@@ -2427,12 +2444,12 @@ function DigitalSpeedBoxList(id_maxwidth) {
 		//jquery: if(reset_text)	$('.display-text','#'+id).text(reset_text); 
 			
 		// ! with this code only *one* child of the 'id' is processed!:
-		var el = document.getElementById(id);
-		if (el) {
-			
-			var dts = el.getElementsByClassName('display-text');
-			if(dts && dts.length) dts[0].innerHtml = reset_text;
-			else throw 'kwd: cannot reset text to "'+reset_text+'"';
+		if(reset_text) {
+			var el = document.getElementById(id);
+			if (el) {
+				var dts = el.getElementsByClassName('display-text');
+				if(dts && dts.length) dts[0].innerHTML = reset_text;
+			}
 		}	
 		return box;			
 	};
@@ -2526,12 +2543,13 @@ function AnalogSpeedBoxList() {
 		//jquery: if(reset_text)	$('.display-text','#'+id).text(reset_text); 
 			
 		// ! with this code only *one* child of the 'id' is processed!:
-		var el = document.getElementById(id);
-		if (el) {
-			
-			var dts = el.getElementsByClassName('display-text');
-			if(dts && dts.length) dts[0].innerHtml = reset_text;
-			else throw 'kwd: cannot reset text to "'+reset_text+'"';
+		if(reset_text) {
+			var el = document.getElementById(id);
+			if (el) {
+				
+				var dts = el.getElementsByClassName('display-text');
+				if(dts && dts.length) dts[0].innerHTML = reset_text;
+			}
 		}	
 		return box;			
 	};
@@ -2722,8 +2740,10 @@ function setTachoLayout() {
 	
 	    if(a && d) {
 	        cssgauge_visible = true;
+	        document.getElementById('cssgauge-wrapper').style.top = '10px';
+	        
 	        //$('#cssgauge-wrapper').show();
-	        document.getElementById('cssgauge-wrapper').style.display = 'block';  // just see if error :-)
+	        //document.getElementById('cssgauge-wrapper').style.display = 'block';  // just see if error :-)
 	        //$('#digital-on-analog').show();    
 	        document.getElementById('digital-on-analog').style.display = 'block';
 	        //$('#cssgauge').addClass('dona');
@@ -2734,7 +2754,8 @@ function setTachoLayout() {
 	    }
 	    else if (a && !d) {
 	        cssgauge_visible = true;
-	        kwd_showById('cssgauge-wrapper'); // $('#cssgauge-wrapper').show(); 
+	        document.getElementById('cssgauge-wrapper').style.top = '10px';
+	        //kwd_showById('cssgauge-wrapper'); // $('#cssgauge-wrapper').show(); 
 	        kwd_hideById('digital-on-analog'); //$('#digital-on-analog').hide();
 	        document.getElementById('cssgauge').classList.remove('dona'); //$('#cssgauge').removeClass('dona');
 	        displayDigitalspeed.hide();
@@ -2742,15 +2763,17 @@ function setTachoLayout() {
 	    }
 	    else if (!a && d) {
 	        cssgauge_visible = false;
+	        document.getElementById('cssgauge-wrapper').style.top = '-2000px';
 	        //$('#cssgauge-wrapper').hide();
-	        document.getElementById('cssgauge-wrapper').style.display = 'none';	        
+	        //document.getElementById('cssgauge-wrapper').style.display = 'none';	        
 	        displayDigitalspeed.show();
 	        //$('#digitalspeed-wrapper').show();
 	        document.getElementById('digitalspeed-wrapper').style.display = 'block';   
 	    }
 	    else {
 	        cssgauge_visible = false;
-	        kwd_hideById('cssgauge-wrapper'); //$('#cssgauge-wrapper').hide();
+	        document.getElementById('cssgauge-wrapper').style.top = '-2000px';
+	        //kwd_hideById('cssgauge-wrapper'); //$('#cssgauge-wrapper').hide();
 	        displayDigitalspeed.hide();
 	        kwd_hideById('digitalspeed-wrapper'); //$('#digitalspeed-wrapper').hide();
 	    }
@@ -2862,12 +2885,14 @@ function scaleDisplays(initial) {
   //  	'width':w+'px',
     //	'height':w+'px'
     //});
-    var el = document.getElementById('cssgauge-wrapper');
-    if (el) {
-    	el.style.width = w-(def_margin*2) + 'px';
-    	el.style.height = w-(def_margin*2) + 'px';
+    if (cssgauge_visible) {
+	    var el = document.getElementById('cssgauge-wrapper');
+	    if (el) {
+	    	el.style.width = w-(def_margin*2) + 'px';
+	    	el.style.height = w-(def_margin*2) + 'px';
+	    }
+	    gauge.scale();
     }
-    gauge.scale();
 
 
         
@@ -2910,7 +2935,7 @@ function scaleDisplays(initial) {
 		// TODO: you must WAIT or try to make is as ONE (read the diff between inner width and width --> know in advance which result width will be)
 		var el = document.getElementById('digital-on-analog');
 		el.style.left = (cssgaugewidth - el.clientWidth) / 2 + 'px';
-		el.style.top =  (cssgaugewidth - el.clientHeight) / 2 + 'px';
+		el.style.top =  (cssgaugewidth - el.clientHeight) / 2 - 10 + 'px'; // 10px oberhalb Miitt
 
 	    // size and position of info (km/h) on analog must depend on cssgauge
 	    /*jquery: $('#info-on-analog').css({
@@ -3021,7 +3046,7 @@ function positionDisplays() {
 	// digital (scale full or half)
 	
 	else if (displayDigitalspeed.isVisible()) {
-		
+
 		digitalspeed_width = screen_w;
 		
 		if (isLandscape && !displays.noneVisible()) {
@@ -3039,7 +3064,8 @@ function positionDisplays() {
 		var el = document.getElementById('digitalspeed-wrapper');
 		el.style.height = 'auto';				
 		//displays.scaleTo($('#digitalspeed-wrapper').width(),0); // TODO: check if you have to WAIT
-		displays.scaleTo(el.clientWidth,0); // TODO: check if you have to WAIT
+		displayDigitalspeed.resize(el.clientWidth,0,'width');
+		//displays.scaleTo(el.clientWidth,0); // TODO: check if you have to WAIT
 		
 		// must be after scale
 		//digitalspeed_height = $('#digitalspeed-wrapper').outerHeight(true);
@@ -3321,7 +3347,7 @@ function kwd_setTimeFormat(evt) {
 			showHint('Seconds off','Sekunden aus');
 		}
 		else {
-			kwd_showById('seconds-text'); //$('#seconds-text').show();
+			kwd_showById('seconds-text','inline'); //$('#seconds-text').show();
 			kta.clockseconds = true;
 			showHint('Seconds on','Sekunden an');
 		}
@@ -3344,9 +3370,13 @@ function refreshall() {
 -          false: Code nicht ausgeführt
 */
 function initApp()  {
+
 	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div)
 
-	document.getElementById('splashscreen').style.opacity = 0.5;
+    tablet = app.IsTablet(); // returns boolean
+    
+
+	document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
     
     // ONSTART
@@ -3384,10 +3414,10 @@ function initApp()  {
 	}
 	
 	// TODO: actually we don't need this anymore
-	if(kta.advancedstyles) {
+	if(0 && kta.advancedstyles) {
 		//$('.skin').addClass('skin-plastic');
 		var skinelements = document.getElementsByClassName('skin');
-		app.Debug(skinelements.length);
+		//app.Debug(skinelements.length);
 		for (var i=skinelements.length-1;i>=0;i--) {
 			//app.Debug(skinelements[i])
 			skinelements[i].classList.add('skin-plastic');
@@ -3423,10 +3453,19 @@ function initApp()  {
 	//var testobject = displays.get('time');
 	//app.Debug('set new obj str: '+testobject.testString('thomas') );
 	//app.Debug('check obj str in time: '+displayTime.testString() );
+	
+	
 		    
     menustack = new KwdPopupStack();
     settings = new AutoSettings(storage_settings); // string definiert Namen in localstorage // loads saved settings
     
+
+    gpstool = new KwdGpsTools(); //global var speed now named: gpstool
+  
+    // Tacho range vor möglichem 'hide' laden 
+	resetTachoRange("load",10); // default==10, if no value found
+
+
     // TODO: layout_gauges sollte man evtl. auch mit einem stack steuern !!
     // TODO: oder integriert in display-objekt-verwaltung
     setTachoLayout();
@@ -3471,10 +3510,6 @@ function initApp()  {
     // TODO: what happens on tablets??
     //app.SetMenu( "Einstellungen,Beenden" );
 
-    tablet = app.IsTablet(); // returns boolean
-    
-    gpstool = new KwdGpsTools(); //global var speed now named: gpstool
-   
 	var units = 'setalt-m';
 	if(settings.get('setalt-ft')) units = 'setalt-ft';
 	setAltimeterUnits(units);
@@ -3491,8 +3526,6 @@ function initApp()  {
     loc.SetRate( 1 ); //seconds (refresh data), test lower rate! good for background activity!
     startGps(); // never do loc.Start(); alone --> use this wrapper  
     
-    // ! now always load (no switching) !
-	resetTachoRange("load",10); // default==10, if no value found
         
     // TODO: hier auch scaleDisplays(), besonders für Landscape
     positionDisplays();
@@ -3510,28 +3543,125 @@ function initApp()  {
         evt.preventDefault();
     });
     
+    
+    
+    
 	// adds listener to wrapper! - it works through capturing OR bubbling!
 	// this is for all dialogs and settings (no info card and no display-boxes):
-	var wrapel = document.getElementById('dialogs-wrapper');
-	var eventtype = kta.browsermode ? 'click':'touchstart';
-	if (wrapel) wrapel.addEventListener(eventtype,function(evt) {
-		var dodefault = true;
+	// - need listener for touchstart AND touchend (otherwise you can destroy or disturb scrolling in browser )
+	var wrapel = document.getElementById('touch-wrapper');
+	
+	// - on touchstart we save the evnt if it is interesting to us
+	// - we only need to know whether the x/y has changed
+	// - also could deny, if event is already under way
+	// - we also color the menuitem manually if given
+	// 
+	 if(wrapel) wrapel.addEventListener('touchstart',function(evt) {
+		
+		this.kwdSwitcherId = '';
+		this.kwdButtonId = '';
+		this.kwdDisplayId = '';
+    	this.kwdCancelTouch  = false;
+
+		// TODO: this statt wrapel
+		 
+		
+		// check if you can save something in this from event (x/y)
+		/*var ts = evt.changedTouches;
+		if(ts.length) {
+			this.kwdpageX = ts[0].pageX; 
+			this.kwdpageY = ts[0].pageY;
+		} */
+		
 		// ! if there can be mor sub-spans you must check also parent of parent!
 		var switcher;
 		if (evt.target.classList.contains('switcher')) switcher = evt.target;
 		if(!switcher && evt.target.parentNode.classList.contains('switcher')) switcher = evt.target.parentNode;
 		if (switcher) {
+			this.kwdSwitcherId = switcher.id;
+		//	switcher.style.backgroundColor = 'rgba(255,255,255,0.3)';
+		}
+		else {
+			// TODO: back-arrow einfach als eine button-id setzen!
+			var button;
+			if (evt.target.classList.contains('btn')) button = evt.target;
+			if(!button && evt.target.parentNode.classList.contains('btn')) button = evt.target.parentNode;
+			if (button) {
+				this.kwdButtonId = button.hash;
+	//			button.style.backgroundColor = '#666';
+			}
+			else {
 
-			// NEW: all menu items are handled here too
+				var backarrow;
+				if (evt.target.classList.contains('back-arrow')) backarrow = evt.target;
+				if(!backarrow && evt.target.parentNode.classList.contains('back-arrow')) backarrow = evt.target.parentNode;
+				if(backarrow) {
+					this.kwdButtonId = 'back-arrow';
+				}
+				else {
+					var display = evt.target;
+					var found = false;
+					while (!found && display) {
+						found = display.classList.contains('fast-option');
+						if (!found) {
+							display = display.parentElement; // == parentNode?
+							if(!display || display.tagName.toLowerCase() == 'body') break;
+						}
+					}					
+					if (display) {
+						this.kwdDisplayId = display.id;
+					}
+				}	
+			}
+		}
+		
+		
+		return true;
+	});
+	
+	// todo: man könnte element-id bei touchstart speichern, und hier nur noch einen großen switch
+	if (wrapel) wrapel.addEventListener('touchend',function(evt) {
+		
+		if (this.kwdCancelTouch) 
+			return true;
+
+		var dodefault = true;
+
+/*		if(this.kwdSwitcherId) 
+			document.getElementById(this.kwdSwitcherId).style.backgroundColor = 'transparent';
+		/*if(this.kwdButtonId && this.kwdButtonId != 'back-arrow') {
+			// Schleife über alle Buttons, da keine Button id verfügbar!!
+			var els = document.getElementsByClassName('.btn');
+			if (els) for(var i = els.length-1; i >= 0; i-- ) {
+				if(!els[i].id || els[i].id != 'donate-button')
+					els[i].style.backgroundColor = '#888';
+			}
+		}*/
 			
-	    	resetMenuFade();
+
+		/*var ts = evt.changedTouches;
+		if(ts.length) {
+			//TODO: prüfe ob bereich (z.B. bis 3-5 pixel Abweichung nötig )
+			if((this.kwdpageX != ts[0].pageX) || (this.kwdpageY != ts[0].pageY)) {
+				this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+				return true; // event-Bearbeitung abgebrochen
+			}
+		} */
+
+	
+		// TODO: Nachdem spezielle Abfragen/Anpassungen, id für switcher/button gleichsetzen
+		var check = this.kwdSwitcherId || this.kwdButtonId || this.kwdDisplayId;
+		if(!check) return true;
+		
+
+		if(check) {
+			// NEW: all menu items are handled here too
+
+	    	resetMenuFade();  // TODO: nicht bei kwdDisplayId
 	    	dodefault = false; // assume to find an entry *here*
 	        var doPosition = false;
 	        var unittext = '';
-	        
-	        //var check = $(this).attr('id');
-	        var check = switcher.id;
-	        
+	        	        
 	        switch (check) {
 	        	case 'setlanguage':
 			    	if (kta.language=='de') {
@@ -3629,6 +3759,11 @@ function initApp()  {
 	                else showHint('Warnings disabled','Warnhinweise ausgeschaltet.');
 	                break;                
 	            case 'switchautorange':
+	            	if(settings.get('tachoswitch')!=true) {
+	            		settings.switchit('tachoswitch');
+	            		doPosition = true;
+	            	}
+	            	setTachoLayout();
 	                resetTachoRange("save",10);  // current minimum
 	                showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
 	                break;
@@ -3643,15 +3778,65 @@ function initApp()  {
 	            	settings.switchit(check);
          			kta.setFastOptions(!kta.fastoptions); // = toggle
 	            	break;
+	            case 'dona-tachounit':
+	            case 'kmh-digital':
+					if (kta.fastoptions) {
+						var newunit = 'kmh';
+						if(settings.get('setkmh')) newunit = 'mph';
+						if(settings.get('setmph')) newunit = 'kn';
+						if(settings.get('setkn')) newunit = 'ms';
+						setTachoUnits(newunit);
+						settings.radio('unitradio','set'+newunit);
+					}
+					else dodefault = true;					
+	            	break;
+	            	
+				case 'tacho-container' :
+			    	if(kta.fastoptions && settings.get('tachoswitch')!=false) {
+			    		var next;
+			    		if (settings.get('digitalanalog')!=false) next = 'digital';
+			    		else if (settings.get('digital')!=false) next = 'analog';
+			    		else next = 'digitalanalog';
+			    			
+				       	settings.radio('radio',next);
+				        setTachoLayout();            	
+				        doPosition = true;
+				        switch(next) {
+				        	case 'digitalanalog':showHint('Touch again for Digital display','Erneut Tippen für Digital'); break;
+				        	case 'digital': showHint('Touch again for Analog display','Erneut Tippen für Analog'); break;
+				        	case 'analog': showHint('Touch again for both displays','Erneut Tippen für Digital + Analog'); break;
+				        }
+			    	} else dodefault = true;
+			    	
+			    	break; 
+	            	
+	            	
+	            case 'm-alt':
+	            	if (kta.fastoptions) {
+						if(settings.get('setalt-ft')) check = 'setalt-m'; // TODO: getter of set element of a radio group
+		            	else check = 'setalt-ft';
+		            }
+		            else {
+		            	dodefault = true;
+		            	break; // break nur im else und nicht unten!
+		            }
 	            case 'setalt-ft':
 	            case 'setalt-m':
 	            	settings.radio('altunits',check);
 	            	setAltimeterUnits(check);
 	            	//OnBack();
 	            	break;
+				case 'time':
 				case 'settimeformat':
 					kwd_setTimeFormat();
-					break;    
+					break;
+				case 'geolocation':
+				    if(kta.fastoptions) {    		
+				        if(gpstool.switchLocFormat()=='decimal') 
+				        	showHint('Touch again for degree values','Tippen für Grad-Anzeige');
+				        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
+			    	}
+    				break;
 	            case 'switchnews1':
 	            	settings.switchit(check);
 	            	break;
@@ -3659,6 +3844,36 @@ function initApp()  {
 	            case 'resetmaxspeed':
 					menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
 					break;
+
+				// .btn
+				
+	            case '#exit' : Quit(); break;
+	            case '#cancel' : OnBack(); break; // TODO: test
+	            case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
+	            case '#info' :
+	                menustack.push('infocard');
+	                //app.ShowDebug(false);
+	                break;
+				case '#warningcont' :
+					// TODO: check if another menu COULD come in between!
+					OnBack();
+					break;
+				case '#confirmresetmaxspeed' : 				
+					gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+					showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
+					OnBack();
+					break;				
+				case '#confirmresetaveragespeed' : 				
+					gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+					showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
+					OnBack();
+					break;
+					
+					
+				case 'back-arrow':
+					OnBack();
+					break;					
+
 	            default: dodefault = true;
 	            break;
 	        }
@@ -3673,131 +3888,28 @@ function initApp()  {
 	
 	        // always (cases are checked inside functions)
 			startGps();        
-		} // end of switchers
-		else {
-			
-			// .btn
-
-			// ! if there can be mor sub-spans you must check also parent of parent!
-			var btn;
-			if (evt.target.classList.contains('btn')) btn = evt.target;
-			if(!btn && evt.target.parentNode.classList.contains('btn')) btn = evt.target.parentNode;
-			if(btn) {
-		        resetMenuFade();
-		        dodefault = false;
-		        
-		        //var check = $(this).attr('href');
-		        var check = btn.hash;
-		        //app.ShowPopup(check,"center");
-		        switch (check) {
-		            case '#exit' : Quit(); break;
-		            case '#cancel' : OnBack(); break; // TODO: test
-		            case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
-		            case '#info' :
-		                menustack.push('infocard');
-		                //app.ShowDebug(false);
-		                break;
-					case '#warningcont' :
-						// TODO: check if another menu COULD come in between!
-						OnBack();
-						break;
-					case '#confirmresetmaxspeed' : 				
-						gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
-						showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
-						OnBack();
-						break;				
-					case '#confirmresetaveragespeed' : 				
-						gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
-						showHint('Maximum speed reset','Höchstgeschwindigkeit zurückgesetzt');
-						OnBack();
-						break;				
-					default: dodefault = true;
-				}
-		        				
-			} // btn
-			else {
-				var backarrow;
-				if (evt.target.classList.contains('back-arrow')) backarrow = evt.target;
-				if(!backarrow && evt.target.parentNode.classList.contains('back-arrow')) backarrow = evt.target.parentNode;
-				if(backarrow) {
-					OnBack();					
-					dodefault = false;
-				}	
-			}
-		}
-				
+		} // end of switchers + buttons
+		
+		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+		
 		if(!dodefault) {
 			evt.stopPropagation();
 			evt.preventDefault();
-		}
-	},true); // ! capturing mode ! 
-    
-    // easy switch tacho layout:
-	//$('#tacho-container').on('tap',function() {
-	kwd_addTouchEvent('tacho-container','',function(evt) {		
-    	if(kta.fastoptions && settings.get('tachoswitch')!=false) {
-    		var next;
-    		if (settings.get('digitalanalog')!=false) next = 'digital';
-    		else if (settings.get('digital')!=false) next = 'analog';
-    		else next = 'digitalanalog';
-    			
-	       	settings.radio('radio',next);
-	        setTachoLayout();            	
-	        positionDisplays();
-	        switch(next) {
-	        	case 'digitalanalog':showHint('Touch again for Digital display','Erneut Tippen für Digital'); break;
-	        	case 'digital': showHint('Touch again for Analog display','Erneut Tippen für Analog'); break;
-	        	case 'analog': showHint('Touch again for both displays','Erneut Tippen für Digital + Analog'); break;
-	        }
-	        return false;
-    	} 
-    	else return true;
-	});
-
-
-	//$('.tachounit').on('tap',function(){
-	kwd_addTouchEvent('','tachounit',function(evt) {		
-		if (kta.fastoptions) {
-			var newunit = 'kmh';
-			if(settings.get('setkmh')) newunit = 'mph';
-			if(settings.get('setmph')) newunit = 'kn';
-			if(settings.get('setkn')) newunit = 'ms';
-			setTachoUnits(newunit);
-			settings.radio('unitradio','set'+newunit);
 			return false;
 		}
-		else return true;
-	});
-	//$('.altitudeunit').on('tap',function() {
-	kwd_addTouchEvent('','altitudeunit',function(evt) {		
-		if (kta.fastoptions) {
-			var newunit = 'setalt-m';
-			if(settings.get('setalt-ft')) newunit = 'setalt-m'; // TODO: getter of set element of a radio group
-			else newunit = 'setalt-ft';
-			setAltimeterUnits(newunit);
-			settings.radio('altunits',newunit);
-			return false;
-		}
-		else return true;		
-	});
-	
+		return true;
+	}); 
     
-    //$(".switchlocformat").on('tap',function() {
-	kwd_addTouchEvent('geolocation','',function() {
-    	if(kta.fastoptions) {    		
-	        if(gpstool.switchLocFormat()=='decimal') 
-	        	showHint('Touch again for degree values','Tippen für Grad-Anzeige');
-	        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
-	        return false;
-    	}
-    	else return true;
+    if(wrapel) wrapel.addEventListener('touchmove',function(evt) {
+    	
+		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+    	this.kwdCancelTouch  = true;
+      	return true;
     });
     
 
-	//TODO: you must check "kta.fastoptions"!!!
-	kwd_addTouchEvent('time','',kwd_setTimeFormat);
 
-   	//TODO: check if works!!!
+    
    	var els = document.getElementsByClassName('card');
    	for(var i=els.length-1;i>=0;i--) {
 	   	kwd_addEvent(els[i],'scroll',function() {
