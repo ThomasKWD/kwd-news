@@ -33,13 +33,11 @@
 	- INTERNAL
 		- alle sicherheits-'if' weg, wenn fehlschlagen nur von meinen Inputs abhängt, also z.B. nicht vom Gerät/Umgebung
 		-> im Zweifel mehr throws
-		- suche Stellen wo css größen ohne px gesetzt -> Probleme!
 		- verwende auch classList.toggle!
 		- kein 'absolute' Element sollte 'margin' haben (verwirrt nur), für Abstände kann der äußere 'padding' haben
 		- bei fehlern displays verwende getComputedStyle! + versuche scrollLeft property!
 		- bei weiter Fehlern: neue Ideen der Umsetzung anstatt einfach jQuery-Ansatz übertragen!
-		
-		- es scheint wirklich möglich zu sein, in DOM-Objekten zusäzliche Daten zwischen zu speichern !! :-)
+		- bei tablet scheint gauge nach erstem draw - vor scale - abzustürzen
     
 	- LANDSCAPE
 		- evtl. landscape displays wrapper vergrößern, wenn analog
@@ -173,14 +171,14 @@
             box-shadow:3px 3px 10px #ddd inset,-3px -3px 7px #555 inset;
             text-decoration:none;
             text-align:center;
-            -webkit-user-select:none;
-            -webkit-touch-callout:none;
         }
         /* want colors of KWD Logo */
         .ext-btn { 
         	background-color:#83C2FD;
         	border-color:#DF3F2E;
             box-shadow:3px 3px 10px #eee inset,-3px -3px 7px #444 inset;
+        }
+        #exit-button {
         }
         /*  switcher must not have .btn
             can have class "switched-on" to determine state
@@ -402,7 +400,8 @@
             margin-bottom:5px;
         }
        	#dialogs-blender {
-       		background-color:rgba(255,255,255,0.7);
+       		background-color:#83C2FD;
+			opacity: 0.7;
        		width:100%;
        		height:100%;
        		position:fixed;
@@ -433,7 +432,7 @@
 			top:5px;
 			display:block;
 	        width:90%;
-	        max-width:30em;
+	        max-width:20em;
 	        /* das verursacht leider bad performance element scroll: max-height:95%; */
 			background-color:black;
 			overflow:auto;
@@ -524,7 +523,7 @@
             margin: 0 -0.25em 0 0;
         }
         #gpswarning {
-            position:absolute;
+            position:fixed;
             top:0;
             left:0;
             font-size:15px;
@@ -618,6 +617,9 @@
 			border-color:black;
 			box-shadow:none;
 			border-radius:0;
+		}
+		.skin-minimal .unitlabel {
+			color:black;
 		}
 		/*
 		TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
@@ -798,7 +800,7 @@
 	  
 
         <!--<a class="btn" href="#info">Info</a>-->
-        <a class="btn" href="#exit"><span lang="en">EXIT APP</span><span lang="de">APP BEENDEN</span></a>
+        <div id="exitbutton-wrapper"><div id="exit-button-bg"><a id="exit-button" class="btn" href="#exit"><span lang="en">EXIT APP</span><span lang="de">APP BEENDEN</span></a></div></div>
         <!--<a class="btn" href="#cancel">Abbrechen</a>-->
     </div>
     
@@ -965,8 +967,10 @@ function KwdTachoApp() {
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.nojquery = false;
-	this.version = 1.50; 
+	this.version = 1.45; 
 	this.defaultMargin = 10;
+	this.debug = true;
+	this.mydebug = null;
 	
 	this.storage = {
 		language : 'tacholanguage',
@@ -1007,9 +1011,50 @@ function KwdTachoApp() {
 		else {
 			var el = document.getElementById(id);
 			if(el) {
+			    //if (!getDisplayWidth()) app.ShowPopup("dialog w=0 : "+id);
 				el.style.left = ((getDisplayWidth() - el.offsetWidth) / 2) + 'px';								
-			}
-		}
+    			
+                if(id=='settingsdialog') {        
+                    // Exit-button in fixed umwandeln, dazu Größe speichern (von auto auf px)
+                    // - muss sichtbar sein
+                    if(el.offsetHeight > getDisplayHeight()) {
+                        
+                        var eb = document.getElementById('exit-button-bg');
+                        var ebwrap = document.getElementById('exitbutton-wrapper');
+                        if (eb && eb.offsetWidth) {
+                            eb.style.width = el.clientWidth + 'px';
+                            //eb.style.height = eb.offsetHeight + 10 + 'px';
+                            eb.style.position = 'fixed';
+                            eb.style.bottom = '0px';
+                           // eb.style.paddingBottom = '10px';
+                            eb.style.backgroundColor = '#000000';
+                            ebwrap.style.width = el.clientWidth + 'px';
+                            ebwrap.style.height = eb.offsetHeight + 10 + 'px';
+                            
+                        }
+                        //else throw 'cannot resize exit button';
+                        // TODO: Hinweis später wieder weg.
+                        showHint('Swipe up to see all','Menü nach oben schieben');
+                    }
+                    else {
+                        var eb = document.getElementById('exit-button-bg');
+                        var ebwrap = document.getElementById('exitbutton-wrapper');
+                        if (eb && eb.offsetWidth) {
+                            eb.style.position = 'static';
+                            eb.style.width = 'auto';
+                            eb.style.height = 'auto';
+                            eb.style.bottom = 'auto';
+                            eb.style.backgroundColor = 'transparent';
+                            ebwrap.style.width = 'auto';
+                            ebwrap.style.height = 'auto';
+                        }
+                        //else throw 'cannot resize exit button';
+                        
+                    }
+                }
+        	}
+    
+		}    		
 	};
 
 }
@@ -1248,7 +1293,7 @@ function OnPause()
 { 
     if (typeof settings !== 'undefined') settings.save();    
     app.PreventScreenLock(false);
-	app.SetScreenMode('Normal');
+	//app.SetScreenMode('Normal');
     // --> TODO: ein flag setzen, so dass gpstool.change darauf reagieren und z.B. nur die wichtigsten Sachen machen
     // kann, z.B. nur die Werte weiter verarbeiten, die die für die Statistik erforderlich sind.
     if (typeof gpstool !== 'undefined') gpstool.saveAverage();
@@ -1266,7 +1311,7 @@ function OnResume()
     startGps(); // check if error when start twice!!!
     if (typeof gpstool !== 'undefined') 
     	if (gpstool.isHud())
-    		app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
+    		//app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
     resetHud();
 }
 
@@ -1594,6 +1639,7 @@ function KwdGpsTools () {
 	        
 	        	
 	        if (cssgauge_visible) { // flag for performance
+		        app.Debug('cssgauge visible -> set analog speed');
 		        // correct scale if >1000 or <1000
 		        //if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
 		        //else if (displayspeed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
@@ -1659,7 +1705,7 @@ function KwdGpsTools () {
             '-moz-transform' : 'scaleX('+scale+')'
         });*/
        var dc = document.getElementById('display-container');
-       dc.style.webkitTransfrom = 'scaleX('+scale+')';
+       dc.style.webkitTransform = 'scaleX('+scale+')';
        dc.style.transform = 'scaleX('+scale+')';
        
 		if (hud) {
@@ -1668,7 +1714,7 @@ function KwdGpsTools () {
 			for(var i=0;i<elems.length;i++) {
 				elems[i].classList.add('skin-minimal');
 			}
-		  app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
+		  //app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
 
 		}
 		else {
@@ -1677,7 +1723,7 @@ function KwdGpsTools () {
 			for(var i=0;i<elems.length;i++) {
 				elems[i].classList.remove('skin-minimal');
 			}
-		  app.SetScreenMode('Normal');
+		  //app.SetScreenMode('Normal');
 		}
     };
 	
@@ -2099,9 +2145,12 @@ function KwdPopupStack() {
 	this.clear = function() {
  		if(stack.length) {
  			//$('#'+stack[stack.length-1].id).hide();
-			var el = document.getElementById(stack[stack.length-1].id);
- 			if (el) el.style.display = 'none';
+			var id = stack[stack.length-1].id;
+			var el = document.getElementById(id);
+ 			//if (el) el.style.display = 'none';
+			this.doOnChange('',id);
  			stack.length = 0; // clear all
+			
  		}
 	};
 	
@@ -2654,8 +2703,6 @@ var fadetimeout = false;
 // function on ice since we don't need infos on the main screen now
 /*function resetAutoFade() {
 	
-    app.SetScreenMode( "Normal"); // show statusbar    
-    app.PreventScreenLock(false); // display timeout on again
 
     if(fadetimeout!==false) clearTimeout(fadetimeout);
 
@@ -2701,13 +2748,8 @@ function resetHud() {
     if(fadetimeout!==false) clearTimeout(fadetimeout);
 
 	if (!menustack.current()) {
-	    //app.SetScreenMode( "Full"); // deaktiviert wegen Einfluss auf tap-event :-(
         fadetimeout = setTimeout(fadehud,5000);
 	}	
-	else {
-	    //app.SetScreenMode( ""); // show statusbar    
-	    //app.PreventScreenLock(false); // display timeout on again
-	}
 	
 	// TODO: make info of advertising here :-)
 	if (layout_gauges < 1 && !menustack.current()) kwd_showById('no-gauges');
@@ -2901,13 +2943,14 @@ function scaleDisplays(initial) {
 //    	'top':'10px'
 //    });
     
+    
     // zentriere alle Dialoge:
 	// - nur sichtbare
 	// - wird nur gebraucht on resize mit offenem dialog
 	var els = document.getElementsByClassName('dialog');
 	for(i=els.length-1;i>=0;i--) {
 		//app.Debug('computed:'+getComputedStyle(els[i],null).display);
-		if(getComputedStyle(els[i],null).display != 'none') {
+		if(getComputedStyle(els[i],null).display != 'none') {  // TODO: lieber flag oder visible oder translate arbeiten
 			kta.centerVisibleDialog(els[i].id);
 		}
 	}
@@ -3376,11 +3419,11 @@ function initApp()  {
     tablet = app.IsTablet(); // returns boolean
     
 
-	document.getElementById('splashscreen').style.opacity = 0.1; // debug
+	//DEBUG: document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
     
     // ONSTART
-    if(!kta.browsermode) kta.useSystemSize = true;
+    //if(!kta.browsermode) kta.useSystemSize = true;
 	
 	// add the back arrows to dialogs
 	var els = document.getElementsByClassName('dialog');
@@ -3747,10 +3790,17 @@ function initApp()  {
 	                if (settings.switchit(check)) {
 	                    displayHints = true;
 		                showHint('All notes active','Alle Hinweise aktiviert.');
+		                if(kta.debug) 	{
+							if(!kta.mydebug) kta.mydebug = app.CreateDebug();
+							app.ShowDebug(true);
+						}
 	                }
 	                else {
 	                  showHint('All notes disabled','Alle Hinweise deaktiviert.');
 					  displayHints = false;
+		                if(kta.debug) 	{
+							app.ShowDebug(false);
+						}					  
 					}  
 	                
 	                break;
@@ -3981,12 +4031,11 @@ function initApp()  {
 
 
 function OnStart() {
-	//app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
+	if(!kta.debug) app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
 	//mydebug = app.CreateDebug();
 	//app.ShowDebug(true);
 	
 	app.Debug("onStart");
-    //app.SetScreenMode( "Full"); // TODO: probleme mit Schriftgrößen und Tap-Events 
     app.PreventScreenLock(true);
 
 	if (app.kwd_droidscript_emulator) {
@@ -4012,37 +4061,6 @@ function OnStart() {
 	setTimeout(initApp,100);
 }
 
-
-/*
- TODO: just for RESIZE event 
- $(document).ready(function() {
-
-	app.Debug('document ready');
-	
-	 // more reliable than onconfig ! :-)
-	 $(window).resize(function() {
-
-	 	var rc; // check if closure works
-	 	
-	 	if (typeof rc == 'undefined') rc = 0;
-	 	else rc++;
-        // TODO: only if really needed: 
-        //      handle problem with possible multiple trigger resize events in some cases
-        
-        // TODO: warum reagiert nicht, wenn Statusbar des Gerätes weg ??
-        // TODO: teste ob OnConfig bei Statusbar-weg reagiert !
-        app.Debug("window resize "+rc);
-        
-		if (initApp()==false) {
-            // resize after init
-    		scaleDisplays(false);
-    		//ORI scaleDisplays(); // wenn später korrekt arbeitet, dürfte doppelter Aufruf egal sein!!
-    		positionDisplays();
-		}
-    });
-    
-});
-*/
 
 // verwende source id : de.kuehne_webdienste.kwdtacho
 	

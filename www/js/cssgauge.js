@@ -44,6 +44,7 @@ function CssGauge(init_settings) {
 		// - the width, height of .gauge is expected to be constant (since not changed by scale)
 		// - ! the unscaled size of .gauge can disturb the size of the body tag !
 		// - checks if width or height is limiting ("bounding box")
+		// TODO: do nothing when not visible (offsetWidth==0)
 		var ws = wrapperRef.clientWidth / gaugeRef.offsetWidth;
 		//var ws =  $('#'+settings.wrapper).width() /  $('#'+settings.gauge).outerWidth();
 		var hs = wrapperRef.clientHeight / gaugeRef.offsetHeight;
@@ -51,7 +52,9 @@ function CssGauge(init_settings) {
 		//console.log(ws+'x'+hs);
 		scale = (ws < hs) ? ws : hs;
 			
+		gaugeRef.style.webkitTransformOrigin = '0 0 0'; // TODO make this once
 		gaugeRef.style.transformOrigin = '0 0 0'; // TODO make this once
+		gaugeRef.style.webkitTransform = 'scale('+scale+','+scale+')';
 		gaugeRef.style.transform = 'scale('+scale+','+scale+')';
 		/*$('#'+settings.gauge).css({
 			'transform-origin':'0 0 0',
@@ -249,6 +252,7 @@ function CssGauge(init_settings) {
 			//andere Berechnung als oben, da senkrecht = 0;
 			var offset = v * angle_range_ratio + zero_angle;
 			var pointerRef = document.getElementById('g-pointer'); // TODO: save once
+			pointerRef.style.webkitTransform = 'rotate('+offset+'deg)';
 			pointerRef.style.transform = 'rotate('+offset+'deg)';
 			//$('#g-pointer').css('transform','rotate('+offset+'deg)'); // TODO: performance: save DOM element reference??
 			return true;
