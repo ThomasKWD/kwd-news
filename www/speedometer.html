@@ -31,13 +31,7 @@
 	TODO: for this release
 	
 	- INTERNAL
-		- alle sicherheits-'if' weg, wenn fehlschlagen nur von meinen Inputs abhängt, also z.B. nicht vom Gerät/Umgebung
-		-> im Zweifel mehr throws
-		- verwende auch classList.toggle!
-		- kein 'absolute' Element sollte 'margin' haben (verwirrt nur), für Abstände kann der äußere 'padding' haben
-		- bei fehlern displays verwende getComputedStyle! + versuche scrollLeft property!
-		- bei weiter Fehlern: neue Ideen der Umsetzung anstatt einfach jQuery-Ansatz übertragen!
-		- bei tablet scheint gauge nach erstem draw - vor scale - abzustürzen
+		- mache new Array weg
     
 	- LANDSCAPE
 		- evtl. landscape displays wrapper vergrößern, wenn analog
@@ -48,6 +42,9 @@
 	TODO: for next release:
 
 	- HUD
+	
+		- dicken rechteckigen Zeiger  oder weißer Kreisbogen und wenige große Skalenzahlen
+		
 	- ZOOM
 		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
 	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
@@ -586,9 +583,43 @@
             box-shadow: 5px 5px 10px #000 inset;			
 		}
 		
-		/* skin-minimal */  
-		/* TODO: skin class only in wrapper
-		 * TODO: .g-pointer shorter in .skin-minimal
+		/* skin-subtle is like earlier design */
+		.gauge.skin-subtle {
+			background-image: none;
+			border-color:#666;
+		}
+		.skin-subtle .g-center {
+			background-color:transparent;
+			border-color:transparent;
+		}
+		.skin-subtle .g-pointer {
+			border-bottom-width: 140px;
+		}
+		.gauge.skin-subtle .g-minor,
+		.gauge.skin-subtle .g-majortick {
+			background-color:white;
+		}
+		.display-box.skin-subtle {
+			border-color:white;
+			background-color:black;
+		}
+		#digital-on-analog.display-box.skin-subtle {
+			border-color:transparent;
+			background-color:transparent;			
+		}
+		#digitalspeed-wrapper.skin-subtle,
+		#displays-wrapper.skin-subtle {
+			background-image:none;
+			border-width:1px;
+			border-color:white;
+			box-shadow:none;
+			border-radius:0;
+		}
+
+		
+		/* skin-minimal is for hud */  
+		/* 
+		 * 
 		 */
 		.gauge.skin-minimal {
 			background-image: none;
@@ -608,8 +639,9 @@
 			border-color:transparent;
 			background-color:black;
 		}
-		#digital-on-analog.skin-minimal {
-			border-top-color: black;
+		#digital-on-analog.display-box.skin-minimal {
+			border-color:transparent;
+			background-color:transparent;			
 		}
 		#digitalspeed-wrapper.skin-minimal,
 		#displays-wrapper.skin-minimal {
@@ -849,9 +881,19 @@
 	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Einheit der Höhenanzeige</span><span lang="en">Altimeter units</span> (<span class="altitudeunit"></span>)</a>
 	    <a id="settimeformat" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhr mit Sekunden</span><span lang="en">Clock with seconds</span></a>
         <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">Schnellauswahl</span><span lang="en">One touch settings</span></a>
+        <a id="switchskins" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-picture"></span><span lang="de">Skins</span><span lang="en">Skins</span></a>
         <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
 	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
 	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
+    </div>        
+
+    <div id="skinsettingsdialog" class="dialog sub-dialog skin">
+        <h3><span lang="en">Skins</span><span lang="de">Erscheinung</span></h3>
+
+	    <a id="setskin-default" class="switcher skinradio switched-on" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Standard</span><span lang="en">Default</span></a>
+	    <a id="setskin-glass" class="switcher skinradio" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Glas</span><span lang="en">Glass</span></a>
+	    <a id="setskin-subtle" class="switcher skinradio" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Dezent</span><span lang="en">Subtle</span></a>
+	    <a id="switchnightmode" class="switcher switched-on" href="#"><span class="fa icon-ok"></span><span lang="de">Tag- / Nachtmodus</span><span lang="en">Daylight mode</span></a>
     </div>        
     
     <!--<div id="menubutton"><span class="fa fa-ellipsis-v autofade"></span></div>-->
@@ -971,6 +1013,7 @@ function KwdTachoApp() {
 	this.defaultMargin = 10;
 	this.debug = false;
 	this.mydebug = null;
+	this.maxaverage = false;
 	
 	this.storage = {
 		language : 'tacholanguage',
@@ -998,6 +1041,40 @@ function KwdTachoApp() {
 			return false;
 		}
 	};
+	
+	/* setzt die gewünschte Skin
+	 * - skin wenn keine id:  je nach aktuellen Einstellungen 
+	 
+	 */
+	this.setSkin = function (id) {
+		
+		if(!id) {
+			if (settings.get('setskin-glass')==true) id = 'setskin-glass';			
+			else if (settings.get('setskin-subtle')==true) id = 'setskin-subtle';
+			else id = 'setskin-default'; 			
+		}
+		
+		var skinclass='';
+		
+		switch (id) {// verarbeitet auch undefined??
+			case 'setskin-glass': skinclass = 'skin-plastic'; 
+				break;
+			case 'setskin-subtle': skinclass = 'skin-subtle';
+				break;
+		}	
+		
+		// ! 'skin-default' wird durch löschen der anderen skin-klassen erreicht
+
+		var skinelements = document.getElementsByClassName('skin');
+		for (var i=skinelements.length-1;i>=0;i--) {
+			//app.Debug(skinelements[i])
+			var s = skinelements[i];
+			s.classList.remove('skin-plastic'); // geht nur, wenn überflüssiger remove NICHT zu error führt
+			s.classList.remove('skin-subtle');
+			if(skinclass) s.classList.add(skinclass);
+		}		
+
+	}; 
 	
 	/* zentriert dialog
 	 * - geht nur, wenn sichtbar!!
@@ -1630,7 +1707,9 @@ function KwdGpsTools () {
 	        //if (speedtest<50) speedtest+=0.9;
 	        //else speedtest+=9;
 	        //speed=speedtest;
-	        
+
+	        // for screenshots:
+	        // speed = 42/3.6;	        
 	        
 	        //TODO: turn on: this.averageSpeed(speed);
 	        this.maxSpeed(speed);
@@ -1712,6 +1791,8 @@ function KwdGpsTools () {
 		  //$('.skin').addClass('skin-minimal');
 			var elems = document.getElementsByClassName('skin');
 			for(var i=0;i<elems.length;i++) {
+				elems[i].classList.remove('skin-subtle');
+				elems[i].classList.remove('skin-plastic');
 				elems[i].classList.add('skin-minimal');
 			}
 		  //app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
@@ -1723,6 +1804,7 @@ function KwdGpsTools () {
 			for(var i=0;i<elems.length;i++) {
 				elems[i].classList.remove('skin-minimal');
 			}
+			kta.setSkin(); // setzt ursprüngliche skin
 		  //app.SetScreenMode('Normal');
 		}
     };
@@ -3450,22 +3532,13 @@ function initApp()  {
 	// for testing in browser
 	if(!kta.browsermode) {
 		//kwd_hideById('speedstats'); //$('#speedstats').hide();
+		kwd_hideById('switchnightmode'); //$('#resetmaxspeed').hide();
 		kwd_hideById('resetmaxspeed'); //$('#resetmaxspeed').hide();
 		kwd_hideById('resetaveragespeed');//$('#resetaveragespeed').hide();
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
 	
-	// ACHTUNG ! plastic skin deaktiviert!
-	if(0 && kta.advancedstyles) {
-		//$('.skin').addClass('skin-plastic');
-		var skinelements = document.getElementsByClassName('skin');
-		//app.Debug(skinelements.length);
-		for (var i=skinelements.length-1;i>=0;i--) {
-			//app.Debug(skinelements[i])
-			skinelements[i].classList.add('skin-plastic');
-		}		
-	}
 	
 
 	analogDisplays = new AnalogSpeedBoxList(); 
@@ -3539,6 +3612,12 @@ function initApp()  {
 	if (settings.get('switchfastoptions')==false) {
 		kta.setFastOptions(false);
 	}
+	
+	var skin;
+	if (settings.get('setskin-glass')) skin = 'setskin-glass';
+	else if (settings.get('setskin-subtle')) skin = 'setskin-subtle';
+	else skin = 'setskin-default';
+	kta.setSkin(skin);
 	
 	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
         
@@ -3893,6 +3972,15 @@ function initApp()  {
 	            	
 	            case 'resetmaxspeed':
 					menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
+					break;
+				case 'switchskins':
+					menustack.push('skinsettingsdialog');
+					break;
+				case 'setskin-default':
+				case 'setskin-glass':
+				case 'setskin-subtle':
+	            	settings.radio('skinradio',check);				
+					kta.setSkin(check);					
 					break;
 
 				// .btn
