@@ -177,15 +177,15 @@ function kwdGeoLocator (options) {
 	 */
 	this.change = function() {
 		var r = Math.random();
-		r = r*5 -2;
+		r = r*5 - 2.5;
 		// override random:
-		r = 1;
+		//r = 1;
 		
 		// NOTE: speed is still m/s here !
 		//if (geodata.speed > 5) geodata.provider = 'network';
 		geodata.speed += r; //= (geodata.speed<20000) ? geodata.speed * 1.1 : geodata.speed * 0.9; // nice simu
 		if (geodata.speed<0) geodata.speed = 0;
-		//geodata.speed=170/3.6;
+		//geodata.speed=51/3.6;
 		
 		// set an altitude
 		geodata.altitude = Math.random() * 300;
