@@ -45,6 +45,7 @@ function CssGauge(init_settings) {
 		// - ! the unscaled size of .gauge can disturb the size of the body tag !
 		// - checks if width or height is limiting ("bounding box")
 		// TODO: do nothing when not visible (offsetWidth==0)
+		// ! Berechnung geht nur mit margin des wrapper (nicht padding)
 		var ws = wrapperRef.clientWidth / gaugeRef.offsetWidth;
 		//var ws =  $('#'+settings.wrapper).width() /  $('#'+settings.gauge).outerWidth();
 		var hs = wrapperRef.clientHeight / gaugeRef.offsetHeight;

@@ -29,14 +29,12 @@
 	
 	
 	TODO: for this release
+
+	- AVR/MAX
 	
-	- INTERNAL
-    
-	- LANDSCAPE
-		- evtl. landscape displays wrapper vergrößern, wenn analog
-		- position Fehler nach hud korrigieren checke Größen nach resize!
-		  (evtl. gleiches Problem wie bei menu: reagiert nicht beim ersten mal
-		  prüfe auch wieviele resize-Events!)
+		- bei analog fliegende Container, die nicht direkt nebeneinander sein müssen
+		- sie sollten bei Landscape sogar links oder rechts übereinander sein 
+		  (da später auf der anderen Seite min und max (Alarm) übereinander angezeigt werden sollen)	
 		
 	TODO: for next release:
 
@@ -266,7 +264,6 @@
             color:white;
             line-height:1em;
             text-align:center;
-            font-weight:bold;
         }
         .gps-warning {
         	color:#DD0000;
@@ -295,12 +292,61 @@
 			left:0;  
 			border-top:1px solid #ddd;       	
        }
+	   .half-box { 
+		 float:left;
+	     width:49.99%;
+	     border-top:1px solid white;
+		}
+		.half-box:first-child {
+			border-right:1px solid white;
+		}
+		.half-box .unitlabel {
+			padding-bottom:0;
+		}
+		.fly-box {
+			position:relative;
+			top:0;
+			width:49%;
+		 	background-color:rgba(0,0,0,1);
+		 	border:1px solid #ddd;
+			border-top-width:10px;
+			border-bottom:10px solid #ddd;			
+		}
+		#averagespeed {
+			float:left;
+			border-right-width:10px;
+			border-top-right-radius:1em;
+			border-color:#A87E00;
+		}
+		#maxspeed {
+			float:right;
+			border-left-width:10px;						
+			border-top-left-radius:1em;			
+			border-color:#aa0000;
+		}
+		.speedstats-wrapper {
+		  	overflow:hidden;
+		 }
+		 #analog-speedstats-wrapper{
+		 	position:absolute;
+		 	width:auto;
+		 	height:auto;
+		 	top:auto;
+		 	bottom:10px;
+		 	left:0;
+			margin:0 10px 0 10px;			
+		 }
       .first-display {
        		border-top-color:transparent;
        		margin-top:0;
        }
 		.positioner {
 			position:absolute;
+		}
+		#touch-wrapper {
+			position:absolute;
+			width:100%;
+			height:100%;
 		}
 		/* alle displays scrollen nicht! */
 		#display-container {
@@ -327,13 +373,11 @@
         }
         #tacho-container {
         	position:absolute;
+        	width: 100%;
         }
 		#digitalspeed-wrapper {
 			position:relative;
 		}
-		#tacho-container {
-			/*outline:1px solid red;*/
-		}        
 		.display-text, .display-text * {
 			white-space: nowrap;
 		}
@@ -368,6 +412,10 @@
             font-size:0.9rem;
             right:0;
             bottom:0;        
+        }
+        .averagespeedlabel {
+        	left:0;
+        	right:auto;
         }
         #gauge {
             /*
@@ -569,9 +617,21 @@
 		}
 		.dialog.skin-plastic,
 		#displays-wrapper.skin-plastic,
-		#digitalspeed-wrapper.skin-plastic {
+		#digitalspeed-wrapper.skin-plastic  {
             background-image:-webkit-linear-gradient(top,rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
             background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);            
+            -webkit-box-shadow: 5px 5px 10px #000 inset;			
+            box-shadow: 5px 5px 10px #000 inset;			
+		}
+		#maxspeed.skin-plastic,
+		#averagespeed.skin-plastic  {
+			border-color:#ddd;
+			
+		}
+		#maxspeed.skin-plastic ,
+		#averagespeed.skin-plastic  {
+            background-image:-webkit-linear-gradient(top,rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 80%);
+            background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 90%);            
             -webkit-box-shadow: 5px 5px 10px #000 inset;			
             box-shadow: 5px 5px 10px #000 inset;			
 		}
@@ -579,7 +639,7 @@
 		/* skin-subtle is like earlier design */
 		.gauge.skin-subtle {
 			background-image: none;
-			border-color:#666;
+			border-color:black;
 		}
 		.skin-subtle .g-center {
 			background-color:transparent;
@@ -608,7 +668,11 @@
 			box-shadow:none;
 			border-radius:0;
 		}
-
+		#maxspeed.skin-subtle ,
+		#averagespeed.skin-subtle  {
+			border-width:1px;
+			
+		}
 		
 		/* skin-minimal is for hud */  
 		/* 
@@ -646,6 +710,12 @@
 		.skin-minimal .unitlabel {
 			color:black;
 		}
+		#maxspeed.skin-minimal ,
+		#averagespeed.skin-minimal  {
+			border-color:black;
+			
+		}
+		
 		/*
 		TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
 		*/
@@ -671,17 +741,19 @@
 	            <div id="info-on-analog"><div id="dona-tachounit" class="tachounit fast-option gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
 			</div>
 		</div>
-<!--        <div id="speedstats">
-            <div id="averagespeed" class="display-box hud halfsize test"><span id="averagespeedtext" class="display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
-            <div id="maxspeed" class="display-box hud halfsize test"><span id="maxspeedtext" class="display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
+        <div id="analog-speedstats-wrapper" class="speedstats-wrapper">
+            <div id="averagespeed" class="display-box hud fly-box fast-option skin"><div class="unitlabel averagespeedlabel">&#216;</div><span class="averagespeedtext display-text gps">00000</span></div>
+            <div id="maxspeed" class="display-box hud fly-box fast-option skin"><span class="maxspeedtext display-text gps">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
         </div>
--->
+
 		<div id="digitalspeed-positioner" class="positioner">
 			<div id="digitalspeed-wrapper" class="skin">
 				<div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit fast-option">km/h</div></div>
-		        <div id="digital-average" class="display-box half-box hud"><span class="averagespeedtext display-text gps">00000</span><div id="averagespeedlabel" class="unitlabel">&#216;</div></div>
-		        <div id="digital-max" class="display-box half-box hud"><span class="maxspeedtext display-text gps">00000</span><div id="maxspeedlabel" class="unitlabel">max</div></div>
-			</div>
+		        <div id="digital-speedstats-wrapper" class="speedstats-wrapper">
+				  <div id="digital-average" class="display-box half-box hud fast-option"><span class="averagespeedtext display-text gps">00000</span><div class="unitlabel averagespeedlabel">&#216;</div></div>
+		          <div id="digital-max" class="display-box half-box hud fast-option"><span class="maxspeedtext display-text gps">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
+				 </div>
+			  </div>
 		</div>
 		
 		<!--you will need 2 versions for display in digital OR analog
@@ -694,7 +766,7 @@
     
     <div id="displays-wrapper" class="skin">    	
 	    <div id="time" class="hud display-box skin fast-option"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
-	    <div id="geoaltitude" class="hud display-box skin"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit fast-option">m</div> </div>
+	    <div id="geoaltitude" class="hud display-box skin fast-option"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit fast-option">m</div> </div>
 		<div id="geolocation" class="hud display-box skin fast-option"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
 
     </div>
@@ -713,7 +785,7 @@
     </div>
     
     <div id="infocard" class="card">
-        <h2><a href="#back" class="back-arrow ext-link"><span class="icon-left-big"></span></a><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to this Speedometer and GPS Tool</span></h2>
+        <h2><a href="#back" class="back-arrow ext-link"><span class="icon-left-big"></span></a><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to the Speedometer and GPS Tool</span></h2>
 		<p>by</p>
 		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
 		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
@@ -747,6 +819,21 @@
         dass es in einigen Ländern/Gebieten möglicherweise nicht gestattet ist, ein nicht fest verbautes HUD im Straßenverkehr zu nutzen!)</p>
         <p lang="en">With <b>"HUD" (head up display)</b> turned on you can put your device in front of mirroring glass (of an vehicle) to read the 
         	reflected displays. Note that the brightness of your device ist not high enough for daylight use in most cases.</p>
+        	
+      	<p lang="en"><b>Maximum and average speed values</b> will only be updated when they are shown, but not reset to 0 when hidden. 
+		The average value will only be updated when not 0 (zero). Thus long periods of not moving will not change the average value.
+      	The values are not reset when you exit the app. They will resume updating even the next day when you use the app again.
+      	You can reset or hide these values in Options > Settings > Speedometer.</p>
+      	
+		<p lang="de"><b>Maximalwert und Mittelwert</b> der gemessenen Geschwindigkeit werden nur aktualisiert, wenn sie sichtbar sind.
+			Sie werden jedoch nicht gelöscht, wenn sie unsichtbar geschaltet werden. Auch beim Beenden der App werden sie <b>nicht</b> gelöscht.
+			Außerdem werden neue Mittelwert nur gebildet, wenn eine Geschwindigkeit größer 0 gemessen wird.
+			Lange Bewegungspausen verändern den Mittelwert daher nicht.
+			Sie können sie unter Auswahl > Einstellungen > Tachometer ausschalten oder löschen.</p></p>
+			
+      	
+		
+
         
 <!--
 	        <p lang="de">Die Einstellung "<b>Direktauswahl</b>" erlaubt die Änderung einiger Einstellungen, wenn Sie einfach auf die Anzeigen tippen.
@@ -803,15 +890,32 @@
 	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
   </div>
 
-	<div id="newsdialog" class="dialog skin">
+<!--	<div id="newsdialog" class="dialog skin">
 		<h3><span lang="en">News</span><span lang="de">Neu</span></h3>
 
-		<p lang="en">Now you can change units of measure (km/h, mph, m/s, kn - for altitude m, ft) directly by touching the unit text. You can also change the type of speedometer directly.
+		<p lang="en">You can change units of measure (km/h, mph, m/s, kn - for altitude m, ft) directly by touching the unit text. You can also change the type of speedometer directly.
 			You can turn off these "One touch settings" in the settings.</p>
 		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden unter "Schnellauswahl".</p>
 	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
 		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
+-->
+	<div id="newsdialog2" class="dialog skin">
+		<h3><span lang="en">News</span><span lang="de">Neu</span></h3>
+
+		<p lang="en">Now you can display statistic <b>maximum</b> and <b>average</b> speed values. Read under "Options > Info" for details.</p>
+
+		<p lang="en">You can also switch between 3 skins to change the look of the displays.</p>
+		
+		<p lang="de">Ab jetzt können Sie den aktuell erreichten Maximalwert und den Mittelwert der gemessenen Geschwindigkeit anzeigen.
+			Weitere Infos dazu unter "Auswahl > Info".</p>
+			
+		<p lang="de">Außerdem können Sie ab jetzt zwischen 3 verschiedenen Erscheinungen (Skins) der Displays umschalten.</p>
+		
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
+		<a id="switchnews2" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+	</div>
+	
 	
     <div id="settingsdialog" class="dialog skin">
         <h3><span lang="de">Auswahl</span><span lang="en">Options</span></h3>
@@ -840,8 +944,8 @@
 		  <a id="switchunits" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="de">Maßeinheit</span><span lang="en">Units</span> (<span class="tachounit">km/h</span>)</a>
 		  <a id="switchmaxaverage" class="switcher switched-on" href="#"><span class="fa icon-ok"></span><span lang="en">Show average and max speed</span><span lang="de">Mittel u. Max. anzeigen</span></a>
 					   
-	       <a id="resetmaxspeed" class="switcher menuitem" href="#"><span class="fa text-icon">MAX</span><span lang="de">Maximale löschen</span><span lang="en">Clear max value</span></a>	  
-	       <a id="resetaveragespeed" class="switcher menuitem" href="#"><span class="fa text-icon">AVR</span><span lang="de">Mittlere löschen</span><span lang="en">Clear average value</span></a>	  
+	       <a id="resetmaxspeed" class="switcher menuitem" href="#"><span class="fa icon-upload"></span><span lang="de">Max. Wert löschen</span><span lang="en">Clear max value</span></a>	  
+	       <a id="resetaveragespeed" class="switcher menuitem" href="#"><span class="fa"> &#216;</span><span lang="de">Mittelwert löschen</span><span lang="en">Clear average value</span></a>	  
 	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span><span lang="de">Wertebereich zurücksetzen</span><span lang="en">Reset speedometer range</span></a>	  
 		  <!--
 		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
@@ -998,6 +1102,7 @@ function kwd_setElementHtml(element,str) {
 
 
 // class for global vars
+// kta =
 function KwdTachoApp() {
 	// public members
 	this.language = 'en';
@@ -1008,9 +1113,10 @@ function KwdTachoApp() {
 	this.nojquery = false;
 	this.version = 1.45; 
 	this.defaultMargin = 10;
-	this.debug = false;
+	this.debug = true;
 	this.mydebug = null;
-	this.maxaverage = false;
+
+	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
 	this.maxaverage_infopos = [0.7, 0.6, 0.32];
 	
 	this.storage = {
@@ -1224,12 +1330,16 @@ function showHint (msg,msg_de) {
 
 /* starts gps sensor 
  * - checks if clock is the only display, then don't start + even stop when already running
+ * - doesn't check if max/average enabled since it will be handled in stopGps()  
+ 
  * TODO: useful to wait until warning at app start is gone??
  */
 var gps_running = false; // prevent loc.Start() if running OR loc.Stop() if already stopped
 function startGps() {
 	if (typeof loc != 'undefined') {
 		var clockonly = (layout_gauges==1 && clock_visible) ? true : false; // TODO could use value from displays list
+		// negate clockonly when max/average is active
+		
 		
 		if (!clockonly && !gps_running) {
 			loc.Start();
@@ -1242,10 +1352,16 @@ function startGps() {
 }
 /* stops gps sensor
  * - prevents multiple send stop command
+ * - does NOT stop when max/average are enabled
  */
 function stopGps() {
-	if (gps_running && (typeof loc != 'undefined')) loc.Stop();
-	gps_running = false;
+	if (gps_running && (typeof loc != 'undefined') 
+		&& (typeof settings != 'undefined')
+		&& (settings.get('switchmaxaverage')==false)) {
+			
+		loc.Stop();
+		gps_running = false;
+	}
 }
 
 var gps_blinking = false;
@@ -1376,17 +1492,16 @@ function OnPause()
     // kann, z.B. nur die Werte weiter verarbeiten, die die für die Statistik erforderlich sind.
     if (typeof gpstool !== 'undefined') gpstool.saveAverage();
     
-    stopGps(); // solange keine Hinterhrundwerte für max/mittel  
+    stopGps(); // ! stop is not performed when max/average on  
 }
  
 // TODO: check what it does when inside menu?
 // --> the double check should prevent fade
 function OnResume() 
 { 
-	app.Debug("on resume");
     app.PreventScreenLock(true);
     
-    startGps(); // check if error when start twice!!!
+    startGps();
     if (typeof gpstool !== 'undefined') {
 //    	if (gpstool.isHud())
     		//app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
@@ -1416,6 +1531,7 @@ function OnBack()
 // (so i control things much better!!)
 function Quit() {
     OnPause();  // nach neuesten Tests nicht automatisch
+    stopGps();
     app.Exit();
 }
 
@@ -1440,25 +1556,27 @@ function loc_OnChange( data )
 // class
 function KwdGpsTools () {
     //private:
-    var speed =0.0;
-    var speedfactor = 3.6;
-    var lastspeed = 0.0;
-    var dspeed = 0.0;
-    var step = 0.0;
-    var stepcount = 0;
+    var that = this;
+    
+    var speed =0.0;        // aktueller/letzter Wert
+    var speedfactor = 3.6; // wird geändert abhängig von gewählter Maßeinheit
+
     var lat = 0;
     var lon = 0;
     var locformat = true; // if true format in ° ' ", otherwise float val
+
     var alt = 0;
-    var altfactor = 1;
+    var altfactor = 1;  // wird geändert abhängig von gewählter Maßeinheit
+    
     var hud = false;
-    var that=this;
     var maxspeed = 0; 
     var tachorange = 10;
     var dochangetachorange = false;
-    var speedtest = 0;
 
+	var maxaverage_show = true;
+	
     var average_list = [];
+    var average_speed = 0; // aktueller Wertin m/s, damit ohne Berechnung refresh möglich
     var average_newentry = false; // signals that e new entry must be added (program start)
     var average_old_sum = 0; // all old values together
     var average_old_n = 0; // all old values together
@@ -1537,59 +1655,66 @@ function KwdGpsTools () {
         else return 'decimal';
     };
     
+	this.showMaxAverage = function(newstate) {
+		maxaverage_show = (newstate) ? 'true' : 'false';
+	} 
+
     /*
         collects values for average speed
           s: speed value to add - must be in m/s 
         
         - does NOT auto save averagespeed persisently (must be done separately, eg. on resetAutoFade/resetHud, or OnPause)
         
-         TODO: neue Implementation: 
          - einfach 3 Werte speichern: Summe, Anzahl, Zeitstempel
          - dies ist eine Gruppe, i.A. benötigt man 1 Gruppe je Programmstart
     */
     this.averageSpeed = function(s) {
- 		
- 		
-		// TODO: völlig neue Berechnung!
-		var ctime =  new Date().getTime();
+ 			
+ 		if(s >= 0) {
+     		    
+    		// TODO: völlig neue Berechnung!
+    		var ctime =  new Date().getTime();
+    		
+    		// add entry
+    		if((average_newentry) || (average_list.length < 1)) {
+    			average_newentry = false;
+    			
+    			// this defines the object type!
+    			var newentry = {
+    				n : 0,
+    				sum : 0,
+    				time : ctime
+    			};
+    			average_list.push(newentry);
+    		}										
+    			
+    		// use current entry
+    		var cas = average_list[average_list.length - 1];
+    		  
+    		cas.n += 1;
+    		cas.sum += s;
+    		cas.time = ctime;
+    		
+    		// set old sum and n only once after program start or init
+    		if(average_list.length > 1) {
+    			if(!average_old_n || !average_old_sum) { // TODO: check if this is really just done when needed!
+    				average_old_n = average_old_sum = 0;
+    				for(var i = average_list.length - 1; i>=0; i--) {
+    					average_old_n += average_list[i].n;
+    					average_old_sum += average_list[i].sum;
+    				}
+    			}
+    		} else average_old_n = average_old_sum = 0; // eigentlich nur bei clear nötig, ist aber sicherer, es immer abzufragen
+    		
+    	
+    		// calculate current average value
+    		// ! hier *mit* #
+    		average_speed = (average_old_sum + cas.sum)  / (average_old_n + cas.n); 
+		} // refresh only
 		
-		// add entry
-		if((average_newentry) || (average_list.length < 1)) {
-			average_newentry = false;
-			
-			// this defines the object type!
-			var newentry = {
-				n : 0,
-				sum : 0,
-				time : ctime
-			};
-			average_list.push(newentry);
-		}										
-			
-		// use current entry
-		var cas = average_list[average_list.length - 1];
-		  
-		cas.n += 1;
-		cas.sum += s;
-		cas.time = ctime;
-		
-		// set old sum and n only once after program start or init
-		if(average_list.length > 1) {
-			if(!average_old_n || !average_old_sum) { // TODO: check if this is really just done when needed!
-				average_old_n = average_old_sum = 0;
-				for(var i = average_list.length - 1; i>=0; i--) {
-					average_old_n += average_list[i].n;
-					average_old_sum += average_list[i].sum;
-				}
-			}
-		} else average_old_n = average_old_sum = 0; // eigentlich nur bei clear nötig, ist aber sicherer, es immer abzufragen
-		
-	
-		// calculate current average value
-		// ! hier *mit* #
-		displaySpeedWithFactor((average_old_sum + cas.sum)  / (average_old_n + cas.n), '#digital-average'); 
+		displaySpeedWithFactor(average_speed, '.averagespeedtext'); // sets more than 1 elements, just like .speed 
     };
- 
+     
  	/* gibt Datum-Stempel der letzten Gruppe zurück für Anzeige in UI Dialog
  	 * return: Datumsobjekt | undefined
  	 * 
@@ -1675,7 +1800,7 @@ function KwdGpsTools () {
         if(newmaxspeed && (newmaxspeed > maxspeed || newmaxspeed < 0)) {
             maxspeed = (newmaxspeed<0) ? -newmaxspeed  : newmaxspeed;
             app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
-			displaySpeedWithFactor(maxspeed,'#digital-max'); // ! hier *mit* #
+			displaySpeedWithFactor(maxspeed,'.maxspeedtext'); // ! hier *mit* . !
         }
         return maxspeed;
         
@@ -1695,7 +1820,6 @@ function KwdGpsTools () {
         if (newlocdata.provider.toLowerCase() == "gps") {
 			clearGpsWarning();
 			
-            lastspeed=speed;
             // rounding saves a lot of space when converting values to string
             speed =  newlocdata.speed;
             if (speed < 0) speed = 0; // for the case of calculation or rounding errors
@@ -1705,25 +1829,20 @@ function KwdGpsTools () {
             //currently not used $('#bearinginfo').text('GPS');
 
 
-	        //if (speedtest<50) speedtest+=0.9;
-	        //else speedtest+=9;
-	        //speed=speedtest;
-
 	        // for screenshots:
 	        // speed = 42/3.6;	        
 	        
 	        // es wird nicht gezählt, falls man steht mit GPS & Average aktiv
-	        if (speed > 0) this.averageSpeed(speed);
-	        this.maxSpeed(speed);
+	        if (maxaverage_show && speed > 0) {
+	            this.averageSpeed(speed);
+	            this.maxSpeed(speed);
+	        }
 	        
 	        var displayspeed = displaySpeedWithFactor(speed,'.speed'); // already sets the output, but returns calculated as number
 	        
 	        	
 	        if (cssgauge_visible) { // flag for performance
-		        app.Debug('cssgauge visible -> set analog speed');
-		        // correct scale if >1000 or <1000
-		        //if (displayspeed >= 1000 && lastspeed<1000) dona_text_scale(dona_scale4);
-		        //else if (displayspeed < 1000 && lastspeed>=1000) dona_text_scale(dona_scale3);
+		        //app.Debug('cssgauge visible -> set analog speed');
 		        
 	        	if (displayspeed > 0) this.tachoRange(displayspeed); // must not be <= 0  (accidently)
 	        	gauge.setValue(displayspeed); // hier den exakten float value nutzen
@@ -1746,9 +1865,6 @@ function KwdGpsTools () {
         //lat = 52.5162731;
         //lon = 13.3777052;
         
-        //step = (speed - lastspeed) / 4;
-        //stepcount=0;
-        //dspeed = lastspeed;
         // window.setTimeout(this.setStep,250);
 
         //test
@@ -1797,7 +1913,7 @@ function KwdGpsTools () {
 				elems[i].classList.remove('skin-plastic');
 				elems[i].classList.add('skin-minimal');
 			}
-		  //app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
+		  	app.SetScreenMode('F'); // TODO: evtl. in mächster DroidScript Version geändert
 
 		}
 		else {
@@ -1807,7 +1923,7 @@ function KwdGpsTools () {
 				elems[i].classList.remove('skin-minimal');
 			}
 			kta.setSkin(); // setzt ursprüngliche skin
-		  //app.SetScreenMode('Normal');
+		  	app.SetScreenMode('Normal');
 		}
     };
 	
@@ -1894,7 +2010,7 @@ function KwdGpsTools () {
 					'maxRange':tachorange,
 					'majorStep':maj, // must be < maxRange and reasonable adjusted
 					'minorTicks':minors, // should be between 0 and 5
-					'overallAngle':270, // degrees, better < 340
+					'overallAngle':250, // degrees, better < 340
 					'value':0 // must be < max Range
         	    });
         	    // some skin classes must be set again:
@@ -2065,8 +2181,7 @@ function AutoSettings(newstoragename,newsetclass) {
     
     /* return: true: on, false: off
  		- value: if given sets to this (must be string 'true'|'false') (TODO: test!)
- 		TODO: alles mit normalem true|false (keine Strings)
-	       TODO: id statt elem, da eh wieder zurück referenziert werden muss
+ 		return: neuer Status (true|false)
      */
     
     this.switchit = function(id,value) {
@@ -2419,7 +2534,7 @@ function DisplayBox (newid,mode) {
 	//jquery:textRef = $('.display-text',boxRef);
 	var dts = boxRef.getElementsByClassName('display-text');
 	if(dts && dts.length) textRef = dts[0];
-	else throw 'kwd: textRef remains null (display-box)';
+	else throw 'kwd: DisplayBox, canno set textRef';
 	//textRef = boxRef.querySelector('.display-text'); // TODO: use when above code doesn't work 
 	 
 	
@@ -2441,6 +2556,7 @@ function DisplayBox (newid,mode) {
 	});*/
 	// ! span tags *don't* have clientWidth/Height!
 	text_w = textRef.scrollWidth || textRef.offsetWidth;
+	var testw = getComputedStyle(boxRef,null).width;
 	textRef.style.width = text_w + 'px';  // set fix  from 'auto' to current width
 	text_h = textRef.scrollHeight || textRef.offsetHeight; 
 	textRef.style.height = text_h + 'px';  // set fix  from 'auto' to current height
@@ -2566,6 +2682,23 @@ function DigitalSpeedBoxList(id_maxwidth) {
 	var idmaxwidth;
 	var list = [];
 	
+	var avrmax = true; // flag für Sichtbarkeit - TODO: muss bei Umschaltung im Menü gesetzt werden
+	
+	this.showMaxAverage = function(newstate) {
+
+		if(newstate) {
+			avrmax = true;
+		}
+		else {
+			avrmax = false;
+		}
+
+		if(gpstool) gpstool.showMaxAverage(avrmax);
+		else throw "kein gpstool für DigitalSpeedBoxList init";
+		
+		return avrmax;
+	};	
+
 	/* adds an element to list
 	 * id: id of HTML tag
 	 */
@@ -2608,52 +2741,38 @@ function DigitalSpeedBoxList(id_maxwidth) {
 		return true;
 	};
 	
-	/* verschiedene Einpass-Funktionen
-	 * - ! z.Z. nur für stapel übereinander geeignet
-	 * TODO: immer noch fehler, da in positionDisplays digitalspeed nicht mit gerechnet, aber hier mit verarbeitet
-	 * TODO: nur gerade sichtbare einberechnen
-	 * TODO: style für :first dynamisch für ersten sichtbaren
+	/* Einpass-Funktion
+	 * - berechnet Höhe wenn avr/max sichtbar 
 	 */
+	 
 	this.scaleTo = function(x,y) {
 			var i;
-			if(list.length>=3) { // just to be saver from errors
-				// - TODO: see DisplayBoxList
-				list[0].setFirst(true); // digitalspeed
-				list[1].setFirst(true); // time
-				var check = (!list[1].isVisible()); // hope check is getting boolean			
-				list[2].setFirst(check); 
-				check = (!(list[1].isVisible()|| list[2].isVisible()));
-				list[3].setFirst(check); 
+			var y_am = 0;
+			
+			// nur wenn was in Liste
+			if (list.length <=0 ) return;
+			
+			var scalemode = '';
+			if(!y) {
+				scalemode = 'width';
+				y = 0;
 			}
 			else {
-				if(list.length) list[0].setFirst(true);
-			}			
-			
-			dy = y;
-			// TODO: calculate more, when average and max there
+				if (avrmax && list.length > 1) {
+					// teilt Höhe in 3/4 für speed und 1/4 für avr/max
+					y_am = y * 0.25;
+					y = y * 0.75; 
+				} 
+			}
 
-			if(y==0) { // normal screen wide
-				for (i=list.length-1;i>=0;i--) {
-					list[i].resize(x,0,"width");	
-				}
-				app.Debug('scaled to max h');				
-			}
-			else {
-				//app.Debug('visible displays: '+c);
-				var dy = y/c; // c generated above
+			// erstes Element *muss* digispeed sein
+			list[0].resize(x,y,scalemode);
 			
-				for (i=0;i<list.length;i++) {
-					if (list[i].name()=='digitalspeed') {
-					    // TODO: do nothing here
-						//list[i].resize(x,0,"width");
-					}
-					else {
-					//TODO: *must* calculate outerWidth(true)
-					//on .display-box for using space
-						list[i].resize(x,dy,"");						
-					}	
-				}
+			// average + max	
+			for (i=1;i<list.length;i++) {
+				list[i].resize(x/2,y_am,scalemode);
 			}
+					
 	};
 	
 } // class DigitalSpeedBoxList
@@ -2665,6 +2784,26 @@ function DigitalSpeedBoxList(id_maxwidth) {
 function AnalogSpeedBoxList() {
 	var list = [];
 	
+	var avrmax = true; // flag für Sichtbarkeit - TODO: muss bei Umschaltung im Menü gesetzt werden
+	
+	/* Achtung! Setzt die Aktivität,
+	 * nicht ob es tatsächlich sichtbar ist!
+	 */
+	this.showMaxAverage = function(newstate) {
+
+		if(newstate) {
+			avrmax = true;
+		}
+		else {
+			avrmax = false;
+		}
+
+		if(gpstool) gpstool.showMaxAverage(avrmax); // TODO; vermeide Dopplung des Aufrufs (DigitalSpeedBoxList)
+		else throw "kein gpstool für AnalogSpeedBoxList init";
+
+		return avrmax;
+	};	
+
 	/* adds an element to list
 	 * id: id of HTML tag
 	 */
@@ -2709,36 +2848,17 @@ function AnalogSpeedBoxList() {
 	};
 	
 	/* verschiedene Einpass-Funktionen
-	 * - ! z.Z. nur für stapel übereinander geeignet
-	 * TODO: immer noch fehler, da in positionDisplays digitalspeed nicht mit gerechnet, aber hier mit verarbeitet
-	 * TODO: nur gerade sichtbare einberechnen
-	 * TODO: style für :first dynamisch für ersten sichtbaren
+	 * - verarbeitet nur Einträge 2,3 (nicht dona!) 
+	 * TODO: ähnlich wie bei digital
 	 */
-	this.scaleTo = function(x,y) {
+	
+	this.scaleTo_istDeaktiviert = function(x,y) {
+			
+			//TODO: remove this:
+			return;
+			
 			var i;
 			
-			if(list.length>=3) { // just to be saver from errors
-				// get visibles:
-				// - there are just 2 possible entries which need the border (can be !first)
-				// - TODO: this as a general rule/loop
-				list[0].setFirst(true); // digitalspeed
-				list[1].setFirst(true); // time
-				var check = (!list[1].isVisible()); // hope check is getting boolean			
-				list[2].setFirst(check); 
-				check = (!(list[1].isVisible()|| list[2].isVisible()));
-				list[3].setFirst(check); 
-			}			
-			
-			var c = 0;
-			// ! only works when #digitalspeed is first in list !
-			// ! counts from second entry 
-			for(i=1;i<list.length;i++) { // always loop forward here!
-				if (list[i].isVisible()) {
-					c++;
-				}
-			}
-
-
 			if(y==0) { // normal screen wide
 				for (i=list.length-1;i>=0;i--) {
 					list[i].resize(x,0,"width");	
@@ -2847,9 +2967,29 @@ function resetHud() {
     - da es nur gleiche Aufrufe gab, jetzt keine Parameter mehr- Elemente direkt genutzt
     - settings Struktur muss initialisiert sein!
     - NEW: sub-elements ar hidden when whole tacho is hidden
+    - max und average werden *nicht* abgeschaltet sondern nur versteckt, wenn kein Tacho sichtbar
+    - TODO: ! die average/max Parameter für Analog könne auch ohne das Gauge sichtbar sein
+      
 */
 function setTachoLayout() {
      
+    var maxaverage_visible = true;
+    
+    // Aktivität von max/average separat setzen
+   	if (settings.get('switchmaxaverage')==false) {
+		digitalSpeedDisplays.showMaxAverage(false);
+		kwd_hideById('digital-speedstats-wrapper');
+		analogDisplays.showMaxAverage(false);
+		kwd_hideById('analog-speedstats-wrapper');
+		maxaverage_visible = false;
+	}
+	else {
+		digitalSpeedDisplays.showMaxAverage(true);
+		analogDisplays.showMaxAverage(true);		
+		kwd_showById('digital-speedstats-wrapper');
+	}
+
+    // setze Tacho
     if (settings.get('tachoswitch')!=false) {
     	
 	  //$('#tacho-container').show();
@@ -2867,8 +3007,10 @@ function setTachoLayout() {
 	
 	    if(a && d) {
 	        cssgauge_visible = true;
-	        document.getElementById('cssgauge-wrapper').style.top = '10px';
-	        
+	        // es muss jeweils nur max/average für *analog* gesetzt/gelöscht werden, da für digital innerhalb des display-wrappers
+	        if(maxaverage_visible) kwd_showById('analog-speedstats-wrapper');
+
+	        document.getElementById('cssgauge-wrapper').style.top = '10px';	        
 	        //$('#cssgauge-wrapper').show();
 	        //document.getElementById('cssgauge-wrapper').style.display = 'block';  // just see if error :-)
 	        //$('#digital-on-analog').show();    
@@ -2881,6 +3023,8 @@ function setTachoLayout() {
 	    }
 	    else if (a && !d) {
 	        cssgauge_visible = true;
+	        if(maxaverage_visible) kwd_showById('analog-speedstats-wrapper');
+	        
 	        document.getElementById('cssgauge-wrapper').style.top = '10px';
 	        //kwd_showById('cssgauge-wrapper'); // $('#cssgauge-wrapper').show(); 
 	        kwd_hideById('digital-on-analog'); //$('#digital-on-analog').hide();
@@ -2890,6 +3034,8 @@ function setTachoLayout() {
 	    }
 	    else if (!a && d) {
 	        cssgauge_visible = false;
+	        if(maxaverage_visible) kwd_hideById('analog-speedstats-wrapper');
+	        
 	        document.getElementById('cssgauge-wrapper').style.top = '-2000px';
 	        //$('#cssgauge-wrapper').hide();
 	        //document.getElementById('cssgauge-wrapper').style.display = 'none';	        
@@ -3056,6 +3202,7 @@ function scaleDisplays(initial) {
 	    
 		dona.resize(wdona,0,'width'); // glob var
 		
+		
 	    /*jquery:$("#digital-on-analog").css({
 	        'left': (cssgaugewidth - $('#digital-on-analog').width()) / 2,
 	        'top':  (cssgaugewidth - $('#digital-on-analog').height()) / 2
@@ -3120,15 +3267,16 @@ function scaleDisplays(initial) {
 	    });
 	    */
     }
+    
+    
 }    // scaleDisplays
 
 /* adjusts positions, proportions and sizes of displays,
  * depending on which display is currently visible
  * - also perfoms scaling of displays
  * - ! do not set height of positioner but of wrapper
- * 
- * - TODO: nimm Höhe und Breite von app.DisplayWidth/Height, da sonst software backbutton höhe nicht beachtet wird (Test)
- * - TODO: Idee: breite,höhe und layoffset in Object DisplayBox integrieren - dort positioner finden lassen (.parent() in jQuery)
+ *
+ * TODO: Wenn keine zusatz-displays:  Digital & avr/max ist Höhe begrenzt --> Höhe vorab berechnen und scale inkl. y-Wert 
  */
 function positionDisplays() {
 		
@@ -3160,23 +3308,66 @@ function positionDisplays() {
 
 
 	if(cssgauge_visible) {
-		
+
+		var cssgauge_size = cssgaugewrapper.offsetWidth; // width == height
 		var gaugeleft = 0;
-		if (isLandscape && displays.noneVisible()) {
-			gaugeleft = (screen_w - cssgaugewrapper.offsetWidth)/2;
+		var maxaverage_size = (screen_w / 2 - def_margin*2	); // must be applied to display-boxes // 10 == gap
+		var maxaverage_height = 0; // adjust depending on orientation + displays + skin
+		var maxaverage_left = 0; // must be applied to analog-speedstats-wrapper
+		//var maxaverage_bottom = 10; // when top == 0, this overrides maxaverage_top
+		var maxaverage_wrapper_width = screen_w - def_margin*2;
+		var maxaverage_backcolor = 'black';
+		
+		if (isLandscape) {
+			
+			
+			if(displays.noneVisible()) {
+				gaugeleft = (screen_w - cssgauge_size) / 2 - def_margin;
+				maxaverage_size *= 0.75; // factor from max possible width
+				maxaverage_backcolor = 'transparent';
+			} 
+			else {
+				maxaverage_wrapper_width = cssgaugewrapper.offsetWidth; 
+				maxaverage_size = cssgauge_size / 2 - def_margin;
+			}
 		}
+		else {
+			//maxaverage_top = cssgaugewrapper.offsetHeight - cssgaugewrapper.offsetHeight * 0.3; // TODO: ask height of speedstats
+			//maxaverage_bottom =  hscreen - cssgauge_size;
+		}
+		
 		cssgaugewrapper.style.top = 0;
 		cssgaugewrapper.style.left = gaugeleft + 'px';
 		/*$('#cssgauge-wrapper').css({
 			'top':'0px',
 			'left': gaugeleft+'px'
 		});*/		
+
+		// Setze Größen von max/average auf analog
+		// TODO: prüfen, ob gerade sichtbar!!
+		maxaverage_height = (maxaverage_size * 0.4) ;
+		analogMaxSpeed.resize(maxaverage_size*0.8,maxaverage_height,'');
+		document.getElementById('maxspeed').style.width = maxaverage_size + 'px';
+		analogAverageSpeed.resize(maxaverage_size*0.8,maxaverage_height,'');
+		document.getElementById('averagespeed').style.width = maxaverage_size + 'px';
+		var ma_wrapper = document.getElementById('analog-speedstats-wrapper');
+		ma_wrapper.style.width = maxaverage_wrapper_width + 'px';
+		ma_wrapper.style.left = maxaverage_left + 'px';
+		ma_wrapper.style.backgroundColor = maxaverage_backcolor;
+		//ma_wrapper.style.top = 'auto';
+		//app.Debug('maxaverage_bottom: '+maxaverage_bottom);
+		//ma_wrapper.style.bottom = maxaverage_bottom + 'px';
 	}
 	
 	// digital (scale full or half)
 	
 	else if (displayDigitalspeed.isVisible()) {
 
+		var statwrap = document.getElementById('digital-speedstats-wrapper');
+		statwrap.style.position = 'relative';
+		statwrap.style.bottom = 'auto';			
+
+		
 		digitalspeed_width = screen_w;
 		
 		if (isLandscape && !displays.noneVisible()) {
@@ -3192,14 +3383,22 @@ function positionDisplays() {
 		//TODO: also easier in object: before each scaleto, height must reset to 'auto'
 		//$('#digitalspeed-wrapper').css('height','auto');
 		var el = document.getElementById('digitalspeed-wrapper');
-		el.style.height = 'auto';				
-		//displays.scaleTo($('#digitalspeed-wrapper').width(),0); // TODO: check if you have to WAIT
-		displayDigitalspeed.resize(el.clientWidth,0,'width');
-		//displays.scaleTo(el.clientWidth,0); // TODO: check if you have to WAIT
+		el.style.height = 'auto';
+		
+		// hier werden digital + enthaltene max/average scaled:				
+		//displayDigitalspeed.resize(el.clientWidth,0,'width');
+		
+		var y = 0;
+		if (isLandscape && displays.noneVisible()) {
+			y = hscreen  - 40; // TODO: wie margin etc. korrekt in var oder auslesen??
+		}		
+		// Funktion scaleTo teilt Platz auf, abhängig von sichtbaren avr/max
+		digitalSpeedDisplays.scaleTo(el.clientWidth,y);
 		
 		// must be after scale
 		//digitalspeed_height = $('#digitalspeed-wrapper').outerHeight(true);
-		digitalspeed_height = parseFloat(el.offsetHeight  + el.style.marginTop + el.style.marginBottom); // you really have to WAIT here!!!!
+		//digitalspeed_height = parseFloat(el.offsetHeight  + el.style.marginTop + el.style.marginBottom); // you really have to WAIT here!!!!
+		digitalspeed_height = parseFloat(el.offsetHeight + def_margin *2);
 
 		if(isLandscape) {
 			digitalspeed_top = (hscreen - digitalspeed_height)/2;
@@ -3219,6 +3418,9 @@ function positionDisplays() {
 		
 		// width only cut in landscape
 		if(isLandscape) {
+			
+			displays_top = 0;
+			
 			if(displayDigitalspeed.isVisible()) {
 				displays_width -= digitalspeed_width;
 			}
@@ -3232,7 +3434,7 @@ function positionDisplays() {
 		// and height in portrait
 		else {
 			if(displayDigitalspeed.isVisible()) {
-				displays_top = digitalspeed_height + def_margin;
+				displays_top = digitalspeed_height; 
 			}
 			else if (cssgauge_visible) {
 				//displays_top = $('#cssgauge-wrapper').outerHeight(true);
@@ -3270,7 +3472,7 @@ function positionDisplays() {
 	
 		if (isLandscape) { // y center only in landscape now			
 			displays_height = parseFloat(displayswrapper.offsetHeight + displayswrapper.style.marginTop + displayswrapper.style.marginBottom); // must be taken after scaleTo !
-			if (displays_height < hscreen) displays_top = (hscreen - displays_height) / 2;	
+			if (displays_height < hscreen) displays_top = (hscreen - displays_height - def_margin*2) / 2;	
 		}				
 		
 		// change vars to adjust digitalspeed-positioning
@@ -3289,12 +3491,16 @@ function positionDisplays() {
 	 
 	if (isLandscape && displayDigitalspeed.isVisible() && !displays.noneVisible()) {
 
+		var statwrap = document.getElementById('digital-speedstats-wrapper');
+		
 		// check which is larger!
 		if(displays_height>digitalspeed_height) {				
 			digitalspeed_height = parseFloat(displayswrapper.offsetHeight + displayswrapper.style.marginTop + displayswrapper.style.marginBottom);
 			digitalspeed_top = displays_top;
-			
 			displays_height = 'auto';
+			
+			statwrap.style.position = 'absolute';
+			statwrap.style.bottom = '0px';
 		}
 		else {
 			// displays set top to digitalspeed
@@ -3303,6 +3509,9 @@ function positionDisplays() {
 			var digiwrap = document.getElementById('digitalspeed-wrapper');
 			displays_height = digiwrap.offsetHeight + digiwrap.style.marginTop + digiwrap.style.marginBottom; // does work when both things have same layout			
 			digitalspeed_height= 'auto';
+			
+			statwrap.style.position = 'relative';
+			statwrap.style.bottom = 'auto';			
 		}		
 	}
 	else { 
@@ -3389,6 +3598,7 @@ function setTachoUnits(newunits) {
 		els[i].innerHTML = txt; // TODO: use nodeValue		
 	}
 	gpstool.maxSpeed(-gpstool.maxSpeed()); // the max-value display with current value 
+	gpstool.averageSpeed(-1); // all minus vals lead to refresh without changing the values
 }    
 
 function setAltimeterUnits(newunits) {
@@ -3491,7 +3701,18 @@ function refreshall() {
 
 }
 
-
+/* returns speed unit as readable text
+ * - depends on autosettings
+ */
+function getCurrentSpeedUnits() {
+	var  dunit = 'km/h';
+	if(settings) {
+		if(settings.get('setmph')) dunit = 'mph';
+		else if(settings.get('setkn')) dunit = 'kn';
+		else if(settings.get('setms')) dunit = 'm/s';
+	}
+	return dunit;
+}
 
 
 /* vereint alle Programmstartfunktionen
@@ -3506,7 +3727,8 @@ function initApp()  {
     tablet = app.IsTablet(); // returns boolean
     
 
-	//DEBUG: document.getElementById('splashscreen').style.opacity = 0.1; // debug
+	//DEBUG: 
+	//document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
     
     // ONSTART
@@ -3538,8 +3760,8 @@ function initApp()  {
 	if(!kta.browsermode) {
 		//kwd_hideById('speedstats'); //$('#speedstats').hide();
 		kwd_hideById('switchnightmode'); //$('#resetmaxspeed').hide();
-		kwd_hideById('resetmaxspeed'); //$('#resetmaxspeed').hide();
-		kwd_hideById('resetaveragespeed');//$('#resetaveragespeed').hide();
+		//kwd_hideById('resetmaxspeed'); //$('#resetmaxspeed').hide();
+		//kwd_hideById('resetaveragespeed');//$('#resetaveragespeed').hide();
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
@@ -3549,6 +3771,8 @@ function initApp()  {
 	analogDisplays = new AnalogSpeedBoxList(); 
  	dona = analogDisplays.add('digital-on-analog','--'); // dona must only be scaled once since it is scaled with gauge later
 	dona.setFirst(true);
+	analogMaxSpeed = analogDisplays.add('maxspeed','--');
+	analogAverageSpeed = analogDisplays.add('averagespeed','--');
 	
 	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
 	
@@ -3599,8 +3823,8 @@ function initApp()  {
     if(settings.get('switchwarning')==false)  {
         displayHints = false;
     }
-    if(settings.get('switchnews1')!=true) { // ! here: hide when true
-    	menustack.push('newsdialog');
+    if(settings.get('switchnews2')!=true) { // ! here: hide when true
+    	menustack.push('newsdialog2');
     }
     
     
@@ -3615,11 +3839,11 @@ function initApp()  {
 	if (settings.get('settimeformat')==false) {
 		kwd_hideById('seconds-text'); //$('#seconds-text').hide();
 		kta.clockseconds = false;
-	} 
-            
+	}             
 	if (settings.get('switchfastoptions')==false) {
 		kta.setFastOptions(false);
 	}
+
 	
 	var skin;
 	if (settings.get('setskin-glass')) skin = 'setskin-glass';
@@ -3689,14 +3913,13 @@ function initApp()  {
 			this.kwdpageX = ts[0].pageX; 
 			this.kwdpageY = ts[0].pageY;
 		} */
-		
 		// ! if there can be mor sub-spans you must check also parent of parent!
 		var switcher;
 		if (evt.target.classList.contains('switcher')) switcher = evt.target;
 		if(!switcher && evt.target.parentNode.classList.contains('switcher')) switcher = evt.target.parentNode;
 		if (switcher) {
 			this.kwdSwitcherId = switcher.id;
-		//	switcher.style.backgroundColor = 'rgba(255,255,255,0.3)';
+			//	switcher.style.backgroundColor = 'rgba(255,255,255,0.3)';
 		}
 		else {
 			// TODO: back-arrow einfach als eine button-id setzen!
@@ -3783,11 +4006,11 @@ function initApp()  {
 	        	case 'setlanguage':
 			    	if (kta.language=='de') {
 			    		setLanguage('en');
-			    		showHint ('Touch again for German');
+			    		showHint ('Erneut tippen für Deutsch');
 			    	}
 			    	else {
 			    		setLanguage('de');
-			    		showHint ('Erneut tippen für Englisch');    		
+			    		showHint ('Touch again for English');
 			    	}
 			    	app.SaveText(kta.storage.language,kta.language); // new val already in kta.language
 			        break;
@@ -3950,6 +4173,11 @@ function initApp()  {
 	            	setAltimeterUnits(check);
 	            	//OnBack();
 	            	break;
+	            case 'geoaltitude':
+	            	var au = 'm';
+	            	if (settings.get('setalt-ft')) au = 'ft';
+					showHint('Altitude in '+au,'Höhe in '+au);
+	            	break;
 				case 'time':
 				case 'settimeformat':
 					kwd_setTimeFormat();
@@ -3961,7 +4189,7 @@ function initApp()  {
 				        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
 			    	}
     				break;
-	            case 'switchnews1':
+	            case 'switchnews2':
 	            	settings.switchit(check);
 	            	break;
 	            	
@@ -3980,6 +4208,42 @@ function initApp()  {
 	            	settings.radio('skinradio',check);				
 					kta.setSkin(check);					
 					break;
+				case 'averagespeed':
+				case 'digital-average':
+					// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
+					var u = getCurrentSpeedUnits();
+					showHint('Average speed ('+u+')','Durchschnittliche Geschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
+					break;
+				case 'maxspeed':
+				case 'digital-max':
+					var u = getCurrentSpeedUnits();
+					// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
+					showHint('Last maximal speed ('+u+')','Letzte Höchstgeschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
+					break;
+				case 'switchmaxaverage' :
+					// NEU:
+					if(settings.switchit(check)) {
+						// TODO: show hint
+					}
+					else {
+						// TODO: show hint						
+					}
+					setTachoLayout();
+					
+					doPosition = true;
+					/* ALT					 
+					if(settings.switchit(check)) {
+						// on
+						digitalSpeedDisplays.showMaxAverage(true);
+						analogDisplays.showMaxAverage(true);
+					}
+					else {
+						// off
+						digitalSpeedDisplays.showMaxAverage(false);
+						analogDisplays.showMaxAverage(false);
+					}
+					*/
+					break;				
 
 				// .btn
 				
