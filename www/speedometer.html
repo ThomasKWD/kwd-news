@@ -13,8 +13,9 @@
     <link rel="stylesheet" href="css/cssgauge.css">
   
     <script src='file:///android_asset/app.js'></script>
-	    <script src='js/droidscript.js'></script>
-    
+	<script src='js/droidscript.js'></script>
+	<script src='js/androidsdk.js'></script>
+        
     <script src="js/cssgauge.js"></script>
 
 <!--
@@ -30,13 +31,18 @@
 	
 	TODO: for this release
 
-	- AVR/MAX
-	
-		- bei analog fliegende Container, die nicht direkt nebeneinander sein müssen
-		- sie sollten bei Landscape sogar links oder rechts übereinander sein 
-		  (da später auf der anderen Seite min und max (Alarm) übereinander angezeigt werden sollen)	
+		- bug fixes
 		
 	TODO: for next release:
+
+	- MULTI-SYSTEM
+	
+		- erkennt über vorhandene Scripts welches System die App hosted: DroidScript|Browser|AndroidSDK
+		 
+	- AVR/MAX
+	
+		- sie sollten bei Landscape sogar links oder rechts übereinander sein 
+		  (da später auf der anderen Seite min und max (Alarm) übereinander angezeigt werden sollen)	
 
 	- HUD
 	
@@ -1110,6 +1116,7 @@ function KwdTachoApp() {
 	this.fastoptions = true;
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
+	this.androidmode = false;
 	this.nojquery = false;
 	this.version = 1.45; 
 	this.defaultMargin = 10;
@@ -1241,6 +1248,11 @@ function KwdTachoApp() {
 		}    		
 	};
 
+	// construct
+	if(app.android_sdk) {
+		app.Debug("Android SDK mode found");
+		this.androidmode = true;
+	}
 }
 
 
@@ -3751,7 +3763,7 @@ function initApp()  {
 		'maxRange':10,
 		'majorStep':1, // must be < maxRange and reasonable adjusted
 		'minorTicks':2, // should be between 0 and 5
-		'overallAngle':270, // degrees, better < 340
+		'overallAngle':250, // degrees, better < 340
 		'value':0 // must be < max Range
 	});
 	
@@ -4180,7 +4192,7 @@ function initApp()  {
 	            	break;
 				case 'time':
 				case 'settimeformat':
-					kwd_setTimeFormat();
+					kwd_setTimeFormat(); // TODO: repeat function with *menu entry* for case fast_options == off
 					break;
 				case 'geolocation':
 				    if(kta.fastoptions) {    		
