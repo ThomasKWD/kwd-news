@@ -19,15 +19,16 @@
     <script src="js/cssgauge.js"></script>
 
 <!--
-	WARNING! This is the *high speed* version - without jQuery. It may not work on old devices!
+	WARNING! This is the *high speed* version - without jQuery. It may not work on old devices with very low webkit versions!
 	 
-	this code is freely copyable between browser/phonegap/DroidScript -->
+	this code is freely copyable between browser/phonegap/DroidScript/android-SDK-bridge project -->
+	
 <!--
 	
 	NOTES:
 	
 	- jQuery free version
-	
+	- identical for browser mode, DroidScript ans Adnroid-SDK mode
 	
 	TODO: for this release
 
@@ -748,16 +749,16 @@
 			</div>
 		</div>
         <div id="analog-speedstats-wrapper" class="speedstats-wrapper">
-            <div id="averagespeed" class="display-box hud fly-box fast-option skin"><div class="unitlabel averagespeedlabel">&#216;</div><span class="averagespeedtext display-text gps">00000</span></div>
-            <div id="maxspeed" class="display-box hud fly-box fast-option skin"><span class="maxspeedtext display-text gps">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
+            <div id="averagespeed" class="display-box hud fly-box fast-option skin"><div class="unitlabel averagespeedlabel">&#216;</div><span class="averagespeedtext display-text">00000</span></div>
+            <div id="maxspeed" class="display-box hud fly-box fast-option skin"><span class="maxspeedtext display-text">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
         </div>
 
 		<div id="digitalspeed-positioner" class="positioner">
 			<div id="digitalspeed-wrapper" class="skin">
 				<div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit fast-option">km/h</div></div>
 		        <div id="digital-speedstats-wrapper" class="speedstats-wrapper">
-				  <div id="digital-average" class="display-box half-box hud fast-option"><span class="averagespeedtext display-text gps">00000</span><div class="unitlabel averagespeedlabel">&#216;</div></div>
-		          <div id="digital-max" class="display-box half-box hud fast-option"><span class="maxspeedtext display-text gps">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
+				  <div id="digital-average" class="display-box half-box hud fast-option"><span class="averagespeedtext display-text">00000</span><div class="unitlabel averagespeedlabel">&#216;</div></div>
+		          <div id="digital-max" class="display-box half-box hud fast-option"><span class="maxspeedtext display-text">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
 				 </div>
 			  </div>
 		</div>
@@ -1118,16 +1119,17 @@ function KwdTachoApp() {
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.androidmode = false;
 	this.nojquery = false;
-	this.version = 1.45; 
+	this.version = 1.51; 
 	this.defaultMargin = 10;
-	this.debug = true;
-	this.mydebug = null;
+	this.debug = false;
+	this.mydebug = null; // for DS debug
 
 	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
 	this.maxaverage_infopos = [0.7, 0.6, 0.32];
 	
 	this.storage = {
 		language : 'tacholanguage',
+		average_no_groups : 'tachoaveragenogroups'
 	};
 	
 	this.setFastOptions = function(fast_on) {
@@ -1263,7 +1265,7 @@ kta = new KwdTachoApp();
 const storage_settings = 'kwd_tacho_settings';
 const storage_tachorange = 'tachorange'; 
 const storage_tachocurrentmax = 'tachocurrentmax'; // meint Höchstgeschwindigkeit
-const storage_tachoaverage = 'tachoaveragegroups'; 
+//const storage_tachoaverage = 'tachoaveragegroups'; // vorbehalten, um vo aktueller average-speicherung zu unterscheiden 
 var tacho_defaultrange = 200;
 var layout_gauges = 0; // counts number of displayed components (for layout and messages)
 var clock_visible = false; // to check if Geoloaction can be paused
@@ -1320,13 +1322,6 @@ function setLanguage(lang) {
 }
 
 
-/* gibt eine message aus
-    - kapselt app.ShowPopup, um Layout und Zusatzfunktionen steuern zu können
-    (z.B. stapeln von Nachrichten ähnlich log)
-*/
-function toastMessage(msg) {
-    app.ShowPopup(msg,'bottom');
-}
 /* shows message depending on language
  * - first msg: in default language
  * - second msg (optionl): in second language (now just german)
@@ -1335,8 +1330,8 @@ function toastMessage(msg) {
  */
 function showHint (msg,msg_de) {
 	if(displayHints) {
-		if (msg_de && kta.language=='de') toastMessage(msg_de);
-		else toastMessage(msg);
+		if (msg_de && kta.language=='de') app.ShowPopup(msg_de,"Bottom");
+		else app.ShowPopup(msg,"Bottom");
 	}
 }
 
@@ -1542,7 +1537,7 @@ function OnBack()
 // my own app.Exit wrapper, app.Exit() must not exist more than once!
 // (so i control things much better!!)
 function Quit() {
-    OnPause();  // nach neuesten Tests nicht automatisch
+    OnPause();  // nach neuesten Tests nicht automatisch // TODO: Achtung! by android-sdk automatisch!!
     stopGps();
     app.Exit();
 }
@@ -1557,7 +1552,8 @@ function OnMenu( name )
 
 
 
-//Called when we get a change in location.  // TODO: direkt set???
+//Called when we get a change in location.  
+// TODO: find out why direct setting og gpstool as callback didn't work (maybe write as string?)
 function loc_OnChange( data ) 
 { 
     gpstool.change(data);
@@ -1570,7 +1566,7 @@ function KwdGpsTools () {
     //private:
     var that = this;
     
-    var speed =0.0;        // aktueller/letzter Wert
+    var speed = 0;        // aktueller/letzter Wert
     var speedfactor = 3.6; // wird geändert abhängig von gewählter Maßeinheit
 
     var lat = 0;
@@ -1590,8 +1586,8 @@ function KwdGpsTools () {
     var average_list = [];
     var average_speed = 0; // aktueller Wertin m/s, damit ohne Berechnung refresh möglich
     var average_newentry = false; // signals that e new entry must be added (program start)
-    var average_old_sum = 0; // all old values together
-    var average_old_n = 0; // all old values together
+    //var average_old_sum = 0; // all old values together
+    //var average_old_n = 0; // all old values together
  
  	this.speedFactor = function(newfactor) {
  		if (newfactor) {
@@ -1669,18 +1665,64 @@ function KwdGpsTools () {
     
 	this.showMaxAverage = function(newstate) {
 		maxaverage_show = (newstate) ? 'true' : 'false';
-	} 
+	};
 
     /*
         collects values for average speed
-          s: speed value to add - must be in m/s 
+          s: speed value to add - must be in m/s
+           s==-1 : generate old value and display
+           s==0 : display value only
+           s>0 : generate new value and add old value and display
         
         - does NOT auto save averagespeed persisently (must be done separately, eg. on resetAutoFade/resetHud, or OnPause)
         
          - einfach 3 Werte speichern: Summe, Anzahl, Zeitstempel
-         - dies ist eine Gruppe, i.A. benötigt man 1 Gruppe je Programmstart
+         - dies ist eine Gruppe, z.Z. wird nur eine einzige Gruppe verwaltet und gespeichert
+         
+         TODO: - alten berechneten Wert anzeigen ohne neuen Wert hinzuzufügen: einfach bei s == 0, kann dann auch von extern aufgerufen werden
+         TODO: - keine Gruppen mehr sondern genau ein Datensatz, der gespeichertes verrrechnet und neues hinzufügt. 
+         TODO: (Gruppen nur sinnvoll, wenn es Funktion für Höchstalter des Mittelwertes gibt)
+         
     */
     this.averageSpeed = function(s) {
+ 			
+ 		if(s != 0) {
+     		    
+    		var ctime =  new Date().getTime();
+    		
+    		// add entry
+    		if(average_list.length < 1) {
+    			average_newentry = false;
+    			
+    			// this defines the object type!
+    			var newentry = {
+    				n : 0,
+    				sum : 0,
+    				time : ctime
+    			};
+    			average_list.push(newentry);
+    		}										
+    			
+    		// use current entry
+    		var cas = average_list[0]; // there is always just 1 entry
+    		  
+    		if(s>0) {
+    			cas.n += 1;
+    			cas.sum += s;
+    			cas.time = ctime;
+    		}
+    		    	
+    		// calculate current average value
+    		// ! hier *mit* #
+    		if(cas.n>0) average_speed = cas.sum  / cas.n;
+		} // refresh only
+		
+		displaySpeedWithFactor(average_speed, '.averagespeedtext'); // sets more than 1 elements, just like .speed 
+    };
+    // disabled for later:
+    /*
+
+	this.averageSpeed_groups = function(s) {
  			
  		if(s >= 0) {
      		    
@@ -1726,7 +1768,8 @@ function KwdGpsTools () {
 		
 		displaySpeedWithFactor(average_speed, '.averagespeedtext'); // sets more than 1 elements, just like .speed 
     };
-     
+    */
+    
  	/* gibt Datum-Stempel der letzten Gruppe zurück für Anzeige in UI Dialog
  	 * return: Datumsobjekt | undefined
  	 * 
@@ -1759,30 +1802,31 @@ function KwdGpsTools () {
 	 			return false;
 	 		}
 	 		app.Debug(str);
-	 		app.SaveText(storage_tachoaverage,str);
+	 		app.SaveText(kta.storage.average_no_groups,str);
 	 	}
 	 	return true;
  	};
  	
- 	/* löscht alle Mittelwert-Dateb
+ 	/* löscht alle Mittelwert-Daten
  	 * - löscht vorsichtshalber auch gespeicherte Liste, falls Programm unterbrochen wird bevor erneut regulär gespeichert wurde.
  	 */
  	this.clearAverage = function() {
  		average_list.length = 0;
  		average_newentry = true;
 		average_old_n = average_old_sum = 0; // damit richtig weiter berechnet
- 		app.SaveText(storage_tachoaverage,'');
+ 		app.SaveText(kta.storage.average_no_groups,'');
  	};
  	
  	/* load function for average speed
  	 * - makes array of object out of string with JSON.parse
  	 * - error while loading or empty string leaves array unchanged
  	 * - this inits the measurement-cycle by 'average_newentry=true' --> only use load on startup or when needed
+ 	 * TODO: - displays the read value
  	 * return: true=success, false=nothing (sensible) loaded
  	 */
  	this.loadAverage = function() {
  		average_newentry = true;
- 		var str = app.LoadText(storage_tachoaverage,'');
+ 		var str = app.LoadText(kta.storage.average_no_groups,'');
  		var err=0;
  		if (str) {
  			
@@ -1795,27 +1839,31 @@ function KwdGpsTools () {
  				err=1;
  				average_list.length = 0;
  			}
+ 			if (average_list.length > 1) throw 'loadAverage: found list too long ('+average_list.length+')';
  			average_old_n = average_old_sum = 0; // damit nach pause/resume richtig neu berechnet
  		}
+ 		// init das display 
+ 		this.averageSpeed(-1); // -1 == calculate but don't add new value
+ 			
+ 		
  		if (err) return false;
  		else return true;
  	};
     /*
         sets the maxspeed
         - newmaxspeed: only accepted if > current maxspeed
-        - newmaxspeed: < 0: reset maxspeed with value (like in this.tachoRange)
+        - resetmode: undefined|false|true: if true: set maxspeed
         - auto saves maxspeed persisently
         ! uses always raw m/s until display!
     */
-    this.maxSpeed = function(newmaxspeed) {
+    this.maxSpeed = function(newmaxspeed,resetmode) {
         
-        if(newmaxspeed && (newmaxspeed > maxspeed || newmaxspeed < 0)) {
-            maxspeed = (newmaxspeed<0) ? -newmaxspeed  : newmaxspeed;
+        if(newmaxspeed!==undefined && (newmaxspeed > maxspeed || resetmode)) {
+        	maxspeed = newmaxspeed;
             app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
 			displaySpeedWithFactor(maxspeed,'.maxspeedtext'); // ! hier *mit* . !
         }
         return maxspeed;
-        
     };
     
     /* call back for change by GPS
@@ -1845,7 +1893,7 @@ function KwdGpsTools () {
 	        // speed = 42/3.6;	        
 	        
 	        // es wird nicht gezählt, falls man steht mit GPS & Average aktiv
-	        if (maxaverage_show && speed > 0) {
+	        if (maxaverage_show && speed > 0.28) {
 	            this.averageSpeed(speed);
 	            this.maxSpeed(speed);
 	        }
@@ -2038,7 +2086,7 @@ function KwdGpsTools () {
 	// construct
 	
     // current maxspeed
-    this.maxSpeed(-app.LoadNumber(storage_tachocurrentmax,1)); // neg. value forces set, default 1, because -0 is just 0
+    this.maxSpeed(app.LoadNumber(storage_tachocurrentmax,0),true); // 2nd param true -> force set 
     // current average speed
     this.loadAverage();
     
@@ -3295,6 +3343,7 @@ function positionDisplays() {
 	
 	var hscreen = getDisplayHeight(); // TODO: put into kta!
 	var screen_w = getDisplayWidth();
+	var screen_ratio = screen_w / hscreen;
 	var def_margin = kta.defaultMargin;
 	
 	// TODO inside display objects??
@@ -3335,7 +3384,7 @@ function positionDisplays() {
 			
 			if(displays.noneVisible()) {
 				gaugeleft = (screen_w - cssgauge_size) / 2 - def_margin;
-				maxaverage_size *= 0.75; // factor from max possible width
+				maxaverage_size /= (screen_ratio * 0.95); // factor from max possible width
 				maxaverage_backcolor = 'transparent';
 			} 
 			else {
@@ -3609,8 +3658,8 @@ function setTachoUnits(newunits) {
 	for(var i=els.length-1;i>=0;i--) {
 		els[i].innerHTML = txt; // TODO: use nodeValue		
 	}
-	gpstool.maxSpeed(-gpstool.maxSpeed()); // the max-value display with current value 
-	gpstool.averageSpeed(-1); // all minus vals lead to refresh without changing the values
+	gpstool.maxSpeed(gpstool.maxSpeed(),true); // the max-value display with current value 
+	gpstool.averageSpeed(0); // ==0 leads to refresh without changing the values
 }    
 
 function setAltimeterUnits(newunits) {
@@ -3729,8 +3778,6 @@ function getCurrentSpeedUnits() {
 
 /* vereint alle Programmstartfunktionen
 (sinn siehe caller)
-- returns: true: Code ausgeführt,
--          false: Code nicht ausgeführt
 */
 function initApp()  {
 
@@ -3740,7 +3787,7 @@ function initApp()  {
     
 
 	//DEBUG: 
-	//document.getElementById('splashscreen').style.opacity = 0.1; // debug
+	if(kta.browsermode) document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
     
     // ONSTART
@@ -4190,7 +4237,9 @@ function initApp()  {
 	            	if (settings.get('setalt-ft')) au = 'ft';
 					showHint('Altitude in '+au,'Höhe in '+au);
 	            	break;
-				case 'time':
+				case 'time': 
+					// teste if + break!
+					if (!kta.fastoptions) break;
 				case 'settimeformat':
 					kwd_setTimeFormat(); // TODO: repeat function with *menu entry* for case fast_options == off
 					break;
@@ -4271,7 +4320,7 @@ function initApp()  {
 					OnBack();
 					break;
 				case '#confirmresetmaxspeed' : 				
-					gpstool.maxSpeed(-1); // neg. value forces set, default 1, because -0 is just 0
+					gpstool.maxSpeed(0,true); 
 					showHint('Maximum speed cleared','Höchstgeschwindigkeit gelöscht');
 					OnBack();
 					break;				
@@ -4394,8 +4443,6 @@ function initApp()  {
 
 function OnStart() {
 	if(!kta.debug) app.SetDebugEnabled( false ); // check if app.Debug calls cause error (use wrapper function!)
-	//mydebug = app.CreateDebug();
-	//app.ShowDebug(true);
 	
 	app.Debug("onStart");
     app.PreventScreenLock(true);
