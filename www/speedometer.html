@@ -343,6 +343,10 @@
 		 	left:0;
 			margin:0 10px 0 10px;			
 		 }
+		 #accuracy {
+		 	background-color:#880000;
+		 	/* TODO: in Nachtmodus/dezent: Schrift statt bg gefärbt */
+		 }
       .first-display {
        		border-top-color:transparent;
        		margin-top:0;
@@ -377,6 +381,7 @@
  		}
         #displays-wrapper {
         	margin-top:10px;
+        	overflow: hidden !important;
         }
         #tacho-container {
         	position:absolute;
@@ -775,7 +780,7 @@
 	    <div id="time" class="hud display-box skin fast-option"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
 	    <div id="geoaltitude" class="hud display-box skin fast-option"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit fast-option">m</div> </div>
 		<div id="geolocation" class="hud display-box skin fast-option"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
-
+		<div id="accuracy" class="hud display-box skin"><span id="accuracytext" class="display-text">GPS (0000m)</span></div>
     </div>
    </div>
 	
@@ -1121,7 +1126,7 @@ function KwdTachoApp() {
 	this.nojquery = false;
 	this.version = 1.51; 
 	this.defaultMargin = 10;
-	this.debug = false;
+	this.debug = true;
 	this.mydebug = null; // for DS debug
 
 	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
@@ -1388,7 +1393,7 @@ function gpsBlink() {
 function setGpsWarning() {
 	if(!gpswarning_active) {
 	    //$("#gpswarning,.gps-warning").show();
-	    document.getElementById('gpswarning').style.display = 'block'; // TODO: check if is not inline!
+	    document.getElementById('gpswarning').style.display = 'block'; // TODO: don't show when Accuracy is currently displayed
 	    var els = document.getElementsByClassName('gps-warning');
 	    for(var i=0; i < els.length; i++) {
 	    	els[i].style.display = 'block'; // TODO: check if is not inline!
@@ -1405,6 +1410,9 @@ function setGpsWarning() {
 	    	els[i].classList.add('no-gps'); 	    
 	    }
 		
+		// set accuracy Text without val
+   		kwd_setElementText('#accuracytext','GPS?');   		 	       
+ 
 		gpswarning_blinkinterval = setInterval(gpsBlink,500);
 		gpswarning_active = true;
 	}	
@@ -1575,6 +1583,8 @@ function KwdGpsTools () {
 
     var alt = 0;
     var altfactor = 1;  // wird geändert abhängig von gewählter Maßeinheit
+    
+    var accuracy; // valid until new value !=0 found
     
     var hud = false;
     var maxspeed = 0; 
@@ -1907,6 +1917,9 @@ function KwdGpsTools () {
 	        	if (displayspeed > 0) this.tachoRange(displayspeed); // must not be <= 0  (accidently)
 	        	gauge.setValue(displayspeed); // hier den exakten float value nutzen
 	        }
+
+    		if (newlocdata.accuracy) accuracy = newlocdata.accuracy;
+	   		kwd_setElementText('#accuracytext','GPS ('+Math.round(accuracy)+'m)');   		 	       
         }
         else {
             //$('#bearinginfo').text('Sensor');
@@ -1918,7 +1931,6 @@ function KwdGpsTools () {
         if (newlocdata.latitude!=0) lat = newlocdata.latitude; // TODO: check if you should round!
         if (newlocdata.longitude!=0) lon = newlocdata.longitude;    // TODO: check if you should round!
         if (newlocdata.altitude!=0) alt = newlocdata.altitude * altfactor; // TODO: save alt * factor seperatly if storage of data needed
-        //currently not used  $('#accuracytext').text(newlocdata.accuracy); 
         // analog speed testing: 
         
         // for screenshots:
@@ -1938,7 +1950,7 @@ function KwdGpsTools () {
         
        
 		//        $('#altitudetext').text(Math.round(alt));
-   		kwd_setElementText('#altitudetext',Math.round(alt)); // fast enough and must kill span if still there 	        	
+   		kwd_setElementText('#altitudetext',Math.round(alt)); // fast enough and must kill span if still there
     };
     
     this.isHud = function() {
@@ -3326,6 +3338,8 @@ function scaleDisplays(initial) {
 	        'top': ($('#digital-on-analog').height() - $('#dona-text').height()) / 2 + 'px'
 	    });
 	    */
+	   
+	   // correct border-radius
     }
     
     
@@ -3786,9 +3800,16 @@ function initApp()  {
     tablet = app.IsTablet(); // returns boolean
     
 
-	//DEBUG: 
-	if(kta.browsermode) document.getElementById('splashscreen').style.opacity = 0.1; // debug
+	//DEBUG vs. release vs. Emulator & Test: 
+	if(kta.browsermode || kta.debug) {
+		document.getElementById('splashscreen').style.opacity = 0.1; // debug
+	}
+	else {
+		kwd_HideById('accuracy');
+		
+	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
+	
     
     // ONSTART
     //if(!kta.browsermode) kta.useSystemSize = true;
@@ -3842,6 +3863,7 @@ function initApp()  {
 	displayTime = displays.add('time');
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
+	displayAccuracy = displays.add('accuracy'); // TODO: does deny reset text work?
 	
 	digitalSpeedDisplays = new DigitalSpeedBoxList();
 	displayDigitalspeed = digitalSpeedDisplays.add('digitalspeed','--');
