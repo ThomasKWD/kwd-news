@@ -191,6 +191,8 @@ function kwdGeoLocator (options) {
 		// set an altitude
 		geodata.altitude = Math.random() * 300;
 		
+		// set an accuracy
+		geodata.accuracy = Math.random() * 100;
 		//console.log (geodata);
 		if (callback_name !== null) callback_name.call(this,geodata);
 	};
