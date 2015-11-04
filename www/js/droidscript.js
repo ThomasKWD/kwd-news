@@ -40,8 +40,9 @@ function DroidScriptApp () {
 	this.SetOrientation = function() {
 		return 'Portrait';
 	};
-	this.GetLanguageCode = function() {
-		var userLang = navigator.language || navigator.userLanguage; 
+	this.GetLanguageCode = function() {		
+		var userLang = navigator.language || navigator.userLanguage;
+		// TODO: kann auch 5-stellig sein (je nach Browser) z.B. "de-DE" 
 		return userLang;
 	};
 	this.Exit = function() {
@@ -217,5 +218,8 @@ function kwdGeoLocator (options) {
 	//alert(options);
 } 
 
+
+
 // make instance
 app = new DroidScriptApp();
+

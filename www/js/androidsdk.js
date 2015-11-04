@@ -1,10 +1,11 @@
 // class for running app with own JAVA-API-bridge
 // NOT a simple emulator
+// many functions equal to droidscript.js
 
 function AndroidSdkApp () {
     //private:
-    debug_on = true;
-	popuptimeout = false;
+    var debug_on = true;
+	var popuptimeout = false;
 	
 	this.kwd_droidscript_emulator = true; // to check in contrast to real DroidScript
 	
@@ -23,12 +24,14 @@ function AndroidSdkApp () {
 	this.clearPopup = function() {
 		//$('.toastmessage').fadeOut(400);
 	};
-	this.ShowPopup = function(msg) {
+	this.ShowPopup = function(msg,options) {
+		
 		//if(popuptimeout!==false) clearTimeout(popuptimeout);
-		this.Debug("popup: "+msg);
+		//this.Debug("popup: "+msg);
 		//$('.toastmessage').text(msg);
 		//$('.toastmessage').show();
 		//setTimeout(this.clearPopup,5000);
+		Android.ShowPopup(msg,options); // invoke java API code
 	};
 	
 	/* return the probable correct value of screen orientation
@@ -41,24 +44,17 @@ function AndroidSdkApp () {
 		return 'Portrait';
 	};
 	this.GetLanguageCode = function() {
-		var userLang = navigator.language || navigator.userLanguage; 
+		var userLang = navigator.language || navigator.userLanguage;
+		// TODO: kann auch 5-stellig sein (je nach Browser) z.B. "de-DE" 
+		if (userLang.length > 2) {
+			userLang = userLang.substr(0,2);
+		}
+		console.log('Sprache gefunden:'+userLang); 
 		return userLang;
 	};
 	this.Exit = function() {
-		//OnPause(); // since DoridScript makes this automatically when exit
-/*
- * 
- 		    var r = confirm("App closed. 'OK' to restart. 'Cancel' to stop.");
-		    if (r == true) {
-				location.href='kwdtacho.html';
-		    } else {
-				location.href='index.html';		    	
-		    }
-*/
-		//alert("APP closed."); // no more alert if redirectin anyway
-		window.onbeforeunload = function (e) {};
-		
-		location.href='index.html';
+		// ! Nicht OnPause aufrufen!
+		Android.Exit();
 	};
 	this.GetOSVersion = function() {
 		return 22; // is Android 5.1
@@ -79,7 +75,7 @@ function AndroidSdkApp () {
     };
 	
 	this.CreateLocator = function(options) {
-		return new kwdGeoLocator(options);	
+		return new kwdGeoLocatorSdk(options);	
 	};
 	
 	this.LoadText = function(key,defaultval) {
@@ -101,6 +97,7 @@ function AndroidSdkApp () {
 	};
 	
 	this.SaveText = function(key,val) {
+		// TODO: recherchieren ob localstorage unsicher ist (nach längerer Zeit automatisch gelöscht??) 
 		
         if(key!='') {
             window.localStorage.setItem(key,val);
@@ -150,48 +147,73 @@ function AndroidSdkApp () {
 }
 
 
+// must wrap this (otherwise overwrites same code in droidscript.s)
+
+
 /*
  * 
      loc = app.CreateLocator( "GPS,Network" ); 
     loc.SetOnChange( loc_OnChange );  // TODO: try to directly set gpstool.change() !!
     loc.SetRate( 1 ); //seconds (refresh data)
-    loc.Start(); 
+    loc.Start();
+    
+    - Problem, direkt navigator.location ist zu langsam und spuckt keine speed-Werte aus
+    TODO: in diesem Fall zusätzlich JAVA-Bridge aktivieren  
 */
-function kwdGeoLocator (options) {
+function kwdGeoLocatorSdk (options) {
 	
 	var timeout = 1000;
 	var timeout_id = false;
 	var callback_name = null;	
 	var geodata = {
 		'provider':'gps',
-		'speed': 1,
+		'speed': 0,
 		'accuracy': 0,
 		'latitude':0,
 		'longitude':0,
 		'altitude':0,
 		'bearing':0
 	};
+	var that = this;
 	
 	/* this invokes to simulated callback call with geo data
 	 * 
 	 */
-	this.change = function() {
-		var r = Math.random();
-		r = r*5 - 2.5;
-		// override random:
-		//r = 1;
-		
-		// NOTE: speed is still m/s here !
-		//if (geodata.speed > 5) geodata.provider = 'network';
-		geodata.speed += r; //= (geodata.speed<20000) ? geodata.speed * 1.1 : geodata.speed * 0.9; // nice simu
-		if (geodata.speed<0) geodata.speed = 0;
-		//geodata.speed=51/3.6;
-		
-		// set an altitude
-		geodata.altitude = Math.random() * 300;
-		
-		//console.log (geodata);
+	this.change = function(newdata) {
+
+		//geodata.provider = 'gps' // to be changed by onerror
+		geodata.speed = newdata.coords.speed;
+		geodata.accuracy = newdata.coords.accuracy;
+		geodata.latitude = newdata.coords.latitude;
+		geodata.longitude = newdata.coords.longitude;
+		geodata.altitude = newdata.coords.altitude;
+		geodata.bearing = newdata.coords.heading;
+
+		// (test values see droidscript.js)
+				
+		//console.log ('speed: '+geodata.speed);
 		if (callback_name !== null) callback_name.call(this,geodata);
+	};
+	
+	this.invoke = function() {
+		navigator.geolocation.getCurrentPosition(that.change,that.onError);
+	};
+	
+	this.onError = function(error) {
+	    switch(error.code) {
+	        case error.PERMISSION_DENIED:
+	            console.log("GPS: User denied the request for Geolocation.");
+	            break;
+	        case error.POSITION_UNAVAILABLE:
+	            console.log("GPS: Location information is unavailable.");
+	            break;
+	        case error.TIMEOUT:
+	            console.log("The request to get user location timed out.");
+	            break;
+	        case error.UNKNOWN_ERROR:
+	            console.log("GPS: An unknown error occurred.");
+	            break;
+	    }		
 	};
 	
 	this.SetOnChange = function(functionname) {
@@ -205,16 +227,29 @@ function kwdGeoLocator (options) {
 		if (rate) timeout = rate*1000;
 	};
 	
+	/*
+	 * startet interval
+	 * - TODO: bei geoloaction fehler, z.B. kein Signal intervall stoppen
+	 * - TODO: wenn sich schlecht macht, einfach provider umschalten
+	 */
 	this.Start = function() {
-		timeout_id = setInterval(this.change,timeout);
+		if(navigator.geolocation) {
+			//navigator.geolocation.watchPosition(that.change,that.onError);	
+			timeout_id = setInterval(this.invoke,timeout);
+		}
 	};
 	
 	this.Stop = function() {
+		//if(navigator.geolocation) {
+			//navigator.geolocation.clearWatch(that.change);	
+		//}
 		if (timeout_id !== false) clearInterval(timeout_id);
 	};
 	
 	// construct code
-	//alert(options);
+	// TODO: Android code call for creating LocationManager
+	// TEST
+	Android.createLocator(options); // you don't need return value fro Java, since object will be stored there 
 } 
 
 // make instance
