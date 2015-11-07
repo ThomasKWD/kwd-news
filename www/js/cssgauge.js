@@ -87,6 +87,7 @@ function CssGauge(init_settings) {
 		// pointer position; left middle  = rotation center
 		var gpointer = document.getElementById('g-pointer');
 		gpointer.style.top = 0;
+
 		gpointer.style.left = '130px';
 		gpointer.style.webkitTransformOrigin = 'center ' +gauge_height/2 +'px 0'; // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
 		gpointer.style.transformOrigin = 'center ' +gauge_height/2 +'px 0'; // 	pointeroffset==gauge_height/2 is for pointer longer than half of gauge
