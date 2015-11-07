@@ -173,6 +173,7 @@
             text-decoration:none;
             text-align:center;
         }
+
         /* want colors of KWD Logo */
         .ext-btn { 
         	background-color:#83C2FD;
@@ -382,6 +383,8 @@
         #displays-wrapper {
         	margin-top:10px;
         	overflow: hidden !important;
+        	z-index:1;
+        	/* needed to prevent border-radius overlap error */
         }
         #tacho-container {
         	position:absolute;
@@ -1018,13 +1021,29 @@
 		<a class="btn btn-yes" href="#confirmresetmaxspeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
 		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
 	</div>
-
+	
+	<div id="askkeepmaxspeed" class="dialog yesnodialog  sub-dialog  skin">
+		<h3><span lang="en">Keep max speed?</span> <span lang="de">Höchstgeschwindigkeit behalten?</span> </h3>
+		<p lang="en">Keep last max speed <b><span class="lastmaxspeed"></span> <span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtimr"></span>).</p>
+		<p lang="de">Ihre letzte Höchstgeschwindigkeit <b><span class="lastmaxspeed"></span> <span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtime"></span>) behalten?</p>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Behalten</span></a>
+		<a class="btn btn-yes" href="#confirmresetlastmaxspeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+	</div>
+	
 	<div id="askresetaveragespeed" class="dialog yesnodialog  sub-dialog skin">
 		<h3><span lang="en">Clear saved average speed?</span> <span lang="de">Gespeicherte mittlere Geschwindigkeit löschen?</span> </h3>
 		<a class="btn btn-yes" href="#confirmresetaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
 		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
 	</div>
 
+	<div id="askkeepaveragespeed" class="dialog yesnodialog  sub-dialog  skin">
+		<h3><span lang="en">Keep average speed?</span> <span lang="de">Mittelwert behalten?</span> </h3>
+		<p lang="en">Keep last average speed <b><span class="lastaveragespeed"></span> <span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtimr"></span>).</p>
+		<p lang="de">Ihre letzte mittlere Geschwindigkeit <b><span class="lastaveragespeed"></span> <span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtime"></span>) behalten?</p>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
+		<a class="btn btn-yes" href="#confirmresetlastaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+	</div>
+	
 </div> <!--dialogs-wrapper-->
 
 </div> <!-- touch-wrapper -->
@@ -1076,7 +1095,10 @@ function kwd_setElementText(element,str) {
 		for(var i=els.length-1;i>=0;i--) {
 			//content = els[i].innerHTML;
 			//app.Debug(content);
-			els[i].childNodes[0].nodeValue = str;
+			// if 'span' don't use childNodes
+			if( els[i].childNodes.length) 			
+				els[i].childNodes[0].nodeValue = str;
+			else els[i].innerHTML = str;
 		}
 	}
 	else {
@@ -1134,7 +1156,8 @@ function KwdTachoApp() {
 	
 	this.storage = {
 		language : 'tacholanguage',
-		average_no_groups : 'tachoaveragenogroups'
+		average_no_groups : 'tachoaveragenogroups',
+		maxspeed_time : 'tachomaxtime'
 	};
 	
 	this.setFastOptions = function(fast_on) {
@@ -1576,18 +1599,20 @@ function KwdGpsTools () {
     
     var speed = 0;        // aktueller/letzter Wert
     var speedfactor = 3.6; // wird geändert abhängig von gewählter Maßeinheit
+    var speedunittext = 'km/h';
 
     var lat = 0;
     var lon = 0;
     var locformat = true; // if true format in ° ' ", otherwise float val
 
     var alt = 0;
-    var altfactor = 1;  // wird geändert abhängig von gewählter Maßeinheit
+    var altfactor = 1;  // wird geändert abhängig von gewählter Maßeinheit // TODO: could be a "unit enabled object" like a speed 
     
     var accuracy; // valid until new value !=0 found
     
     var hud = false;
     var maxspeed = 0; 
+    var maxspeedtime = 0;
     var tachorange = 10;
     var dochangetachorange = false;
 
@@ -1599,9 +1624,10 @@ function KwdGpsTools () {
     //var average_old_sum = 0; // all old values together
     //var average_old_n = 0; // all old values together
  
- 	this.speedFactor = function(newfactor) {
+ 	this.speedFactor = function(newfactor,factortext) {
  		if (newfactor) {
  			speedfactor = newfactor;
+ 			speedunittext = factortext;
  		}	
  		return speedfactor;
  	};
@@ -1792,6 +1818,7 @@ function KwdGpsTools () {
 
  	};
  	
+ 	
  	/* save function  for average speed
  	 * 
  	 * - seperate from generating for performance reasons (should be used only on pause / quit )
@@ -1859,23 +1886,72 @@ function KwdGpsTools () {
  		if (err) return false;
  		else return true;
  	};
+ 	
     /*
         sets the maxspeed
         - newmaxspeed: only accepted if > current maxspeed
         - resetmode: undefined|false|true: if true: set maxspeed
-        - auto saves maxspeed persisently
+        - auto saves maxspeed + time of max speed persisently
         ! uses always raw m/s until display!
     */
     this.maxSpeed = function(newmaxspeed,resetmode) {
         
         if(newmaxspeed!==undefined && (newmaxspeed > maxspeed || resetmode)) {
         	maxspeed = newmaxspeed;
+			if(resetmode) {
+				if(newmaxspeed == 0) maxspeedtime = 0;
+				else {
+					var t = app.LoadNumber(kta.storage.maxspeed_time,0); // time laden 
+					if (t) maxspeedtime = t;
+					else maxspeedtime = new Date().getTime(); // needed to be compatible: if user updates exsiting app, time must be generated for (long) existing maxspeed 
+				}
+
+			}				
+			else maxspeedtime = new Date().getTime();
+			
             app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
+            app.SaveNumber(kta.storage.maxspeed_time,maxspeedtime); // is called quite often shortly after reset but not more often than once a second
 			displaySpeedWithFactor(maxspeed,'.maxspeedtext'); // ! hier *mit* . !
         }
         return maxspeed;
     };
     
+ 	/* get data about maxspeed as object
+ 	 * - speed is already calc. with factor + displayed
+ 	 * - return values for additional info display 
+ 	 
+ 	 */
+ 	this.getMaxSpeedData = function(setelem) {
+ 		
+ 		var retobj = {
+ 			speed : displaySpeedWithFactor(maxspeed,setelem),
+ 			unittext : speedunittext,
+ 			time : maxspeedtime // can be 0 if maxspeed is enabled but not set at least once 
+ 		};
+ 		
+ 		return retobj;
+ 	};
+
+ 	/* get data about averagespeed as object
+ 	 * - speed is already calc. with factor + displayed
+ 	 * - return values for additional info display
+ 	 * - return: object with data | undefined 
+ 	 */
+ 	this.getAverageSpeedData = function(setelem) {
+ 		
+ 		if (average_list.length) {
+ 			
+	 		var retobj = {
+ 				speed : displaySpeedWithFactor(average_list[0].sum / average_list[0].n,setelem),
+ 				unittext : speedunittext,
+ 				time : average_list[0].time
+ 			};
+	 		return retobj;
+ 		}	
+ 		
+ 		// returns undefined by default
+ 	};
+
     /* call back for change by GPS
       * - uses displayspeed for tachoRange... and speed (raw) for max and average
      */
@@ -3666,7 +3742,7 @@ function setTachoUnits(newunits) {
 		case 'kn'  : txt = 'kn'; factor =  1.9438445; showHint('Knots','Knoten'); break;
 		default : txt = 'km/h'; factor =   3.6; showHint('Kilometers per hour','Kilometer je Stunde'); break;
 	}
-	gpstool.speedFactor(factor);
+	gpstool.speedFactor(factor,txt); // save txt, makes later print of correct values easier
 	//$('.tachounit').text(txt);
 	var els = document.getElementsByClassName('tachounit');
 	for(var i=els.length-1;i>=0;i--) {
@@ -3900,14 +3976,14 @@ function initApp()  {
     setTachoLayout();
 	if (settings.get('tachoswitch')!=false) layout_gauges++;
 	
+    if(settings.get('switchnews2')!=true) { // ! here: hide when true
+    	menustack.push('newsdialog2');
+    }
+
     // this are the normal hints!
     if(settings.get('switchwarning')==false)  {
         displayHints = false;
     }
-    if(settings.get('switchnews2')!=true) { // ! here: hide when true
-    	menustack.push('newsdialog2');
-    }
-    
     
     // this is the WARNING
     if(settings.get('switchredwarning')!==false)  {
@@ -3954,6 +4030,86 @@ function initApp()  {
 	else if(settings.get('setkn')) units = 'kn';
 	setTachoUnits(units); // must be after gpstool init
 
+    // push dialog for keeping max/average
+	// must be called *after* SetTachoUnits! 
+    if(settings.get('switchmaxaverage')) {
+    	
+		// max    	
+		var maxdata = gpstool.getMaxSpeedData('.lastmaxspeed'); // ! the speed is already put into html  
+		if (maxdata.time) {
+			kwd_setElementText('.lastmaxspeedunits',maxdata.unittext);
+	
+			var d = new Date(maxdata.time);
+			var comparedate = new Date();
+			var namedday = '';
+			if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
+				if (d.getDate() == comparedate.getDate()) namedday = 't';
+				// TODO: make work on "month change yesterday"
+				else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
+			}
+	
+			var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
+			if (kta.language=='de') {
+				if (namedday=='y')
+					datestr = 'gestern '+datestr;
+				else if (!namedday)  				 
+					datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
+				datestr += ' Uhr';
+			}
+			else {  
+				if (namedday=='y')
+					datestr = 'yesterday '+ datestr;
+				else if (!namedday)  				 
+					datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
+				datestr += ' h';
+			}
+			
+			//  TODO: recognize today, yesterday, x days ago
+			kwd_setElementText('.lastmaxspeedtime',datestr);
+	    	menustack.push('askkeepmaxspeed');
+	   }
+    	
+    	// average	
+
+		// TODO: how to make general function? (or better: obj hierarchy with inheritance of code)
+		
+		var avrdata = gpstool.getAverageSpeedData('.lastaveragespeed'); // ! the speed is already put into html  
+		if (avrdata) {
+			kwd_setElementText('.lastaveragespeedunits',avrdata.unittext);
+	
+			var d = new Date(avrdata.time);
+			var comparedate = new Date();
+			var namedday = '';
+			if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
+				if (d.getDate() == comparedate.getDate()) namedday = 't';
+				// TODO: make work on "month change yesterday"
+				else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
+			}
+			
+			// TODO: even this could be sub function
+			// TODO: when oop combine functions needed for time display
+			var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
+			if (kta.language=='de') {
+				if (namedday=='y')
+					datestr = 'gestern '+datestr;
+				else if (!namedday)  				 
+					datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
+				datestr += ' Uhr';
+			}
+			else {  
+				if (namedday=='y')
+					datestr = 'yesterday '+ datestr;
+				else if (!namedday)  				 
+					datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
+				datestr += ' h';
+			}
+			
+			//  TODO: recognize today, yesterday, x days ago
+			kwd_setElementText('.lastaveragespeedtime',datestr);
+	    	menustack.push('askkeepaveragespeed');
+	   }
+    }
+    
     //Create and start location sensor. 
     //(Achievable update rate is hardware specific) 
     loc = app.CreateLocator( "GPS,Network" ); 
@@ -4346,11 +4502,21 @@ function initApp()  {
 					showHint('Maximum speed cleared','Höchstgeschwindigkeit gelöscht');
 					OnBack();
 					break;				
+				case '#confirmresetlastmaxspeed' : 
+					// bring up confirm dialog				
+					OnBack();
+					menustack.push('askresetmaxspeed');
+					break;				
 				case '#confirmresetaveragespeed' : 				
 					gpstool.clearAverage();
 					showHint('Average speed cleared','Mittlere Geschwindigkeit gelöscht');
 					OnBack();
 					break;
+				case '#confirmresetlastaveragespeed' : 
+					// bring up confirm dialog				
+					OnBack();
+					menustack.push('askresetaveragespeed');
+					break;				
 					
 					
 				case 'back-arrow':
