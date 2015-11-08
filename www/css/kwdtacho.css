@@ -1,0 +1,620 @@
+
+/* #83C2FD */
+/* #DD0000 warning */
+ 
+* {box-sizing:border-box;font-family:Tahoma,Verdana,Univers,sans-serif;
+    -webkit-user-select:none;
+    -webkit-touch-callout:none;
+}
+/* note: select/callout should be activated in input fields or longer texts
+*/
+    body { margin:0;padding:0;font-size:15px;color:white;background-color:black;}
+    body.en :lang(de) { display:none; }
+    body.de :lang(en) { display:none; }
+    p,h1,h2,h3,h4 {margin:0;padding:0;color:white;}
+   html { height: 100%; } body { min-height: 100%; }
+    .hgchange {
+    	opacity:0.0;
+          }
+	#hg {
+		position:fixed;
+		top:0;
+		left:0;
+		width:100%;
+		height:100%;
+		/* JS must reset me to real height */
+	background-color:#83C2FD;
+	transition:1.5s opacity ease-in;
+}
+/* for debugging and testing: */
+#ruler {
+	position:fixed;
+	width:0;
+	height:100%;
+	top:0;
+	left:300px;
+	border-top:1px solid red;
+	border-left:1px solid blue;
+	z-index:10000;
+	display:none;
+}
+/* links and menus */
+a,a:hover,a:focus,a:active,a:visited {
+     -webkit-tap-highlight-color: rgba(255,255,255,0);
+}   
+.ext-btn,
+.btn {
+    display:block;
+    color:white !important;
+    font-size:130%;
+    font-weight:bold;
+    background-color:#888;
+    padding:5px;
+    margin:1em;
+    border:4px solid #f0f0f0;
+    border-radius:15px;
+    box-shadow:3px 3px 10px #ddd inset,-3px -3px 7px #555 inset;
+    text-decoration:none;
+    text-align:center;
+}
+
+/* want colors of KWD Logo */
+.ext-btn { 
+	background-color:#83C2FD;
+	border-color:#DF3F2E;
+    box-shadow:3px 3px 10px #eee inset,-3px -3px 7px #444 inset;
+}
+#exit-button {
+}
+/*  switcher must not have .btn
+    can have class "switched-on" to determine state
+*/
+a.back-arrow,
+a.back-arrow:link,
+a.back-arrow:visited,
+a.back-arrow:hover,
+a.back-arrow:focus,
+a.back-arrow:active {
+	color:white;
+	display:inline-block;
+	margin-left:-0.25em;
+	margin-right:0.75em;
+	text-decoration: none;
+}
+
+a.switcher,
+a.switcher:link,
+a.switcher:visited,
+a.switcher:hover,
+a.switcher:focus,
+a.switcher:active {
+    display:block;
+    color:white;
+    padding:1em 1em 1em 1em;
+    /*padding:1em 1em 1em 3em;
+     text-indent:-1.5em;*/
+        margin:0;
+        border-top:1px solid white;
+        text-decoration:none;
+        -webkit-user-select:none;
+        -webkit-touch-callout:none;
+    }
+   
+    .lastswitcher {
+        border-bottom:1px solid white;
+    }
+    .fa,
+    .fa-black {
+        display:inline-block;
+        width:40px;
+        padding-right:20px;
+    }
+    .switcher .fa {
+        color:#dd0000;
+    }        
+    .switcher .fa-black {
+    	color:#000000;
+    }
+    .switched-on .fa,
+    .switched-on .fa-black {
+		color :#00dd00;
+	}
+	.menuitem .fa
+	{
+        color:#FFFFFF;
+    }
+	.mirror {
+	    -webkit-transform:scale(-1,1);
+		transform:scale(-1,1);
+        padding-right:0;
+        padding-left:1em;
+        text-align:right;
+	}
+	.icon-zoom-out {
+		font-size:65%;
+	}
+    .text-icon {
+    	font-size:65%;
+    }
+	/* marks elements to be changed when no-gps
+ */
+.gps {
+}
+.no-gps {
+	color:#dd0000 !important;
+}
+/* some properties are set by JS */
+#digital-on-analog {
+    position:absolute;
+    letter-spacing:0;
+    padding-left:0 !important;
+    padding-right:0 !important;
+}
+
+#info-on-analog {
+    position:absolute;
+    color:white;
+    line-height:1em;
+    text-align:center;
+}
+.gps-warning {
+	color:#DD0000;
+}
+.gps-warning-text {
+	font-size:1.75em;
+	line-height:1em;
+}
+/* text inside #digital-on-analog shield */
+#dona-text {
+    position:absolute;
+    letter-spacing:0;                      
+}
+/* for object-driven layout: */
+   /* ! no padding-bottom since font height leads to space anyway */ 
+   .display-box {
+		position:relative;
+		overflow:hidden;
+        font-size:100px;
+        line-height:1em;
+        font-weight:bold;
+		padding:5px 15px 0 15px;
+		white-space:nowrap;
+		text-align:center;
+		top:0;
+		left:0;  
+		border-top:1px solid #ddd;       	
+   }
+   .half-box { 
+	 float:left;
+     width:49.99%;
+     border-top:1px solid white;
+	}
+	.half-box:first-child {
+		border-right:1px solid white;
+	}
+	.half-box .unitlabel {
+		padding-bottom:0;
+	}
+	.fly-box {
+		position:relative;
+		top:0;
+		width:49%;
+	 	background-color:rgba(0,0,0,1);
+	 	border:1px solid #ddd;
+		border-top-width:10px;
+		border-bottom:10px solid #ddd;			
+	}
+	#averagespeed {
+		float:left;
+		border-right-width:10px;
+		border-top-right-radius:1em;
+		border-color:#A87E00;
+	}
+	#maxspeed {
+		float:right;
+		border-left-width:10px;						
+		border-top-left-radius:1em;			
+		border-color:#aa0000;
+	}
+	.speedstats-wrapper {
+	  	overflow:hidden;
+	 }
+	 #analog-speedstats-wrapper{
+	 	position:absolute;
+	 	width:auto;
+	 	height:auto;
+	 	top:auto;
+	 	bottom:10px;
+	 	left:0;
+		margin:0 10px 0 10px;			
+	 }
+	 #accuracy {
+	 	background-color:#880000;
+	 	/* TODO: in Nachtmodus/dezent: Schrift statt bg gefärbt */
+	 }
+  .first-display {
+   		border-top-color:transparent;
+   		margin-top:0;
+   }
+	.positioner {
+		position:absolute;
+	}
+	#touch-wrapper {
+		position:absolute;
+		width:100%;
+		height:100%;
+	}
+	/* alle displays scrollen nicht! */
+#display-container {
+	width:100%;
+	height:100%;
+	overflow:hidden;
+	position:fixed;
+}
+#displays-positioner {
+	/*outline: 1px solid green;*/
+}
+#digitalspeed-positioner {
+	/*outline: 1px solid yellow;*/ 
+}
+/* not yet defined!: */
+#analogspeed-positioner {
+	/*outline: 1px solid red;*/
+}
+#cssgauge-wrapper {
+	/*outline:1px solid orange;*/
+}
+#displays-wrapper {
+	margin-top:10px;
+	overflow: hidden !important;
+	z-index:1;
+	/* needed to prevent border-radius overlap error */
+}
+#tacho-container {
+	position:absolute;
+	width: 100%;
+}
+#digitalspeed-wrapper {
+	position:relative;
+}
+.display-text, .display-text * {
+	white-space: nowrap;
+}
+#seconds-text {
+	font-size:50%;
+}
+.halfsize {
+	background-color: #000000;
+}
+.speed {
+    line-height:1.25em;
+}
+.valuefract {
+	font-size:65%;
+}
+/* kmh wird jetzt unabhängig gesetzt, da es bei analog die Anzeige
+von canvgauge verdeckt.
+wenn digital, soll es allerdings innerhalb positioniert werden.
+Alternative: zwei verschiedene 
+
+TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
+    in Funktion gleichwertig verarbeiten!
+    
+*/
+.unitlabel {
+    position:absolute;
+    color:white;
+    line-height:2rem;
+    text-align:center;
+    font-weight:normal;
+    padding:10px;
+    font-size:0.9rem;
+    right:0;
+    bottom:0;        
+}
+.averagespeedlabel {
+	left:0;
+	right:auto;
+}
+#gauge {
+    /*
+          transform:scale(-1,1);
+  -moz-transform:scaleX(-1);
+  -webkit-transform: scaleX(-1);
+  */
+}
+#title {
+    position:relative;
+    bottom:1em;
+    padding:1em;
+}
+#logo img {
+    width:100%;
+    margin-left:-7px;
+    margin-bottom:15px;
+}
+#title p{
+    margin-bottom:5px;
+}
+#dialogs-blender {
+	background-color:#83C2FD;
+	opacity: 0.7;
+	width:100%;
+	height:100%;
+	position:fixed;
+	overflow:hidden;
+	display:none;
+}
+/* for current control funcs. all dialogs must be visible! */
+.dialog,
+#displays-wrapper,
+#digitalspeed-wrapper {
+    color:white;
+    /*box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;*/
+   	background-color:black;
+    border:10px solid #ddd;
+    border-radius:3em;
+    font-size:1em;
+}
+#displays-wrapper,
+#digitalspeed-wrapper {
+	margin:10px;			
+}
+#displays-wrapper {
+	position: relative;
+}
+.dialog {
+	position:absolute;
+	left:5px;
+	top:5px;
+	display:block;
+    width:90%;
+    max-width:20em;
+    /* das verursacht leider bad performance element scroll: max-height:95%; */
+	background-color:black;
+	overflow:auto;
+	display:none;
+ }
+ /* TODO: du brauchst einen inneren div, damit wichtige Buttons nicht mitscrollen! */
+.dialog p,
+.dialog h1,
+.dialog h2,
+.dialog h3 {
+    margin:1em;
+}
+#menu {
+    margin: 1em auto;
+    text-align:center;
+    display:none;
+}
+#warningdialog {
+    color:white;
+    border-color:#CC0000;
+}
+#warningdialog h3 {
+    color:red;
+    text-align:center;
+}
+#warningdialog p {
+	font-weight:bold;
+}
+#splashscreen {
+	display:table;
+    background-color: #83C2FD;
+    position:absolute;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+	padding:20px;
+}
+#splashscreen p {
+	display:table-cell;
+	vertical-align:middle;
+    font-weight:bold;
+    text-align:center;
+}
+#splashscreen img {
+    width:100%;
+    max-width:360px;
+}
+#wait {
+    width:200px;
+    height:2em;
+    margin:auto;
+}
+#infocard {
+    position:absolute;
+    top:0;
+    width:100%;
+    min-height:100%;
+    overflow:scroll;
+    background-color:white;
+    color:black;
+    padding:25px;
+    display:none;
+}
+#infocard * {
+    color:black;
+}
+#infocard p,
+#infocard h1,
+#infocard h2,
+#infocard h3 {
+    margin-bottom: 0.7em;
+}
+#infocard h3{
+    font-size:1em;
+}
+#infocard a {
+    font-weight:bold;
+    color:  #40a1fc;
+}
+/* neg right padding due to css of .fa : */
+#menubutton {
+    position:absolute;
+    top:0;
+    right:0;
+    font-size:2em;
+    padding:0.5em 0em 1em 1em;
+    margin: 0 -0.25em 0 0;
+}
+#gpswarning {
+    position:fixed;
+    top:0;
+    left:0;
+    font-size:15px;
+    font-weight:bold;
+    color:#ff2222;
+    color:white;
+    padding:0.3em;
+    background-color: rgba(0,0,0,0.6);
+    border-right:3px solid #aa0000;
+    border-bottom:3px solid #aa0000;
+    border-bottom-right-radius: 10px;
+}
+.toastmessage {
+    width:80%;
+    height:auto;
+    position:fixed;
+    left:50%;
+    margin-left:-40%;
+    bottom:10px;
+    background-color: #383838;
+    color: #F0F0F0;
+    font-family: Calibri,sans-serif;
+    font-size: 20px;
+    padding:10px;
+    text-align:center;
+    border-radius: 2px;
+    -webkit-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+    -moz-box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+    box-shadow: 0px 0px 24px -1px rgba(56, 56, 56, 1);
+    display:none;
+}
+
+/* class for changes when digital + analog */
+.dona  .g-center {
+	background-color:black !important;
+}
+.dona .g-pointer {
+	border-bottom-width: 85px !important;
+	border-left-width:8px !important;
+	border-right-width:8px !important;
+}
+
+/* 
+für Skins addClass mit verschachtelten Klassen,
+*/
+
+
+/* skin-plastic */
+/* is default skin but not enabled in old versions */
+.dialog.skin-plastic {
+	background-color:transparent;
+	box-shadow: 5px 5px 20px #000;
+}
+.dialog.skin-plastic,
+#displays-wrapper.skin-plastic,
+#digitalspeed-wrapper.skin-plastic  {
+    background-image:-webkit-linear-gradient(top,rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);
+    background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 40%);            
+    -webkit-box-shadow: 5px 5px 10px #000 inset;			
+    box-shadow: 5px 5px 10px #000 inset;			
+}
+#maxspeed.skin-plastic,
+#averagespeed.skin-plastic  {
+	border-color:#ddd;
+	
+}
+#maxspeed.skin-plastic ,
+#averagespeed.skin-plastic  {
+    background-image:-webkit-linear-gradient(top,rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 80%);
+    background-image:linear-gradient(rgba(100,100,100,0.95) 5%, rgba(0,0,0,0.95) 90%);            
+    -webkit-box-shadow: 5px 5px 10px #000 inset;			
+    box-shadow: 5px 5px 10px #000 inset;			
+}
+
+/* skin-subtle is like earlier design */
+.gauge.skin-subtle {
+	background-image: none;
+	border-color:black;
+}
+.skin-subtle .g-center {
+	background-color:transparent;
+	border-color:transparent;
+}
+.skin-subtle .g-pointer {
+	border-bottom-width: 140px;
+}
+.gauge.skin-subtle .g-minor,
+.gauge.skin-subtle .g-majortick {
+	background-color:white;
+}
+.display-box.skin-subtle {
+	border-color:white;
+	background-color:black;
+}
+#digital-on-analog.display-box.skin-subtle {
+	border-color:transparent;
+	background-color:transparent;			
+}
+#digitalspeed-wrapper.skin-subtle,
+#displays-wrapper.skin-subtle {
+	background-image:none;
+	border-width:1px;
+	border-color:white;
+	box-shadow:none;
+	border-radius:0;
+}
+#maxspeed.skin-subtle ,
+#averagespeed.skin-subtle  {
+	border-width:1px;
+	
+}
+
+/* skin-minimal is for hud */  
+/* 
+ * 
+ */
+.gauge.skin-minimal {
+	background-image: none;
+	border-color:black;
+}
+.skin-minimal .g-center {
+	background-color:black;
+}
+.skin-minimal .g-pointer {
+	border-bottom-width: 130px;
+}
+.gauge.skin-minimal .g-minor,
+.gauge.skin-minimal .g-majortick {
+	background-color:white;
+}
+.display-box.skin-minimal {
+	border-color:transparent;
+	background-color:black;
+}
+#digital-on-analog.display-box.skin-minimal {
+	border-color:transparent;
+	background-color:transparent;			
+}
+#digitalspeed-wrapper.skin-minimal,
+#displays-wrapper.skin-minimal {
+	background-image:none;
+	border-color:black;
+	box-shadow:none;
+	border-radius:0;
+}
+.skin-minimal .unitlabel {
+	color:black;
+}
+#maxspeed.skin-minimal ,
+#averagespeed.skin-minimal  {
+	border-color:black;
+	
+}
+
+/*
+TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
+*/
