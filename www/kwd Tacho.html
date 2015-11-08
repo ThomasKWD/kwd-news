@@ -1,0 +1,457 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="charset" content="utf-8">
+
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <title>Tachometer App Android DroidScript</title>
+    
+    <link rel="stylesheet" href="css/fontello.css">
+    <link rel="stylesheet" href="css/cssgauge.css">
+    <link rel="stylesheet" href="css/kwdtacho.css">
+  
+    <script src='file:///android_asset/app.js'></script>
+	<script src='js/droidscript.js'></script>
+	<script src='js/androidsdk.js'></script>
+        
+    <script src="js/version.js"></script>
+	<!-- more includes at the end of code -->    
+
+<!--
+	WARNING! 
+	
+	* This is the PURE HTML version of the basic "Easy Speedometer" app (all css and js is in separate files)
+	* 
+	* (other version are titled with "Plus", "Premium" or "Light")
+	
+	This is the *high speed* versison - without jQuery. It may not work on old devices with very low webkit versions!
+	 
+	this code is freely copyable between browser/phonegap/DroidScript/android-SDK-bridge project -->
+	
+<!--
+	
+	NOTES:
+	
+	- jQuery free version
+	- identical for browser mode, DroidScript ans Adnroid-SDK mode
+	
+	TODO: for this release
+
+		- bug fixes
+		
+	TODO: for next release:
+
+	- MULTI-SYSTEM
+	
+		- erkennt über vorhandene Scripts welches System die App hosted: DroidScript|Browser|AndroidSDK
+		 
+	- AVR/MAX
+	
+		- sie sollten bei Landscape sogar links oder rechts übereinander sein 
+		  (da später auf der anderen Seite min und max (Alarm) übereinander angezeigt werden sollen)	
+
+	- HUD
+	
+		- dicken rechteckigen Zeiger  oder weißer Kreisbogen und wenige große Skalenzahlen
+		
+	- ZOOM
+		- zoom analog soll ratio berechnen und den angezeigten Winkel davon abhängig machen
+	- zoom could mean don't use positionDisplays and don't shrink analog on quadratic displays
+	- more direct options
+	- skin minimal
+	
+	- EMULATOR: simuliere Statusbar und ihr wegschalten (Problem: screen größe
+        - screen größe grundsätzlich mit droidscript Funktionen 
+        statt reinen webview Variablen, testen!	
+	
+	- .skin-hud von skin-minimal trennen (nur ähnlich)
+	- nachtmodus oder wenigstens minimal skan manuell verfügbar machen
+	
+	TODO: nach nächstem Release:
+
+    - PORTRAIT
+        - wieder zentrieren wie früher
+	- bei landscape immer Menüs/Cards zweigeteilt nebeneinander (innen float Blöcke ähnlich bootstrap)
+	    - aber Abfrage auf sehr kompakte displays (Quadrate)
+    
+	- was tun bei sehr quadrat-nahen Bildschirmen? -- evtl. analog Tacho kleiner - oder einige displays verbergen 
+	andere nicht zu klein werden lassen (Problem tritt bei nur-digital nicht auf)
+	- Treshhold als ratio w/h einfach im Browser ausprobieren 
+	- untere Ecken von displays-wrapper nicht rund und Rand außerhalb
+	
+	LAYOUT: 
+	- css reduziert und background-color(!) wenn OSVersion < 14 (teste Sebi Handy)
+	- menüs zweispaltig, mit internem scroll, evtl. rand weg oder außerhalb des screens positionieren bei sehr kleinen displays
+	 - zweispaltig nicht bei sehr großen displays oder wenn menüs klein genug!
+	- HINTS: bei großen Bildschirmen evtl. Hints als Fenster rechts, oder zusäzliche ausführliche Hints rechts, die bei
+	  kleinen Screens als Fragezeichen mit selbst zu öffnendem popup erscheinen	
+	 
+	TODO:
+	
+	Infocard:
+	- in 2 oder mehr Blöcke unterteilen, die bei großen Displays (Landscape oder immer) nebeneinander gestellt werden.
+	  (oder von vorherein float responsive)
+	
+	Ideen:
+	- Schnellumschaltungen "1-touch" (abschaltbar)
+	- Skins: Standard, Minimal, Auto(=Tag/Nacht)
+	-GPS-Warnung Balken unten auch bei GPS an mit Farben (je nach Range) 
+	
+	- glob Variablen oder array für sichtbarkeit von Komponenten spart zeitaufwendiges u. manchmal 
+	  fehleranfälliges (wegen Dauer) abfragen über jQuery
+	  besonders für das häufige Abfragen innerhal gpstool.change
+
+	- vordefinierte Verschachtelung für displays:
+		- wenn drei, die 2 kürzesten nebeneinander, das lange darunter
+		- wenn vier, die beiden langen auf eine Seite??
+		- wenn 2 immer untereinander	  
+		- gilt für landscape ohne gauge und portrait unter gauge
+		- Länge wird im Objekt bei init gespeichert, genau wie der init-string
+	- bei Tablet Menüs (immer rechts und )immer 90% Höhe und *immer extra Fenster mit Hinweisen*
+	- Tablet Menüs evtl. auch Untermenüs rechts von Hauptmenüs (grundsätzlich Platz für drei Menüs nebeneinander, bei Portrait 2)
+	  - Hilfedialog zuschaltbar (abh. vo Hinweise??)- auch bei phones/portrait (hier Breite des normalen Menüs abh. von *Höhe* in Landsacpe damit nict so breit aussieht...)
+	- im menu einstellbar ob max unt mittel im Hintergrund genommen werden, wenn Tacho aus (dann könnte man ggf. GPS
+	  abschalten, wenn Uhr alleine sichtbar)
+	
+	- BEENDEN bei Landscape möglichst immer sichtbar (einfach nach oben?)
+	
+	TODO: emulator: position des browsers nehmen + network
+-->
+
+
+
+</head>
+
+<body onload="app.Start()">
+
+<div id="hg"></div>
+
+<div id="touch-wrapper">
+	
+<div id="display-container">
+    <div id="tacho-container" class="fast-option">
+  
+        <div id="cssgauge-wrapper">
+			<div id="cssgauge" class="gauge skin">
+				<div class="g-scale"></div>
+					<div id="g-ticks-container" class="g-item"></div>
+					<div id="g-pointer" class="g-pointer g-item"></div>
+					<div id="g-center" class="g-center g-item"></div>
+	            <div id="digital-on-analog" class="hud skin display-box"><div id="dona-text" class="speed gps display-text">0000</div></div>
+	            <div id="info-on-analog"><div id="dona-tachounit" class="tachounit fast-option gps-no-warning">kmh/h</div><div class="gps-warning"><span class="gps-warning-text">GPS</span></div></div>
+			</div>
+		</div>
+        <div id="analog-speedstats-wrapper" class="speedstats-wrapper">
+            <div id="averagespeed" class="display-box hud fly-box fast-option skin"><div class="unitlabel averagespeedlabel">&#216;</div><span class="averagespeedtext display-text">00000</span></div>
+            <div id="maxspeed" class="display-box hud fly-box fast-option skin"><span class="maxspeedtext display-text">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
+        </div>
+
+		<div id="digitalspeed-positioner" class="positioner">
+			<div id="digitalspeed-wrapper" class="skin">
+				<div id="digitalspeed" class="hud skin display-box"><span class="speed display-text gps">0000</span><div id="kmh-digital" class="unitlabel autofade tachounit fast-option">km/h</div></div>
+		        <div id="digital-speedstats-wrapper" class="speedstats-wrapper">
+				  <div id="digital-average" class="display-box half-box hud fast-option"><span class="averagespeedtext display-text">00000</span><div class="unitlabel averagespeedlabel">&#216;</div></div>
+		          <div id="digital-max" class="display-box half-box hud fast-option"><span class="maxspeedtext display-text">00000</span><div class="unitlabel maxspeedlabel"><span class="icon-upload"></span></div></div>
+				 </div>
+			  </div>
+		</div>
+		
+		<!--you will need 2 versions for display in digital OR analog
+			TODO: make flag instead of setting both (performance)
+		-->
+		
+	</div><!--tacho-container-->
+
+	<div id="displays-positioner" class="positioner">
+    
+    <div id="displays-wrapper" class="skin">    	
+	    <div id="time" class="hud display-box skin fast-option"><span id="time-text-wrapper" class="display-text"><span id="time-text">00:00</span><span id="seconds-text">:00</span></span></div>
+	    <div id="geoaltitude" class="hud display-box skin fast-option"><span id="altitudetext" class="display-text gps">00000</span><div id="m-alt" class="unitlabel autofade altitudeunit fast-option">m</div> </div>
+		<div id="geolocation" class="hud display-box skin fast-option"><span id="positiontext" class="display-text gps">00°00'00.0"N<br />00°00'00.0"E</span></div>
+		<div id="accuracy" class="hud display-box skin"><span id="accuracytext" class="display-text">GPS (0000m)</span></div>
+    </div>
+   </div>
+	
+</div>
+<!--        <div id="geobearing" class="hud display-frame"><span id="bearingtext skin" class="display-text gps">000°</span><div id="bearinginfo" class="unitlabel">Sensor</div></div>
+        <div id="geoaccuracy" class="hud display-frame"><span id="accuracytext skin" class="display-text gps">0000</span><div id="accuracyinfo" class="unitlabel">m</div></div>
+-->
+
+<div id="dialogs-blender"></div>
+
+    <div id="menu">
+        <a class="btn" href="#info">Info</a>
+        <a class="btn" href="#settings">Einstellungen / Settings</a>
+    </div>
+    
+    <div id="infocard" class="card">
+        <h2><a href="#back" class="back-arrow ext-link"><span class="icon-left-big"></span></a><span lang="de">Viel Spaß mit unserer Tacho- und GPS-App!</span><span lang="en">Welcome to the Speedometer and GPS Tool</span></h2>
+		<p>by</p>
+		<a id="logo" href="#"><img src="res/kwd-4-title.png" /></a>
+		<p lang="de">Dies ist ein <strong>GPS</strong>-Tachometer mit Höhen-, Positions- und Zeitanzeige für Reise und Freizeit.</p>
+		<p lang="en">Use this GPS speedometer with altitude, geolocation and current time, especially when you are not driving
+			 a car but going by bicycle, by train, by boat or even by airplane!</p>
+	  	
+	    <p lang="de">Die aktuelle GPS-Position <!--oder Ihre Richtung --> schnell anzuzeigen ist in der freien Natur nicht nur interessant sondern z.B. auch im
+        Notfall eine wichtige Info für Rettungskräfte. Es kann wahlweise der dezimale Wert angezeigt werden.</p>
+        <p lang="en">Sometimes it is useful or even essential to display the current geoloation quickly
+          - even without a network connection -  	e.g. in an emergency.</p>
+        
+        <p lang="de"><b>Die Genauigkeit</b> der Höhenangabe über NN sollte nicht überschätzt werden.
+        Sie liegt im gleichen Bereich wie die der Position, wo die Ungenauigkeit
+        selbst bei guten Empfang meist zwischen 3 und 20 Metern schwankt (bei schlechtem Empfang bis über 100 Meter).
+        Ähnliches gilt für die Geschwindigkeit bei sehr geringen Werten.</p>
+        
+        <p lang="en">Note that sometimes the <b>accuracy</b> seems very low when observing the altitude (above sea level) since it will be the same as 
+        	the accuracy of location. While you expect the location to differ for several meters, it looks odd in terms of altitude
+        	when there is in error of 3m or even 50 m (depending on GPS signal). This also applies to very low speed values.</p> 
+        	 
+        
+        <p lang="de">Ihr Gerät benötigt einen <b>GPS-Sensor</b> für die Geschwindigkeit. Netzempfang ist jedoch nicht nötig.
+        	Die App kann auch im "Flugmodus" laufen.
+        	Bitte beachten Sie, dass Sie  eventuell erst GPS (meist "Standort > Hohe Genauigkeit" genannt) in den Einstellungen
+        Ihres Gerätes aktivieren müssen.</p>
+        <p lang="en">Your device must have a <b>GPS-sensor</b> enabled to display speed (see under 'Location' in the device's
+        	settings). You don't need a network connection and can also use the app in "flight mode". 
+        
+      	<p lang="de"> <b>Die HUD-Funktion</b>
+        ("Head-Up-Display") erlaubt es, das Gerät mit gespiegelter Anzeige vor die Scheibe eines Fahrzeugs zu legen. (Beachten Sie bitte,
+        dass es in einigen Ländern/Gebieten möglicherweise nicht gestattet ist, ein nicht fest verbautes HUD im Straßenverkehr zu nutzen!)</p>
+        <p lang="en">With <b>"HUD" (head up display)</b> turned on you can put your device in front of mirroring glass (of an vehicle) to read the 
+        	reflected displays. Note that the brightness of your device ist not high enough for daylight use in most cases.</p>
+        	
+      	<p lang="en"><b>Maximum and average speed values</b> will only be updated when they are shown, but not reset to 0 when hidden. 
+		The average value will only be updated when not 0 (zero). Thus long periods of not moving will not change the average value.
+      	The values are not reset when you exit the app. They will resume updating even the next day when you use the app again.
+      	You can reset or hide these values in Options > Settings > Speedometer.</p>
+      	
+		<p lang="de"><b>Maximalwert und Mittelwert</b> der gemessenen Geschwindigkeit werden nur aktualisiert, wenn sie sichtbar sind.
+			Sie werden jedoch nicht gelöscht, wenn sie unsichtbar geschaltet werden. Auch beim Beenden der App werden sie <b>nicht</b> gelöscht.
+			Außerdem werden neue Mittelwert nur gebildet, wenn eine Geschwindigkeit größer 0 gemessen wird.
+			Lange Bewegungspausen verändern den Mittelwert daher nicht.
+			Sie können sie unter Auswahl > Einstellungen > Tachometer ausschalten oder löschen.</p></p>
+			
+      	
+		
+
+        
+<!--
+	        <p lang="de">Die Einstellung "<b>Direktauswahl</b>" erlaubt die Änderung einiger Einstellungen, wenn Sie einfach auf die Anzeigen tippen.
+        	Diese Funktion kann abgeschaltet werden.</p>
+        <p lang="en">The option "Direct Config" means you can change some settings by tapping the gauges and values. You can turn of this option in the settings menu.</p>
+-->    
+        <p lang="de">Standortdaten werden von dieser App nicht gespeichert, gesendet  oder anders weitergegeben.</p>
+        <p lang="en">Geo location data are not stored, send or shared in any way by this app.</p>
+        <p lang="de"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=47">Datenschutzerklärung</a></p>
+        <p lang="en"><a class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=52">Privacy policy</a></p>
+        
+        <p>KWD Tacho Version <span id="appversion"></span> <span id="internalinfo"> </span> &copy; 2015 <a class="ext-link" href="http://kuehne-webdienste.de/">KUEHNE-Webdienste.de</a></p>
+        <p lang="de"><a lang="de" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=49">Lizenzen</a></p>
+        <p lang="en"><a lang="en" class="ext-link" href="http://kuehne-webdienste.de/index.php?article_id=51">Licenses</a></p>
+        
+        <p lang="de">Diese App verzichtet auf Werbe-Einblendungen und ist dennoch kostenlos.
+        Falls Ihnen die App gefällt, können Sie ihre Entwicklung voran treiben,
+        indem Sie einen kleinen Betrag spenden. Vielen Dank!
+        
+        <a id="donate-button" href="http://kuehne-webdienste.de/index.php?article_id=50" class="ext-btn ext-link"><span lang="de">Spenden</span></a>
+        
+        </p>
+
+    </div>
+
+<!--wraps all dialogs: -->
+<div id="dialogs-wrapper">
+
+    <div id="title" class="autofade">
+        
+	  <p id="no-gauges"><a class="btn" href="#settings"><span lang="en">Add meters</span><span lang="de">Anzeigen zuschalten</span></a></p>
+	  
+  	</div>
+
+
+
+  <div id="warningdialog" class="dialog skin">
+    <h3 lang="de">Warnung!</h3>
+    <h3 lang="en">Warning!</h3>
+    
+    <p  lang="de">Verwendung auf eigene Gefahr!</p>
+    <p  lang="en">Use this app at your own risk!</p>
+    
+    <p lang="en">Opening or controlling the app while driving or using a machine is dangerous! Start this app before you start driving or working!</p>
+    	<p lang="de">Bedienen Sie diese App nicht,
+      während Sie ein Fahrzeug oder eine Maschine steuern! Starten Sie die App vor Beginn der Fahrt/Tätigkeit!</p>
+      
+    <p lang="en">The use of the HUD (projecting the display on to a windscreen of a vehicle)  in traffic may be prohibited by law in your country, state or location.</p>
+
+    <p lang="en">The display timeout of your device is disabled. Don't leave the device unattended!</p>
+    <p lang="de"> Der Anzeige-Timeout Ihres Gerätes ist deaktiviert.
+      Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
+      
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
+  </div>
+
+<!--	<div id="newsdialog" class="dialog skin">
+		<h3><span lang="en">News</span><span lang="de">Neu</span></h3>
+
+		<p lang="en">You can change units of measure (km/h, mph, m/s, kn - for altitude m, ft) directly by touching the unit text. You can also change the type of speedometer directly.
+			You can turn off these "One touch settings" in the settings.</p>
+		<p lang="de">Tachometertyp und Einheiten können direkt auf den Anzeigen umgeschaltet werden. Tippen Sie auf den Tacho oder die Einheitenangabe. Dies kann in den Einstellungen auch ausgeschaltet werden unter "Schnellauswahl".</p>
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
+		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+	</div>
+-->
+	<div id="newsdialog2" class="dialog skin">
+		<h3><span lang="en">News</span><span lang="de">Neu</span></h3>
+
+		<p lang="en">Now you can display statistic <b>maximum</b> and <b>average</b> speed values. Read under "Options > Info" for details.</p>
+
+		<p lang="en">You can also switch between 3 skins to change the look of the displays.</p>
+		
+		<p lang="de">Ab jetzt können Sie den aktuell erreichten Maximalwert und den Mittelwert der gemessenen Geschwindigkeit anzeigen.
+			Weitere Infos dazu unter "Auswahl > Info".</p>
+			
+		<p lang="de">Außerdem können Sie ab jetzt zwischen 3 verschiedenen Erscheinungen (Skins) der Displays umschalten.</p>
+		
+	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
+		<a id="switchnews2" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+	</div>
+	
+	
+    <div id="settingsdialog" class="dialog skin">
+        <h3><span lang="de">Auswahl</span><span lang="en">Options</span></h3>
+
+      <a id="tachoswitch" class="switcher switched-on" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
+	  <a id="switchtime" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhrzeit</span><span lang="en">Time</span></a>
+	  <a id="switchaltitude" class="switcher switched-on" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="en">Altitude</span><span lang="de">Höhe</span></a>
+	  <a id="switchposition" class="switcher switched-on" href="#"><span class="fa icon-location"></span><span lang="en">Geo-location</span><span lang="de">Position</span></a>
+	  <a id="switchhudsettings" class="switcher" href="#"><span class="fa icon-sort-numeric mirror"></span>HUD</a>
+      <a id="moresettings" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="en">Settings</span><span lang="de">Einstellungen</span></a>
+	  <a id="showinfo" class="switcher menuitem" href="#"><span class="fa icon-info-circled"></span>Info</a>
+	  <!--<a id="switchbackkey" class="switcher switched-on" href="#"><span class="fa icon-ok"></span> Beenden mit Zurück-Taste</a>-->
+	  
+
+        <!--<a class="btn" href="#info">Info</a>-->
+        <div id="exitbutton-wrapper"><div id="exit-button-bg"><a id="exit-button" class="btn" href="#exit"><span lang="en">EXIT APP</span><span lang="de">APP BEENDEN</span></a></div></div>
+        <!--<a class="btn" href="#cancel">Abbrechen</a>-->
+    </div>
+    
+    <div id="tachosettingsdialog" class="dialog sub-dialog skin">
+        <h3><span lang="en">Speedometer</span><span lang="de">Tachometer</span></h3>
+
+	      <a id="digitalanalog" class="switcher switched-on radio" href="#"><span class="fa icon-gauge-2"></span>Digital + Analog</a>
+	      <a id="digital" class="switcher radio" href="#"><span class="fa icon-sort-numeric"></span><span lang="de">Nur </span>Digital<span lang="en"> only</span></a>
+		  <a id="analog" class="switcher radio" href="#"><span class="fa icon-gauge"></span><span lang="de">Nur </span>Analog<span lang="en"> only</span></a>
+		  <a id="switchunits" class="switcher menuitem" href="#"><span class="fa icon-cog"></span><span lang="de">Maßeinheit</span><span lang="en">Units</span> (<span class="tachounit">km/h</span>)</a>
+		  <a id="switchmaxaverage" class="switcher switched-on" href="#"><span class="fa icon-ok"></span><span lang="en">Show average and max speed</span><span lang="de">Mittel u. Max. anzeigen</span></a>
+					   
+	       <a id="resetmaxspeed" class="switcher menuitem" href="#"><span class="fa icon-upload"></span><span lang="de">Max. Wert löschen</span><span lang="en">Clear max value</span></a>	  
+	       <a id="resetaveragespeed" class="switcher menuitem" href="#"><span class="fa"> &#216;</span><span lang="de">Mittelwert löschen</span><span lang="en">Clear average value</span></a>	  
+	       <a id="switchautorange" class="switcher menuitem" href="#"><span class="fa icon-gauge-2"></span><span lang="de">Wertebereich zurücksetzen</span><span lang="en">Reset speedometer range</span></a>	  
+		  <!--
+		  	<a id="maxsettings" class="switcher menuitem" href="#"><span class="fa icon-upload"></span>Höchstgeschwindigkeit</a>
+		  <a id="averagesettings" class="switcher menuitem" href="#"><span class="fa icon-right"></span>Mittlere Geschwindigkeit</a>
+		  -->
+		  <!--<a id="alarmsettings" class="switcher menuitem" href="#"><span class="fa icon-bell-alt"></span>Geschwindigkeitsalarm</a>-->
+		  <!--
+		  	TODO: implement later, when auto-background-management is not enough
+		  	<a id="backgroundsettings" class="switcher swithhed-on" href="#"><span class="fa icon-chart-area"></span>Hintergrundmessung</a>
+		  -->
+    </div>
+
+    <div id="unitsettings" class="dialog sub-dialog skin">
+        <h3><span lang="en">Measure of Speedometer</span><span lang="de">Tachometer Einheit</span></h3>
+
+	      <a id="setkmh" class="switcher switched-on unitradio" href="#"><span class="fa icon-dot-circled"></span>km/h</a>
+	      <a id="setmph" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>mph</a>
+	      <a id="setkn" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>kn</a>
+	      <a id="setms" class="switcher unitradio" href="#"><span class="fa icon-dot-circled"></span>m/s</a>
+    </div>
+
+    <div id="altitudeunitsettings" class="dialog sub-dialog skin">
+        <h3><span lang="en">Measure of Altimeter</span><span lang="de">Höhen-Einheit</span></h3>
+
+	      <a id="setalt-m" class="switcher switched-on altunits" href="#"><span class="fa icon-dot-circled"></span>m (Meter<span lang="en">s</span>)</a>
+	      <a id="setalt-ft" class="switcher altunits" href="#"><span class="fa icon-dot-circled"></span>ft (<span lang="en">Feet</span><span lang="de">Fuß</span>)</a>
+    </div>
+
+	
+    <div id="moresettingsdialog" class="dialog sub-dialog skin">
+        <h3><span lang="en">Settings</span><span lang="de">Einstellungen</span></h3>
+
+	    <a id="tachosettings" class="switcher menuitem" href="#"><span class="fa icon-gauge"></span><span lang="de">Tachometer</span><span lang="en">Speedometer</span></a>
+	    <a id="altitudesettings" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-android-landscape-512px"></span><span lang="de">Einheit der Höhenanzeige</span><span lang="en">Altimeter units</span> (<span class="altitudeunit"></span>)</a>
+	    <a id="settimeformat" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhr mit Sekunden</span><span lang="en">Clock with seconds</span></a>
+        <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">Schnellauswahl</span><span lang="en">One touch settings</span></a>
+        <a id="switchskins" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-picture"></span><span lang="de">Erscheinung</span><span lang="en">Skin</span></a>
+        <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
+	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
+	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
+    </div>        
+
+    <div id="skinsettingsdialog" class="dialog sub-dialog skin">
+        <h3><span lang="en">Skin</span><span lang="de">Erscheinung</span></h3>
+
+	    <a id="setskin-default" class="switcher skinradio switched-on" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Standard</span><span lang="en">Default</span></a>
+	    <a id="setskin-glass" class="switcher skinradio" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Glas</span><span lang="en">Glass</span></a>
+	    <a id="setskin-subtle" class="switcher skinradio" href="#"><span class="fa icon-dot-circled"></span><span lang="de">Dezent</span><span lang="en">Subtle</span></a>
+	    <a id="switchnightmode" class="switcher switched-on" href="#"><span class="fa icon-ok"></span><span lang="de">Tag- / Nachtmodus</span><span lang="en">Daylight mode</span></a>
+    </div>        
+    
+    <!--<div id="menubutton"><span class="fa fa-ellipsis-v autofade"></span></div>-->
+    
+  <div id="gpswarning" class="gps-warning"><small><span lang="de">kein</span><span lang="en">no</span> </small>GPS</div>
+  
+	<div id="askresetmaxspeed" class="dialog yesnodialog  sub-dialog  skin">
+		<h3><span lang="en">Clear saved max speed?</span> <span lang="de">Gespeicherte Höchstgeschwindigkeit löschen?</span> </h3>
+		<a class="btn btn-yes" href="#confirmresetmaxspeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
+	</div>
+	
+	<div id="askkeepmaxspeed" class="dialog yesnodialog  sub-dialog  skin">
+		<h3><span lang="en">Keep max speed?</span> <span lang="de">Höchstgeschwindigkeit behalten?</span> </h3>
+		<p lang="en">Keep last max speed <b><span class="lastmaxspeed"></span> <span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtimr"></span>).</p>
+		<p lang="de">Ihre letzte Höchstgeschwindigkeit <b><span class="lastmaxspeed"></span> <span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtime"></span>) behalten?</p>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Behalten</span></a>
+		<a class="btn btn-yes" href="#confirmresetlastmaxspeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+	</div>
+	
+	<div id="askresetaveragespeed" class="dialog yesnodialog  sub-dialog skin">
+		<h3><span lang="en">Clear saved average speed?</span> <span lang="de">Gespeicherte mittlere Geschwindigkeit löschen?</span> </h3>
+		<a class="btn btn-yes" href="#confirmresetaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
+	</div>
+
+	<div id="askkeepaveragespeed" class="dialog yesnodialog  sub-dialog  skin">
+		<h3><span lang="en">Keep average speed?</span> <span lang="de">Mittelwert behalten?</span> </h3>
+		<p lang="en">Keep last average speed <b><span class="lastaveragespeed"></span> <span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtimr"></span>).</p>
+		<p lang="de">Ihre letzte mittlere Geschwindigkeit <b><span class="lastaveragespeed"></span> <span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtime"></span>) behalten?</p>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
+		<a class="btn btn-yes" href="#confirmresetlastaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
+	</div>
+	
+</div> <!--dialogs-wrapper-->
+
+</div> <!-- touch-wrapper -->
+
+<div id="splashscreen" class="screencard">
+	<p>
+     <img src="res/kwd-4-title.png" />
+	</p>
+</div>
+
+<div class="toastmessage">Das ist ein Popup</div>
+
+<div id="ruler" class="ruler"></div>
+
+<script type="text/javascript">
+// verwende source id : de.kuehne_webdienste.kwdtacho
+</script>
+
+<script src="js/cssgauge.js"></script>
+<script src="js/kwdtacho.js"></script>
+   
+</body>
+</html> 
