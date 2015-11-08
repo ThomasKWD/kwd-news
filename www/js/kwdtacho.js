@@ -1489,6 +1489,20 @@ function DisplayBox (newid,mode) {
 		return id;
 	};
 	
+	/* returns boxRef (node object)
+	 * - doesn't check if valid
+	 */
+	this.getElement = function() {
+		return boxRef;
+	};
+
+	/* returns textRef (node object)
+	 * - doesn't check if valid
+	 */
+	this.getTextElement = function() {
+		return textRef;
+	};
+	
 	this.testString = function(newstr) {
 		if((typeof newstr != 'undefined') && newstr) teststring = newstr;
 		return teststring;
@@ -1519,8 +1533,8 @@ function DisplayBox (newid,mode) {
 	 * TODO: caller must ask whether he wants digitalspeed either - or not
 	 */
 	this.setFirst = function(isfirst) {
-		if ((isfirst && firstvisible) || (!isfirst && !firstvisible)) return;
 		
+		if ((isfirst && firstvisible) || (!isfirst && !firstvisible)) return;
 		
 		if (isfirst) {
 			//$(boxRef).addClass('first-display');
@@ -1721,15 +1735,15 @@ function DisplayBoxList(id_maxwidth) {
 	this.scaleTo = function(x,y) {
 			var i;
 			
-			if(list.length>=3) { // just to be saver from errors
-				// get visibles:
-				// - there are just 2 possible entries which need the border (can be !first)
-				// - TODO: this as a general rule/loop
-				list[0].setFirst(true); // time
-				var check = (!list[0].isVisible()); // hope check is getting boolean			
-				list[1].setFirst(check); 
-				check = (!list[0].isVisible()) && (!list[1].isVisible());
-				list[2].setFirst(check); 
+			// sets the setFirst css class depending on which are visible
+			var foundfirstvisible = false;
+			for(i=0;i<list.length;i++) {
+				
+				if (list[i].isVisible() && !foundfirstvisible) {
+					foundfirstvisible = true;
+					list[i].setFirst(true);
+				}
+				else list[i].setFirst(false); // since element could have been first before last config change
 			}			
 			
 			var c = 0;
@@ -1759,6 +1773,9 @@ function DisplayBoxList(id_maxwidth) {
 				}
 				app.Debug('scaled to h ='+dy);								
 			}
+			
+			// resize accuracy again because of text size
+			
 	};
 	// construct
 	idmaxwidth = id_maxwidth;
@@ -2882,6 +2899,7 @@ function initApp()  {
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
 	displayAccuracy = displays.add('accuracy'); // TODO: does deny reset text work?
+	displayAccuracy.getTextElement().style.fontSize = '35%';
 	
 	digitalSpeedDisplays = new DigitalSpeedBoxList();
 	displayDigitalspeed = digitalSpeedDisplays.add('digitalspeed','--');
