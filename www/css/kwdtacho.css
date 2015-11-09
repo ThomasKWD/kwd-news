@@ -344,6 +344,7 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 	position:fixed;
 	overflow:hidden;
 	display:none;
+	z-index:2;
 }
 /* for current control funcs. all dialogs must be visible! */
 .dialog,
@@ -374,6 +375,7 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 	background-color:black;
 	overflow:auto;
 	display:none;
+	z-index:3;
  }
  /* TODO: du brauchst einen inneren div, damit wichtige Buttons nicht mitscrollen! */
 .dialog p,
