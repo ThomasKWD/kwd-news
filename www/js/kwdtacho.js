@@ -76,7 +76,7 @@ function kwd_setElementHtml(element,str) {
 
 
 // class for global vars
-// kta =
+// kta = ...
 function KwdTachoApp() {
 	// public members
 	this.language = 'en';
