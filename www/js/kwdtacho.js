@@ -86,10 +86,11 @@ function KwdTachoApp() {
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.androidmode = false;
 	this.nojquery = false;
-	this.version = 1.51; 
+	this.version = 1.51; // may be overwritten by value from kwdTachoVersion 
 	this.defaultMargin = 10;
 	this.debug = true;
 	this.mydebug = null; // for DS debug
+	this.tablet = false;
 
 	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
 	this.maxaverage_infopos = [0.7, 0.6, 0.32];
@@ -1892,6 +1893,9 @@ function AnalogSpeedBoxList() {
 	var list = [];
 	
 	var avrmax = true; // flag für Sichtbarkeit - TODO: muss bei Umschaltung im Menü gesetzt werden
+
+	this.zoomanalog = false;
+
 	
 	/* Achtung! Setzt die Aktivität,
 	 * nicht ob es tatsächlich sichtbar ist!
@@ -2221,6 +2225,14 @@ function getDisplayWidth() {
 	return w;
 }
 
+//TODO: give also ratio
+function getDisplayMinSize() {
+	var s = getDisplayWidth();
+	var s2 = getDisplayHeight();
+	if (s < s2) return s;
+	else return s2; 
+}
+
 /* berechnet alle Größen und Positionen der Anzeigen
  * - initial: gesetzt wenn bei Programmstart aufgerufen
  */
@@ -2237,16 +2249,21 @@ function scaleDisplays(initial) {
 
     var w = 0;
     var h = 0;
-    
+    var screen_longest;
+    var zoom_treshhold = 1.8; // TODO: must be changed due to zoom and tablet ??
     
     if (screen_w <  screen_h) {
        isLandscape = false;
        w = screen_w;
+       screen_longest = screen_h; 
     }
     else {
        isLandscape = true;
        w = h = screen_h;
+       screen_longest = screen_w; 
     }
+    
+    var screen_analog = screen_longest / zoom_treshhold;
     
 	// set the positioners to a certain initial width:
 	// (otherwise displays can not init to a certain size)
@@ -2258,31 +2275,23 @@ function scaleDisplays(initial) {
 
     var i = 0;
     
-    //app.Debug (w2);
-    
-    // gauge will be centered later
-//    $('#cssgauge-wrapper').css({
-  //  	'width':w+'px',
-    //	'height':w+'px'
-    //});
+	// TODO: unbedingt in position displays verschieben
+   	// current idea: must not be larger than half of longest dimension of screen - except zoom mode
+    // TODO: consider kta.tablet + gauge.zoom | analogDisplays.zoom
+    // - gauge will be centered later
+    // - no limitation when no other displays
     if (cssgauge_visible) {
+    	var gaugesize = w;
+   		if (!displays.noneVisible() && w > screen_analog) gaugesize = screen_analog;
 	    var el = document.getElementById('cssgauge-wrapper');
 	    if (el) {
-	    	el.style.width = w-(def_margin*2) + 'px';
-	    	el.style.height = w-(def_margin*2) + 'px';
+	    	el.style.width = gaugesize - (def_margin*2) + 'px';
+	    	el.style.height = gaugesize - (def_margin*2) + 'px';
 	    }
 	    gauge.scale();
     }
 
-
-        
-//    else $('#cssgauge-wrapper').css({
-//    	'left':'10px',
-//    	'top':'10px'
-//    });
-    
-    
-    // zentriere alle Dialoge:
+	// zentriere alle Dialoge:
 	// - nur sichtbare
 	// - wird nur gebraucht on resize mit offenem dialog
 	var els = document.getElementsByClassName('dialog');
@@ -2296,8 +2305,21 @@ function scaleDisplays(initial) {
 	    
     if (initial) {    
     
-		// make all dialogs hidden now 
-
+		// calculate border radius of box-wrappers
+		// because a) be independend of text size of device
+		// and b) make sure older webkit-implementations work (css viewport units may not be recognized)
+		// and c) no fixed size due to very small device screens
+		var cboxborder = getDisplayMinSize() * 0.1;
+		//app.Debug('box-wrapper border: '+cboxborder+' ('+window.devicePixelRatio+')');
+		
+		var els = document.getElementsByClassName('box-wrapper');
+		for(i=els.length-1;i>=0;i--) {
+			els[i].style.borderRadius = cboxborder + 'px';
+			els[i].style.webkitBorderRadius = cboxborder + 'px';
+			els[i].style.borderWidth = cboxborder * 0.3 + 'px';
+			//app.Debug('set 1 box-wrapper');
+		}
+		
 	    // digital on analog speed size
 	    // now orientated to position and size of #cssgauge (not screen at all!)
 	    // ! note that this is only needed when *initial* since it is scaled together with gauge 
@@ -2421,6 +2443,7 @@ function positionDisplays() {
 
 		var cssgauge_size = cssgaugewrapper.offsetWidth; // width == height
 		var gaugeleft = 0;
+		var gaugetop = 0;
 		var maxaverage_size = (screen_w / 2 - def_margin*2	); // must be applied to display-boxes // 10 == gap
 		var maxaverage_height = 0; // adjust depending on orientation + displays + skin
 		var maxaverage_left = 0; // must be applied to analog-speedstats-wrapper
@@ -2440,18 +2463,19 @@ function positionDisplays() {
 				maxaverage_wrapper_width = cssgaugewrapper.offsetWidth; 
 				maxaverage_size = cssgauge_size / 2 - def_margin;
 			}
+			// always center vertically:
+			gaugetop = (hscreen - cssgauge_size) /2 - def_margin;
 		}
 		else {
 			//maxaverage_top = cssgaugewrapper.offsetHeight - cssgaugewrapper.offsetHeight * 0.3; // TODO: ask height of speedstats
 			//maxaverage_bottom =  hscreen - cssgauge_size;
+			// always center horizontally
+			gaugeleft = (screen_w - cssgauge_size) / 2 - def_margin;
 		}
 		
-		cssgaugewrapper.style.top = 0;
+		cssgaugewrapper.style.top = gaugetop + 'px';
 		cssgaugewrapper.style.left = gaugeleft + 'px';
-		/*$('#cssgauge-wrapper').css({
-			'top':'0px',
-			'left': gaugeleft+'px'
-		});*/		
+		
 
 		// Setze Größen von max/average auf analog
 		// TODO: prüfen, ob gerade sichtbar!!
@@ -2832,7 +2856,7 @@ function initApp()  {
 
 	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div)
 
-    tablet = app.IsTablet(); // returns boolean
+    kta.tablet = app.IsTablet(); // returns boolean
     
 
 	//DEBUG vs. release vs. Emulator & Test: 
@@ -2889,7 +2913,7 @@ function initApp()  {
 	analogMaxSpeed = analogDisplays.add('maxspeed','--');
 	analogAverageSpeed = analogDisplays.add('averagespeed','--');
 	
-	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
+	//scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
 	
 	// init displays
 	displays = new DisplayBoxList('geolocation');
@@ -2908,12 +2932,10 @@ function initApp()  {
 	
 	displayDigitalspeed.setFirst(true);	
 	
-	// !! DISABLeD 
-	if(kta.browsermode && 0) {
-		displayAverage = displays.add('averagespeed','--');
-		displayMaxspeed = displays.add('maxspeed','--');
-	}
-	
+	// TODO: 10.11.2015 check if new problem
+	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
+
+
 	// object referencing works (changes in displays.[one object] appear in references e.g. displayTime) 
 	//var testobject = displays.get('time');
 	//app.Debug('set new obj str: '+testobject.testString('thomas') );
@@ -2951,6 +2973,7 @@ function initApp()  {
     }
     if(settings.get('switchtime')==false) displayTime.hide(); else { layout_gauges++; startClock(); }
     if(settings.get('switchposition')==false) displayLocation.hide(); else layout_gauges++;
+    if(settings.get('switchaccuracy')==false) displayAccuracy.hide(); else layout_gauges++;
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
 	if(settings.get('switchhudsettings')===true) settings.switchit('switchhudsettings'); // auto saved will be overidden here, because all switchers are auto-saved
 	if (settings.get('settimeformat')==false) {
@@ -2970,8 +2993,6 @@ function initApp()  {
 	
 	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
         
-    // prevent accidently back 
-    app.EnableBackKey( false ); // TODO: not until listener installed? 
 
 
     //settings.init('backkey',true); // init bewirkt, dass true nur gesetzt wird, wenn es nicht geladen werden konnte
@@ -3069,7 +3090,7 @@ function initApp()  {
 	    	menustack.push('askkeepaveragespeed');
 	   }
     }
-    
+
     //Create and start location sensor. 
     //(Achievable update rate is hardware specific) 
     loc = app.CreateLocator( "GPS,Network" ); 
@@ -3276,6 +3297,17 @@ function initApp()  {
 	                } 
 	                doPosition = true;
 	                break;
+				case 'switchaccuracy':
+					if(settings.switchit(check)) {
+						displayAccuracy.show();
+						layout_gauges++;
+					}
+					else {
+						displayAccuracy.hide();
+						layout_gauges--;
+					}
+					doPosition = true;
+					break;
 	            case 'switchhudsettings':
 	           		gpstool.switchHud();
 	                settings.switchit(check);
@@ -3594,6 +3626,8 @@ function OnStart() {
 	
 	app.Debug("onStart");
     app.PreventScreenLock(true);
+    // prevent accidently back 
+    app.EnableBackKey( false );  
 
 	if (app.kwd_droidscript_emulator) {
 		kta.browsermode = true;

@@ -265,9 +265,9 @@ a.switcher:active {
 	/*outline:1px solid orange;*/
 }
 #displays-wrapper {
-	margin-top:10px;
+	margin-top:10px !important;
 	overflow: hidden !important;
-	z-index:1;
+	z-index:1 !important;
 	/* needed to prevent border-radius overlap error */
 }
 #tacho-container {
@@ -348,21 +348,18 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 }
 /* for current control funcs. all dialogs must be visible! */
 .dialog,
-#displays-wrapper,
-#digitalspeed-wrapper {
+.box-wrapper {
     color:white;
     /*box-shadow: 5px 5px 10px #000 inset,5px 5px 20px #000;*/
    	background-color:black;
     border:10px solid #ddd;
-    border-radius:3em;
     font-size:1em;
 }
-#displays-wrapper,
-#digitalspeed-wrapper {
-	margin:10px;			
+.box-wrapper {
+	margin:10px !important;			
 }
 #displays-wrapper {
-	position: relative;
+	position: relative !important;
 }
 .dialog {
 	position:absolute;
@@ -375,6 +372,7 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 	background-color:black;
 	overflow:auto;
 	display:none;
+    border-radius:3em;
 	z-index:3;
  }
  /* TODO: du brauchst einen inneren div, damit wichtige Buttons nicht mitscrollen! */
