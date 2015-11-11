@@ -194,6 +194,7 @@ function kwdGeoLocator (options) {
 		// set an accuracy
 		geodata.accuracy = Math.random() * 100;
 		//console.log (geodata);
+		//geodata.provider="Network";
 		if (callback_name !== null) callback_name.call(this,geodata);
 	};
 	

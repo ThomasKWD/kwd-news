@@ -350,6 +350,8 @@ function gpsBlink() {
 	for(var i=els.length-1;i>=0;i--) {
 		els[i].style.color = color;
 	}
+	// experimental: also accuracy
+	if (displayAccuracy && displayAccuracy.isVisible()) document.getElementById('accuracytext').style.color = color;
 
 	gps_blinking = !gps_blinking;
 }
@@ -358,12 +360,19 @@ function gpsBlink() {
  */
 function setGpsWarning() {
 	if(!gpswarning_active) {
-	    //$("#gpswarning,.gps-warning").show();
-	    document.getElementById('gpswarning').style.display = 'block'; // TODO: don't show when Accuracy is currently displayed
+		
 	    var els = document.getElementsByClassName('gps-warning');
 	    for(var i=0; i < els.length; i++) {
-	    	els[i].style.display = 'block'; // TODO: check if is not inline!
+	 	  	els[i].style.display = 'block'; // TODO: check if is not inline!
 	    }
+		// hide warning label again if accuracy visible
+	   	//if(displayAccuracy && displayAccuracy.isVisible())
+		// {			
+	    	// kwd_hideById('gpswarning'); // TODO: don't show when Accuracy is currently displayed
+		// }
+	    	
+
+	    
 	    //$('.gps-no-warning').hide();
 	    var els = document.getElementsByClassName('gps-no-warning');
 	    for(var i=0; i < els.length; i++) {
@@ -377,7 +386,7 @@ function setGpsWarning() {
 	    }
 		
 		// set accuracy Text without val
-   		kwd_setElementText('#accuracytext','GPS?');   		 	       
+   		kwd_setElementText('#accuracytext','GPS ?');   		 	       
  
 		gpswarning_blinkinterval = setInterval(gpsBlink,500);
 		gpswarning_active = true;
@@ -389,8 +398,7 @@ function setGpsWarning() {
  */
 function clearGpsWarning() {
 	if(gpswarning_active) {
-		//$("#gpswarning,.gps-warning").hide();
-	    document.getElementById('gpswarning').style.display = 'none'; // TODO: check if is not inline!
+	    //document.getElementById('gpswarning').style.display = 'none'; // TODO: check if is not inline!
 	    var els = document.getElementsByClassName('gps-warning');
 	    for(var i=0; i < els.length; i++) {
 	    	els[i].style.display = 'none'; 
@@ -938,7 +946,14 @@ function KwdGpsTools () {
 	        }
 
     		if (newlocdata.accuracy) accuracy = newlocdata.accuracy;
-	   		kwd_setElementText('#accuracytext','GPS ('+Math.round(accuracy)+'m)');   		 	       
+	   		kwd_setElementText('#accuracytext','GPS ('+Math.round(accuracy)+'m)'); // TODO: use textRef from Box 
+	   		var c = accuracy;
+	   		// c depends on value, assume: <5 == very good (green). > 100 == very poor (orange)
+	   		// the formula is left verbose for understanding
+	   		if (c>100) c = 100;
+	   		if (c<5) c = 5;
+	   		c = 125 - c;
+	   		displayAccuracy.getTextElement().style.color = 'hsl('+c+',100%,43%)'; // set color	   			 	       
         }
         else {
             //$('#bearinginfo').text('Sensor');
@@ -1677,6 +1692,7 @@ function DisplayBox (newid,mode) {
 
 /* verwaltet nur noch die Objekte vom Typ 'displayBox', die im displays-wrapper als zusätzliche Displays zusammengefasst sind.
  * - nicht nur List-Funktionen sondern auch visuelle Interaktionen und Abhängigkeiten (z.B. Schriftgrößen)
+ * - considers last element as "aaccuracy" which may be styled differently 
  * - TODO: id_maxwidth: id von HTMl-Element, definiert, welches durch seine Schriftgröße die Größe der anderen bestimmen soll
  * - TODO: id_maxheight: id von HTMl-Element, definiert, welches durch seine Schriftgröße die Größe der anderen bestimmen soll
  */
@@ -1744,12 +1760,10 @@ function DisplayBoxList(id_maxwidth) {
 					foundfirstvisible = true;
 					list[i].setFirst(true);
 				}
-				else list[i].setFirst(false); // since element could have been first before last config change
+				else list[i].setFirst(false); // since element could be set to first before last config change
 			}			
 			
 			var c = 0;
-			// ! only works when #digitalspeed is first in list !
-			// ! counts from second entry 
 			for(i=0;i<list.length;i++) { // always loop forward here!
 				if (list[i].isVisible()) {
 					c++;
@@ -1775,7 +1789,7 @@ function DisplayBoxList(id_maxwidth) {
 				app.Debug('scaled to h ='+dy);								
 			}
 			
-			// resize accuracy again because of text size
+			// TODO: resize accuracy again because of text size ..
 			
 	};
 	// construct
@@ -2864,7 +2878,7 @@ function initApp()  {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	}
 	else {
-		kwd_HideById('accuracy');
+		kwd_HideById('geoaccuracy');
 		
 	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
@@ -2922,8 +2936,8 @@ function initApp()  {
 	displayTime = displays.add('time');
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
-	displayAccuracy = displays.add('accuracy'); // TODO: does deny reset text work?
-	displayAccuracy.getTextElement().style.fontSize = '35%';
+	displayAccuracy = displays.add('geoaccuracy'); // TODO: does deny reset text work?
+	// TODO: enable again: displayAccuracy.getTextElement().style.fontSize = '35%'; // smaller font than other displays
 	
 	digitalSpeedDisplays = new DigitalSpeedBoxList();
 	displayDigitalspeed = digitalSpeedDisplays.add('digitalspeed','--');
@@ -2973,7 +2987,11 @@ function initApp()  {
     }
     if(settings.get('switchtime')==false) displayTime.hide(); else { layout_gauges++; startClock(); }
     if(settings.get('switchposition')==false) displayLocation.hide(); else layout_gauges++;
-    if(settings.get('switchaccuracy')==false) displayAccuracy.hide(); else layout_gauges++;
+    if(settings.get('switchaccuracy')==false) displayAccuracy.hide(); 
+    else 
+    {
+    	layout_gauges++;
+    }
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
 	if(settings.get('switchhudsettings')===true) settings.switchit('switchhudsettings'); // auto saved will be overidden here, because all switchers are auto-saved
 	if (settings.get('settimeformat')==false) {
@@ -3101,7 +3119,7 @@ function initApp()  {
         
     // TODO: hier auch scaleDisplays(), besonders für Landscape
     positionDisplays();
-    setGpsWarning(); // display warnings until gps receives data
+    setGpsWarning(); // initially display warnings until gps receives data
 
     // EVENTS
     
