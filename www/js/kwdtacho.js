@@ -157,6 +157,7 @@ function KwdTachoApp() {
 		}		
 		
 		// TODO: check ob beide nötig:, auch scaleDisplays
+		scaleDisplays();
 		positionDisplays();
 
 	}; 
@@ -2296,6 +2297,7 @@ function scaleDisplays(initial) {
     // - no limitation when no other displays
     //if (cssgauge_visible) {
     	var gaugesize = w;
+    	// TODO: switch zoom here (for digital zoom can be controlled by positionDisplays)
    		if (!displays.noneVisible() && w > screen_analog) gaugesize = screen_analog;
 	    var el = document.getElementById('cssgauge-wrapper');
 	    if (el) {
@@ -2304,21 +2306,46 @@ function scaleDisplays(initial) {
 	    }
 	    gauge.scale();
     //}
+    
+    // unfortunately border radius + width are set here as element style 
+    // which override css class settings
+    // thus skin class switch can't work without JS
+    // we must recognize skin here!
+    
 	// calculate border radius of box-wrappers
 	// because a) be independend of text size of device
 	// and b) make sure older webkit-implementations work (css viewport units may not be recognized)
 	// and c) no fixed size due to very small device screens
 	
-	var cboxborder = getDisplayMinSize() * 0.1;
-	//app.Debug('box-wrapper border: '+cboxborder+' ('+window.devicePixelRatio+')');
+	var cborderradius = cborderwidth = 1;
+	var checkel = document.getElementById('cssgauge'); // just *any* element which is affected by .skin
+	if (!checkel.classList.contains('skin-minimal') && !checkel.classList.contains('skin-subtle')) 
+	{
+		cborderradius = getDisplayMinSize() * 0.1;
+		//app.Debug('box-wrapper border: '+cborderradius+' ('+window.devicePixelRatio+')');	
+		// new: border width depend on gauge border (= 1/30 of its size)
+		cborderwidth = gaugesize / 30;
+	}
+	
+	// 
 	
 	var els = document.getElementsByClassName('box-wrapper');
-	for(i=els.length-1;i>=0;i--) {
-		els[i].style.borderRadius = cboxborder + 'px';
-		els[i].style.webkitBorderRadius = cboxborder + 'px';
-		els[i].style.borderWidth = gaugesize / 30 + 'px'; // -> new: depend on gauge border (= 1/30 of its size)
+	for(i=els.length-1;i>=0;i--) 
+	{
+		els[i].style.borderRadius = cborderradius + 'px';
+		els[i].style.webkitBorderRadius = cborderradius + 'px';
+		els[i].style.borderWidth = cborderwidth + 'px'; 
 		//app.Debug('set 1 box-wrapper');
 	}
+	
+	// handle border width of avr/max on analog
+	// separate is easiest due to symmetry
+	var el = document.getElementById('averagespeed');
+	el.style.borderWidth = cborderwidth + 'px';
+	el.style.borderLeftWidth = 1 + 'px';
+	var el = document.getElementById('maxspeed');
+	el.style.borderWidth = cborderwidth + 'px';
+	el.style.borderRightWidth = 1 + 'px';
 
 	// zentriere alle Dialoge:
 	// - nur sichtbare
@@ -2461,6 +2488,7 @@ function positionDisplays() {
 		var maxaverage_size = (screen_w / 2 - def_margin*2	); // must be applied to display-boxes // 10 == gap
 		var maxaverage_height = 0; // adjust depending on orientation + displays + skin
 		var maxaverage_left = 0; // must be applied to analog-speedstats-wrapper
+		var maxaverage_bottom = 0; // must be applied if landscape
 		//var maxaverage_bottom = 10; // when top == 0, this overrides maxaverage_top
 		var maxaverage_wrapper_width = screen_w - def_margin*2;
 		var maxaverage_backcolor = 'black';
@@ -2478,13 +2506,16 @@ function positionDisplays() {
 				maxaverage_size = cssgauge_size / 2 - def_margin;
 			}
 			// always center vertically:
-			gaugetop = (hscreen - cssgauge_size) /2 - def_margin;
+			gaugetop = (hscreen - cssgauge_size) /2 - def_margin - 2; // -2 due to rounding errors of scaled gauge
+			maxaverage_bottom = - gaugetop; // TODO: check if margin must be included
 		}
 		else {
 			//maxaverage_top = cssgaugewrapper.offsetHeight - cssgaugewrapper.offsetHeight * 0.3; // TODO: ask height of speedstats
 			//maxaverage_bottom =  hscreen - cssgauge_size;
 			// always center horizontally
 			gaugeleft = (screen_w - cssgauge_size) / 2 - def_margin;
+			//maxaverage_wrapper_width = cssgaugewrapper.offsetWidth; 
+			maxaverage_size = cssgauge_size / 2 - def_margin;			
 		}
 		
 		cssgaugewrapper.style.top = gaugetop + 'px';
@@ -2501,7 +2532,8 @@ function positionDisplays() {
 		var ma_wrapper = document.getElementById('analog-speedstats-wrapper');
 		ma_wrapper.style.width = maxaverage_wrapper_width + 'px';
 		ma_wrapper.style.left = maxaverage_left + 'px';
-		ma_wrapper.style.backgroundColor = maxaverage_backcolor;
+		//ma_wrapper.style.backgroundColor = maxaverage_backcolor;
+		ma_wrapper.style.bottom = maxaverage_bottom + def_margin +'px';
 		//ma_wrapper.style.top = 'auto';
 		//app.Debug('maxaverage_bottom: '+maxaverage_bottom);
 		//ma_wrapper.style.bottom = maxaverage_bottom + 'px';
@@ -3543,8 +3575,10 @@ function initApp()  {
 	        	setTachoUnits(unittext);
 	        	//OnBack(); // proceed like Android select menu
 	        }
-	        else if(doPosition) positionDisplays();
-	
+	        else if(doPosition) {
+	        	scaleDisplays();
+	        	positionDisplays();
+			}
 	        // always (cases are checked inside functions)
 			startGps();        
 		} // end of switchers + buttons
