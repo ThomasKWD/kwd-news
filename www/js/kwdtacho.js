@@ -2294,7 +2294,7 @@ function scaleDisplays(initial) {
     // TODO: consider kta.tablet + gauge.zoom | analogDisplays.zoom
     // - gauge will be centered later
     // - no limitation when no other displays
-    if (cssgauge_visible) {
+    //if (cssgauge_visible) {
     	var gaugesize = w;
    		if (!displays.noneVisible() && w > screen_analog) gaugesize = screen_analog;
 	    var el = document.getElementById('cssgauge-wrapper');
@@ -2303,7 +2303,22 @@ function scaleDisplays(initial) {
 	    	el.style.height = gaugesize - (def_margin*2) + 'px';
 	    }
 	    gauge.scale();
-    }
+    //}
+	// calculate border radius of box-wrappers
+	// because a) be independend of text size of device
+	// and b) make sure older webkit-implementations work (css viewport units may not be recognized)
+	// and c) no fixed size due to very small device screens
+	
+	var cboxborder = getDisplayMinSize() * 0.1;
+	//app.Debug('box-wrapper border: '+cboxborder+' ('+window.devicePixelRatio+')');
+	
+	var els = document.getElementsByClassName('box-wrapper');
+	for(i=els.length-1;i>=0;i--) {
+		els[i].style.borderRadius = cboxborder + 'px';
+		els[i].style.webkitBorderRadius = cboxborder + 'px';
+		els[i].style.borderWidth = gaugesize / 30 + 'px'; // -> new: depend on gauge border (= 1/30 of its size)
+		//app.Debug('set 1 box-wrapper');
+	}
 
 	// zentriere alle Dialoge:
 	// - nur sichtbare
@@ -2315,25 +2330,10 @@ function scaleDisplays(initial) {
 			kta.centerVisibleDialog(els[i].id);
 		}
 	}
-	//kta.centerVisibleDialogs(); // wenn id übergeben wir nur der eine geändert
+	
 	    
     if (initial) {    
     
-		// calculate border radius of box-wrappers
-		// because a) be independend of text size of device
-		// and b) make sure older webkit-implementations work (css viewport units may not be recognized)
-		// and c) no fixed size due to very small device screens
-		var cboxborder = getDisplayMinSize() * 0.1;
-		//app.Debug('box-wrapper border: '+cboxborder+' ('+window.devicePixelRatio+')');
-		
-		var els = document.getElementsByClassName('box-wrapper');
-		for(i=els.length-1;i>=0;i--) {
-			els[i].style.borderRadius = cboxborder + 'px';
-			els[i].style.webkitBorderRadius = cboxborder + 'px';
-			els[i].style.borderWidth = cboxborder * 0.3 + 'px';
-			//app.Debug('set 1 box-wrapper');
-		}
-		
 	    // digital on analog speed size
 	    // now orientated to position and size of #cssgauge (not screen at all!)
 	    // ! note that this is only needed when *initial* since it is scaled together with gauge 
