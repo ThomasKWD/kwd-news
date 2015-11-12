@@ -3078,7 +3078,7 @@ function initApp()  {
 				// TODO: make work on "month change yesterday"
 				else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
 			}
-	
+			
 			var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
 			if (kta.language=='de') {
 				if (namedday=='y')

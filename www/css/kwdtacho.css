@@ -305,13 +305,16 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 .unitlabel {
     position:absolute;
     color:white;
-    line-height:2rem;
     text-align:center;
     font-weight:normal;
     padding:10px;
-    font-size:0.9rem;
     right:0;
-    bottom:0;        
+    bottom:0px;
+    font-size:15px;
+    line-height:15px;        
+}
+.digitallabel {
+	bottom:13px;
 }
 .averagespeedlabel {
 	left:0;
@@ -620,3 +623,30 @@ für Skins addClass mit verschachtelten Klassen,
 /*
 TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
 */
+
+/* tablets:
+ * (normally all phones have screens<768 independent of physical resolution)
+ */
+@media (min-width: 768px) {
+
+	body {
+		font-size:17px;
+	}
+
+	#displays-wrapper .unitlabel,
+	#digitalspeed-wrapper .unitlabel {
+		bottom:30px;
+	}
+
+	@media (orientation:portrait) {
+		
+		.averagespeedlabel.digitallabel {
+			bottom:30px;
+			left:20px;
+		}
+		.maxspeedlabel.digitallabel {
+			bottom:30px;
+			right:20px;
+		}
+	}
+}
