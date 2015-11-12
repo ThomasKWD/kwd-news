@@ -2298,7 +2298,8 @@ function scaleDisplays(initial) {
     //if (cssgauge_visible) {
     	var gaugesize = w;
     	// TODO: switch zoom here (for digital zoom can be controlled by positionDisplays)
-   		if (!displays.noneVisible() && w > screen_analog) gaugesize = screen_analog;
+   		//if (!displays.noneVisible() && w > screen_analog) gaugesize = screen_analog;
+   		if(kta.tablet && w > screen_analog) gaugesize = screen_analog;
 	    var el = document.getElementById('cssgauge-wrapper');
 	    if (el) {
 	    	el.style.width = gaugesize - (def_margin*2) + 'px';
@@ -2498,13 +2499,14 @@ function positionDisplays() {
 			
 			if(displays.noneVisible()) {
 				gaugeleft = (screen_w - cssgauge_size) / 2 - def_margin;
-				maxaverage_size /= (screen_ratio * 0.95); // factor from max possible width
+				//maxaverage_size /= (screen_ratio * 0.95); // factor from max possible width
 				maxaverage_backcolor = 'transparent';
 			} 
 			else {
 				maxaverage_wrapper_width = cssgaugewrapper.offsetWidth; 
-				maxaverage_size = cssgauge_size / 2 - def_margin;
 			}
+			// size (height) always corresponding to gauge size
+			maxaverage_size = cssgauge_size / 2 - def_margin;
 			// always center vertically:
 			gaugetop = (hscreen - cssgauge_size) /2 - def_margin - 2; // -2 due to rounding errors of scaled gauge
 			maxaverage_bottom = - gaugetop; // TODO: check if margin must be included
@@ -2523,7 +2525,6 @@ function positionDisplays() {
 		
 
 		// Setze Größen von max/average auf analog
-		// TODO: prüfen, ob gerade sichtbar!!
 		maxaverage_height = (maxaverage_size * 0.4) ;
 		analogMaxSpeed.resize(maxaverage_size*0.8,maxaverage_height,'');
 		document.getElementById('maxspeed').style.width = maxaverage_size + 'px';
