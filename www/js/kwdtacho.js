@@ -78,6 +78,12 @@ function kwd_setElementHtml(element,str) {
 // class for global vars
 // kta = ...
 function KwdTachoApp() {
+	
+	// public constants
+	this.STAGE_BASIC = 'basic';
+	this.STAGE_PLUS = 'plus';
+	this.STAGE_PREMIUM = 'premium';
+	
 	// public members
 	this.language = 'en';
 	this.tachounit = 'kmh';
@@ -85,6 +91,7 @@ function KwdTachoApp() {
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.androidmode = false;
+	this.stage = '';     // 'basic'|'plus'|'premium'
 	this.nojquery = false;
 	this.version = 1.51; // may be overwritten by value from kwdTachoVersion 
 	this.defaultMargin = 10;
@@ -222,6 +229,15 @@ function KwdTachoApp() {
 
 	// construct
 	if(kwdTachoVersion) this.version = kwdTachoVersion;
+	if(kwdProjectStage) this.stage = kwdProjectStage;
+	else this.stage = this.STAGE_BASIC;
+	
+	switch(this.stage) {
+		case this.STAGE_BASIC : kstage = new KwdStageBasic(this); break;
+		case this.STAGE_PLUS :  kstage = new KwdStagePlus(this); break;
+		case this.STAGE_PREMIUM : kstage = new KwdStagePremimum(this); break;
+		default: throw  "no project stage defined";
+	}
 	
 	if(app.android_sdk) {
 		app.Debug("Android SDK mode found");
@@ -230,7 +246,7 @@ function KwdTachoApp() {
 }
 
 
-
+var kstage = null; // preset global var
 kta = new KwdTachoApp();
 
 // Konstanten
@@ -1267,7 +1283,7 @@ function AutoSettings(newstoragename,newsetclass) {
             }
         }
         
-        return; // ! automatically returns 'undfined' TODO: lieber String 'unset'
+        return; // ! automatically returns 'undefined' 
     };
     
     /*  setzt einen Status und erzeugt Element, wenn nicht vorhanden
@@ -1387,8 +1403,34 @@ function KwdPopupStack() {
 			var el = document.getElementById(show_id);
 			el.style.display = 'block';
 			el.scrollTop = 0;
-			kta.centerVisibleDialog(show_id);
 			kwd_showById('dialogs-blender');
+			
+			// Dialoge vom Typ 'infodialog' werden bei kleinen Displays verändert.
+			if (el.classList.contains('infodialog')) {
+				
+				if (el.scrollHeight > getDisplayHeight()) // TODO: need to calculate border??
+				{
+					//debugger;
+					//el.style.width = getDisplayWidth() + 'px';
+					el.style.maxWidth = getDisplayWidth() + 'px';
+				 	app.Debug('found big infodialog:'+el.scrollHeight);
+				
+					// suche nach Buttons
+					var i = 0;
+					var els = el.getElementsByClassName('btn');
+					if(els.length>1) {					
+						app.Debug('infodialog buttons:'+els.length);
+						for(i=0;i<els.length;i++) {
+							els[i].style.display = 'inline-block';
+							els[i].style.margin = '0.5em 0 0.5em 0';
+							if(i==0) els[i].style.marginLeft = '0.5em';
+						}
+					}
+				}
+			}
+	
+			kta.centerVisibleDialog(show_id);
+
 		}
 		else { // this must be only when stack empty
 			kwd_hideById('dialogs-blender');			
@@ -3005,26 +3047,19 @@ function initApp()  {
     setTachoLayout();
 	if (settings.get('tachoswitch')!=false) layout_gauges++;
 	
-    if(settings.get('switchnews2')!=true) { // ! here: hide when true
-    	menustack.push('newsdialog2');
-    }
+    if(settings.get('switchnews2')!=true) menustack.push('newsdialog2'); // true means ok set means don't show again
+    
 
     // this are the normal hints!
     if(settings.get('switchwarning')==false)  {
         displayHints = false;
     }
     
-    // this is the WARNING
-    if(settings.get('switchredwarning')!==false)  {
-    	menustack.push('warningdialog'); // note: all dialogs hidden by default!
-    }
     if(settings.get('switchtime')==false) displayTime.hide(); else { layout_gauges++; startClock(); }
     if(settings.get('switchposition')==false) displayLocation.hide(); else layout_gauges++;
-    if(settings.get('switchaccuracy')==false) displayAccuracy.hide(); 
-    else 
-    {
-    	layout_gauges++;
-    }
+    // inside the stage function will be decided:
+    layout_gauges = kstage.accuracy.init(settings,'switchaccuracy',layout_gauges);
+    
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
 	if(settings.get('switchhudsettings')===true) settings.switchit('switchhudsettings'); // auto saved will be overidden here, because all switchers are auto-saved
 	if (settings.get('settimeformat')==false) {
@@ -3066,80 +3101,91 @@ function initApp()  {
 	// must be called *after* SetTachoUnits! 
     if(settings.get('switchmaxaverage')) {
     	
-		// max    	
-		var maxdata = gpstool.getMaxSpeedData('.lastmaxspeed'); // ! the speed is already put into html  
-		if (maxdata.time) {
-			kwd_setElementText('.lastmaxspeedunits',maxdata.unittext);
-	
-			var d = new Date(maxdata.time);
-			var comparedate = new Date();
-			var namedday = '';
-			if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
-				if (d.getDate() == comparedate.getDate()) namedday = 't';
-				// TODO: make work on "month change yesterday"
-				else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
-			}
-			
-			var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
-			if (kta.language=='de') {
-				if (namedday=='y')
-					datestr = 'gestern '+datestr;
-				else if (!namedday)  				 
-					datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
-				datestr += ' Uhr';
-			}
-			else {  
-				if (namedday=='y')
-					datestr = 'yesterday '+ datestr;
-				else if (!namedday)  				 
-					datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
-				datestr += ' h';
-			}
-			
-			//  TODO: recognize today, yesterday, x days ago
-			kwd_setElementText('.lastmaxspeedtime',datestr);
-	    	menustack.push('askkeepmaxspeed');
-	   }
-    	
+		// max
+	    if(settings.get('switchkeepmaxspeed')!=true)
+	    {
+			var maxdata = gpstool.getMaxSpeedData('.lastmaxspeed'); // ! the speed is already put into html  
+			if (maxdata.time) {
+				kwd_setElementText('.lastmaxspeedunits',maxdata.unittext);
+		
+				var d = new Date(maxdata.time);
+				var comparedate = new Date();
+				var namedday = '';
+				if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
+					if (d.getDate() == comparedate.getDate()) namedday = 't';
+					// TODO: make work on "month change yesterday"
+					else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
+				}
+				
+				var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
+				if (kta.language=='de') {
+					if (namedday=='y')
+						datestr = 'gestern '+datestr;
+					else if (!namedday)  				 
+						datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
+					datestr += ' Uhr';
+				}
+				else {  
+					if (namedday=='y')
+						datestr = 'yesterday '+ datestr;
+					else if (!namedday)  				 
+						datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
+					datestr += ' h';
+				}
+				
+				//  TODO: recognize today, yesterday, x days ago
+				kwd_setElementText('.lastmaxspeedtime',datestr);
+		    	menustack.push('askkeepmaxspeed');
+		   }
+		}
+		
     	// average	
 
 		// TODO: how to make general function? (or better: obj hierarchy with inheritance of code)
+	    if(settings.get('switchkeepaveragespeed')!=true) 
+		{	
+			var avrdata = gpstool.getAverageSpeedData('.lastaveragespeed'); // ! the speed is already put into html  
+			if (avrdata) {
+				kwd_setElementText('.lastaveragespeedunits',avrdata.unittext);
 		
-		var avrdata = gpstool.getAverageSpeedData('.lastaveragespeed'); // ! the speed is already put into html  
-		if (avrdata) {
-			kwd_setElementText('.lastaveragespeedunits',avrdata.unittext);
-	
-			var d = new Date(avrdata.time);
-			var comparedate = new Date();
-			var namedday = '';
-			if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
-				if (d.getDate() == comparedate.getDate()) namedday = 't';
-				// TODO: make work on "month change yesterday"
-				else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
-			}
-			
-			// TODO: even this could be sub function
-			// TODO: when oop combine functions needed for time display
-			var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
-			if (kta.language=='de') {
-				if (namedday=='y')
-					datestr = 'gestern '+datestr;
-				else if (!namedday)  				 
-					datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
-				datestr += ' Uhr';
-			}
-			else {  
-				if (namedday=='y')
-					datestr = 'yesterday '+ datestr;
-				else if (!namedday)  				 
-					datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
-				datestr += ' h';
-			}
-			
-			//  TODO: recognize today, yesterday, x days ago
-			kwd_setElementText('.lastaveragespeedtime',datestr);
-	    	menustack.push('askkeepaveragespeed');
-	   }
+				var d = new Date(avrdata.time);
+				var comparedate = new Date();
+				var namedday = '';
+				if(d.getMonth() == comparedate.getMonth() && d.getFullYear() == comparedate.getFullYear()) {
+					if (d.getDate() == comparedate.getDate()) namedday = 't';
+					// TODO: make work on "month change yesterday"
+					else if (d.getDate() == (parseInt(comparedate.getDate()+1))) namedday = 'y';
+				}
+				
+				// TODO: even this could be sub function
+				// TODO: when oop combine functions needed for time display
+				var datestr = ((d.getHours()<10)?('0'+d.getHours()):(d.getHours())) + ((kta.language=='de') ?('.'):(':') ) + ((d.getMinutes()<10)?('0'+d.getMinutes()):(d.getMinutes()));
+				if (kta.language=='de') {
+					if (namedday=='y')
+						datestr = 'gestern '+datestr;
+					else if (!namedday)  				 
+						datestr = d.getDate() + '.' +d.getMonth() + '.'+ d.getFullYear() + ' ' +datestr;
+					datestr += ' Uhr';
+				}
+				else {  
+					if (namedday=='y')
+						datestr = 'yesterday '+ datestr;
+					else if (!namedday)  				 
+						datestr = d.getMonth() + '/' + d.getDay() + '/' + d.getFullYear() + ' ' + datestr;
+					datestr += ' h';
+				}
+				
+				//  TODO: recognize today, yesterday, x days ago
+				kwd_setElementText('.lastaveragespeedtime',datestr);
+		    	menustack.push('askkeepaveragespeed');
+		   }
+		}
+    }
+
+
+    // this is the WARNING
+    if(settings.get('switchredwarning')!=true)  {
+    	menustack.push('warningdialog'); // note: all dialogs hidden by default!
     }
 
     //Create and start location sensor. 
@@ -3350,12 +3396,10 @@ function initApp()  {
 	                break;
 				case 'switchaccuracy':
 					if(settings.switchit(check)) {
-						displayAccuracy.show();
-						layout_gauges++;
+						layout_gauges = kstage.accuracy.show(layout_gauges);
 					}
 					else {
-						displayAccuracy.hide();
-						layout_gauges--;
+						layout_gauges = kstage.accuracy.hide(layout_gauges);
 					}
 					doPosition = true;
 					break;
@@ -3381,10 +3425,6 @@ function initApp()  {
 					}  
 	                
 	                break;
-	            case 'switchredwarning':
-	                if(settings.switchit(check)) showHint('Warnings active','Warnhinweise wieder eingeschaltet.');
-	                else showHint('Warnings disabled','Warnhinweise ausgeschaltet.');
-	                break;                
 	            case 'switchautorange':
 	            	if(settings.get('tachoswitch')!=true) {
 	            		settings.switchit('tachoswitch');
@@ -3471,10 +3511,26 @@ function initApp()  {
 				        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
 			    	}
     				break;
+    			// all dismissable dialogs
 	            case 'switchnews2':
+   	            case 'switchredwarning':
+   	            case 'switchkeepmaxspeed':
+   	            case 'switchkeepaveragespeed':
+   	            case 'switchexplaindialogswitch':
 	            	settings.switchit(check);
 	            	break;
-	            	
+	            case 'switchdialogs':
+	            	if(!settings.get('switchexplaindialogswitch')) menustack.push('explainswitchdialog');
+	            	else
+	            	{
+	            		showHint('All dialogs turned on again','Alle Abfragen und Warnungen wieder eingeschaltet');
+	            	}
+		            settings.switchit('switchnews2',false);
+	   	            settings.switchit('switchredwarning',false);
+	   	            settings.switchit('switchkeepmaxspeed',false);
+	   	            settings.switchit('switchkeepaveragespeed',false);
+	            	settings.switchit('switchexplaindialogswitch',false);
+	            	break;
 	            case 'resetmaxspeed':
 					menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
 					break;
@@ -3682,9 +3738,11 @@ function OnStart() {
     // prevent accidently back 
     app.EnableBackKey( false );  
 
-	if (app.kwd_droidscript_emulator) {
+	if (app.kwd_droidscript_emulator) { // find emulator
 		kta.browsermode = true;
 		app.Debug('browser mode');
+		// change project stage as needed for testing
+		kta.stage = 'plus';
 	} 
 	else app.Debug('droidscript mode');
 	

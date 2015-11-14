@@ -270,7 +270,7 @@
 
 
 
-  <div id="warningdialog" class="dialog skin">
+  <div id="warningdialog" class="dialog infodialog skin">
     <h3 lang="de">Warnung!</h3>
     <h3 lang="en">Warning!</h3>
     
@@ -288,6 +288,8 @@
       Lassen Sie die App nicht unbeaufsichtigt laufen!</p>
       
 	<p><a href="#warningcont" class="btn"><span lang="de">Weiter</span><span lang="en">Continue</span></a></p>
+	<a id="switchredwarning" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+
   </div>
 
 <!--	<div id="newsdialog" class="dialog skin">
@@ -300,7 +302,7 @@
 		<a id="switchnews1" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
 -->
-	<div id="newsdialog2" class="dialog skin">
+	<div id="newsdialog2" class="dialog infodialog skin">
 		<h3><span lang="en">News</span><span lang="de">Neu</span></h3>
 
 		<p lang="en">Now you can display statistic <b>maximum</b> and <b>average</b> speed values. Read under "Options > Info" for details.</p>
@@ -385,8 +387,8 @@
 	    <a id="settimeformat" class="switcher switched-on" href="#"><span class="fa icon-clock"></span><span lang="de">Uhr mit Sekunden</span><span lang="en">Clock with seconds</span></a>
         <a id="switchfastoptions" class="switcher switched-on" href="#"><span class="fa icon-lock-open"></span><span lang="de">Schnellauswahl</span><span lang="en">One touch settings</span></a>
         <a id="switchskins" class="switcher menuitem" href="#"><span class="fa icon-zoom-out icon-picture"></span><span lang="de">Erscheinung</span><span lang="en">Skin</span></a>
-        <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Hinweise anzeigen</span><span lang="en">Show hints</span></a>
-	    <a id="switchredwarning" class="switcher switched-on" href="#"><span class="fa icon-attention"></span><span lang="de">Warnungen anzeigen</span><span lang="en">Show warnings</span></a>
+        <a id="switchwarning" class="switcher switched-on" href="#"><span class="fa icon-info-circled"></span><span lang="de">Tipps anzeigen</span><span lang="en">Show hints</span></a>
+	    <a id="switchdialogs" class="switcher menuitem" href="#"><span class="fa icon-ok"></span><span lang="de">Alle Dialoge zurücksetzen</span><span lang="en">Reset all dialogs</span></a>
 	    <a id="setlanguage" class="switcher menuitem" href="#"><span class="fa icon-globe"></span><span lang="de">Sprache: DEUTSCH</span><span lang="en">Language: ENGLISH</span></a>
     </div>        
 
@@ -409,7 +411,7 @@
 		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Behalten</span></a>
 	</div>
 	
-	<div id="askkeepmaxspeed" class="dialog yesnodialog  sub-dialog  skin">
+	<div id="askkeepmaxspeed" class="dialog yesnodialog  sub-dialog infodialog skin">
 		<h3><span lang="en">Maximum speed?</span> <span lang="de">Höchstgeschwindigkeit</span> </h3>
 		<p lang="en">Keep last max speed <b><span class="lastmaxspeed"></span>&nbsp;<span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtime"></span>).</p>
 		<p lang="de">Letzte Höchstgeschwindigkeit <b><span class="lastmaxspeed"></span>&nbsp;<span class="lastmaxspeedunits"></span></b> (<span class="lastmaxspeedtime"></span>) behalten?</p>
@@ -418,13 +420,13 @@
 		<a id="switchkeepmaxspeed" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
 	
-	<div id="askresetaveragespeed" class="dialog yesnodialog  sub-dialog skin">
+	<div id="askresetaveragespeed" class="dialog yesnodialog  sub-dialog infodialog skin">
 		<h3><span lang="en">Clear saved average speed?</span> <span lang="de">Gespeicherte mittlere Geschwindigkeit löschen?</span> </h3>
 		<a class="btn btn-yes" href="#confirmresetaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
 		<a class="btn btn-cancel" href="#cancel"><span lang="en">Keep</span><span lang="de">Beibehalten</span></a>
 	</div>
 
-	<div id="askkeepaveragespeed" class="dialog yesnodialog  sub-dialog  skin">
+	<div id="askkeepaveragespeed" class="dialog yesnodialog  sub-dialog infodialog skin">
 		<h3><span lang="en">Average speed</span> <span lang="de">Mittelwert</span> </h3>
 		<p lang="en">Keep last average speed <b><span class="lastaveragespeed"></span>&nbsp;<span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtime"></span>)?</p>
 		<p lang="de">Ihre letzte mittlere Geschwindigkeit <b><span class="lastaveragespeed">&nbsp;</span><span class="lastaveragespeedunits"></span></b> (<span class="lastaveragespeedtime"></span>) behalten?</p>
@@ -432,6 +434,16 @@
 		<a class="btn btn-yes" href="#confirmresetlastaveragespeed"><span lang="en">Clear</span><span lang="de">Löschen</span></a>
 		<a id="switchkeepaveragespeed" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
+	
+	<div id="explainswitchdialog" class="dialog sub-dialog infodialog skin">
+		<h3><span lang="en">Dialogs and Warnings</span><span lang="de">Abfragen und Warnungen</span></h3>
+		<p lang="en">All warnings and other dialogs that have been turned off by "Don't show again", will be turned on again now.</p>
+		<p lang="de">Alle Abfragen und Warnungen, die zuvor mit "Nicht mehr anzeigen" ausgeschaltet wurden, werden wieder eingeschaltet.</p>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Continue</span><span lang="de">Weiter</span></a>
+		<a id="switchexplaindialogswitch" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
+	</div>
+	
+	
 	
 </div> <!--dialogs-wrapper-->
 
@@ -451,6 +463,8 @@
 // verwende source id : de.kuehne_webdienste.kwdtacho
 </script>
 
+<script src="js/stage_basic.js"></script>
+<script src="js/stage_plus.js"></script>
 <script src="js/cssgauge.js"></script>
 <script src="js/kwdtacho.js"></script>
    
