@@ -3,4 +3,4 @@
  */
 kwdTachoVersion = 1.52; // is float val by purposes
 kwdProjectStage = 'basic'; // will be set in KwdTachoApp object as well // can left unset if default desired
-// TODO: debug switch here!
+kwdDebudMode = true;

@@ -231,6 +231,7 @@ function KwdTachoApp() {
 	if(kwdTachoVersion) this.version = kwdTachoVersion;
 	if(kwdProjectStage) this.stage = kwdProjectStage;
 	else this.stage = this.STAGE_BASIC;
+	if(kwdDebudMode) this.debug = kwdDebudMode;
 	
 	switch(this.stage) {
 		case this.STAGE_BASIC : kstage = new KwdStageBasic(this); break;
@@ -2952,8 +2953,7 @@ function initApp()  {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
 	}
 	else {
-		kwd_HideById('geoaccuracy');
-		
+		kwd_hideById('geoaccuracy');
 	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
 	
