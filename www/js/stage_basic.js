@@ -12,11 +12,17 @@ function StageBasicObject() {
 		if(displayAccuracy) displayAccuracy.hide();
 		return gaugecount;
 	};
-	this.show = function() {
+	this.show = function(set,id,gaugecount) {
+		//set.switchit(id,false);
 		// include message that function not available
+		menustack.push('nobasicdialog');
+		showHint('Not available in this app','Nicht verfügbar in dieser App');
+		return gaugecount;
 	};
-	this.hide = function() {
-		// include message that function not available		
+	this.hide = function(set,id,gaugecount) {
+		// actually this function is never reached in BASIC (except on devicess where accuracy has already been used)
+		if(displayAccuracy) displayAccuracy.hide();
+		return gaugecount;		
 	};
 }
 

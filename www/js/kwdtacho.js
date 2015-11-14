@@ -1303,7 +1303,7 @@ function AutoSettings(newstoragename,newsetclass) {
     
     
     /* return: true: on, false: off
- 		- value: if given sets to this (must be string 'true'|'false') (TODO: test!)
+ 		- value: if given sets to this (must be boolean true|false)
  		return: neuer Status (true|false)
      */
     
@@ -1312,25 +1312,25 @@ function AutoSettings(newstoragename,newsetclass) {
 		if(typeof id != 'string') throw('switchit NEW!!');
 		
 		var elem = document.getElementById(id);  
-        var sw = elem.classList.contains(setclass); // TODO: check if works!
-        var setto = (value == 'true') ? true : false; // value undefined also leads to false
-        
-        if (sw && setto) return true; // prevent multiple set of class
-        
+        var sw = elem.classList.contains(setclass); // get current state
+        if(value===undefined) setto =!sw;
+        else setto = (value == 'true') ? true : false;
+        var ret = false;
+                
         if(sw && !setto) {
-        	// remove class may sometimes be called when there is nor more class - without effect
-            //$(elem).removeClass(setclass);
+        	// remove class may sometimes be called when there is no more class - without effect
             elem.classList.remove(setclass);
             this.set(id,'false');
         }
-        else {
+        else if (!sw && setto) {
             //$(elem).addClass(setclass);
             elem.classList.add(setclass);
             this.set(id,'true');
+            ret = true;
         }
 
         this.save();
-        return !sw;
+        return setto;
     };
     
     /* im Gegensatz zum switch muss bei radio bei allen
@@ -1410,7 +1410,6 @@ function KwdPopupStack() {
 				
 				if (el.scrollHeight > getDisplayHeight()) // TODO: need to calculate border??
 				{
-					//debugger;
 					//el.style.width = getDisplayWidth() + 'px';
 					el.style.maxWidth = getDisplayWidth() + 'px';
 				 	app.Debug('found big infodialog:'+el.scrollHeight);
@@ -2988,6 +2987,7 @@ function initApp()  {
 	if(!kta.browsermode) {
 		//kwd_hideById('speedstats'); //$('#speedstats').hide();
 		kwd_hideById('switchnightmode'); //$('#resetmaxspeed').hide();
+		if(!kta.debug) kwd_hideById('switchaccuracy'); // until PLUS is published
 		//kwd_hideById('resetmaxspeed'); //$('#resetmaxspeed').hide();
 		//kwd_hideById('resetaveragespeed');//$('#resetaveragespeed').hide();
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
@@ -3047,8 +3047,6 @@ function initApp()  {
     setTachoLayout();
 	if (settings.get('tachoswitch')!=false) layout_gauges++;
 	
-    if(settings.get('switchnews2')!=true) menustack.push('newsdialog2'); // true means ok set means don't show again
-    
 
     // this are the normal hints!
     if(settings.get('switchwarning')==false)  {
@@ -3183,6 +3181,8 @@ function initApp()  {
     }
 
 
+    if(settings.get('switchnews2')!=true) menustack.push('newsdialog2'); // true means ok set means don't show again
+        
     // this is the WARNING
     if(settings.get('switchredwarning')!=true)  {
     	menustack.push('warningdialog'); // note: all dialogs hidden by default!
@@ -3395,11 +3395,11 @@ function initApp()  {
 	                doPosition = true;
 	                break;
 				case 'switchaccuracy':
-					if(settings.switchit(check)) {
-						layout_gauges = kstage.accuracy.show(layout_gauges);
+					if(!settings.get(check)) {
+						layout_gauges = kstage.accuracy.show(settings,check,layout_gauges);
 					}
 					else {
-						layout_gauges = kstage.accuracy.hide(layout_gauges);
+						layout_gauges = kstage.accuracy.hide(settings,check,layout_gauges);
 					}
 					doPosition = true;
 					break;
@@ -3516,20 +3516,14 @@ function initApp()  {
    	            case 'switchredwarning':
    	            case 'switchkeepmaxspeed':
    	            case 'switchkeepaveragespeed':
-   	            case 'switchexplaindialogswitch':
 	            	settings.switchit(check);
 	            	break;
 	            case 'switchdialogs':
-	            	if(!settings.get('switchexplaindialogswitch')) menustack.push('explainswitchdialog');
-	            	else
-	            	{
-	            		showHint('All dialogs turned on again','Alle Abfragen und Warnungen wieder eingeschaltet');
-	            	}
+            		menustack.push('explainswitchdialog');
 		            settings.switchit('switchnews2',false);
 	   	            settings.switchit('switchredwarning',false);
 	   	            settings.switchit('switchkeepmaxspeed',false);
 	   	            settings.switchit('switchkeepaveragespeed',false);
-	            	settings.switchit('switchexplaindialogswitch',false);
 	            	break;
 	            case 'resetmaxspeed':
 					menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
