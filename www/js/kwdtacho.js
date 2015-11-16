@@ -493,7 +493,7 @@ function OnPause()
 { 
     if (typeof settings !== 'undefined') settings.save();    
     app.PreventScreenLock(false);
-	//app.SetScreenMode('Normal');
+	if(kta.androidmode) app.SetScreenMode('Normal');
     // --> TODO: ein flag setzen, so dass gpstool.change darauf reagieren und z.B. nur die wichtigsten Sachen machen
     // kann, z.B. nur die Werte weiter verarbeiten, die die für die Statistik erforderlich sind.
     if (typeof gpstool !== 'undefined') gpstool.saveAverage();
@@ -509,9 +509,8 @@ function OnResume()
     
     startGps();
     if (typeof gpstool !== 'undefined') {
-//    	if (gpstool.isHud())
-    		//app.SetScreenMode('Game'); // TODO: evtl. in mächster DroidScript Version geändert
-    		gpstool.loadAverage();
+    	if (gpstool.isHud()) if(kta.androidmode) app.SetScreenMode('Full'); // TODO: evtl. in mächster DroidScript Version geändert
+    	gpstool.loadAverage();
     }
     resetHud();
 }
@@ -615,6 +614,7 @@ function KwdGpsTools () {
             sec :(0|D*60%1*6000)/100
         };
     }
+    
 
     function refreshLocDisplay() {
     	
@@ -629,7 +629,7 @@ function KwdGpsTools () {
             //$('#positiontext').html(tempstr);
             positext.innerHTML = tempstr;
         }
-        else positext.innerHTML = lat+',<br />'+lon; 
+        else positext.innerHTML = lat.toFixed(7)+',<br />'+lon.toFixed(7); 
         //$('#positiontext').html(lat+',<br />'+lon);
     }
 
@@ -1036,7 +1036,7 @@ function KwdGpsTools () {
 				elems[i].classList.remove('skin-plastic');
 				elems[i].classList.add('skin-minimal');
 			}
-		  	app.SetScreenMode('F'); // TODO: evtl. in mächster DroidScript Version geändert
+		  	if(kta.androidmode) app.SetScreenMode('Full'); // TODO: evtl. in mächster DroidScript Version geändert
 
 		}
 		else {
@@ -1046,7 +1046,7 @@ function KwdGpsTools () {
 				elems[i].classList.remove('skin-minimal');
 			}
 			kta.setSkin(); // setzt ursprüngliche skin
-		  	app.SetScreenMode('Normal');
+		  	if(kta.androidmode) app.SetScreenMode('Normal');
 		}
     };
 	
@@ -2948,7 +2948,7 @@ function initApp()  {
     kta.tablet = app.IsTablet(); // returns boolean
     
 
-	//DEBUG vs. release vs. Emulator & Test: 
+	//DEBUG vs. release vs. Emulator & Test:
 	if(kta.browsermode || kta.debug) {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
 		document.getElementById('debuginfo').style.display = 'block';
@@ -3613,7 +3613,13 @@ function initApp()  {
 					OnBack();
 					menustack.push('askresetaveragespeed');
 					break;				
-					
+				// only android 
+				case '#confirmturngpson' :
+					if(kta.androidmode) // is redundant
+					{
+						Android.callGPSSettings();
+					} 
+					break;	
 					
 				case 'back-arrow':
 					OnBack();
@@ -3753,9 +3759,5 @@ function OnStart() {
 		//kwd_setElementText('#internalinfo','(x)');
 	}
 			
-	// force portrait until layout is more flexible:
-	//app.SetOrientation( "Portrait" ); 
-	// für lock -> bekommt man halt entweder primary portrait oder primary landscape
-        	
 	setTimeout(initApp,100);
 }

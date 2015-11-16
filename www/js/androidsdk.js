@@ -7,7 +7,9 @@ function AndroidSdkApp () {
     var debug_on = true;
 	var popuptimeout = false;
 	
+	
 	this.kwd_droidscript_emulator = true; // to check in contrast to real DroidScript
+	this.android_sdk = true;
 	
 	this.Start = function() {
 		OnStart();
@@ -34,15 +36,6 @@ function AndroidSdkApp () {
 		Android.ShowPopup(msg,options); // invoke java API code
 	};
 	
-	/* return the probable correct value of screen orientation
-	 * TODO: don't just return "portrait" when screen is not portrait-like 
-	 */
-	this.GetOrientation = function() {
-		return 'Portrait';
-	};
-	this.SetOrientation = function() {
-		return 'Portrait';
-	};
 	this.GetLanguageCode = function() {
 		var userLang = navigator.language || navigator.userLanguage;
 		// TODO: kann auch 5-stellig sein (je nach Browser) z.B. "de-DE" 
@@ -66,12 +59,16 @@ function AndroidSdkApp () {
 		console.log('app.EnableBackKey:'+mode);
 	};
 	this.SetScreenMode = function(mode) {
-		if (mode.toLowerCase()=='full') console.log ('app: hide statusbar');
-		if (mode.toLowerCase()=='normal') console.log ('app: show statusbar');
+		console.log('screen mode: '+mode);
+		//if (mode.toLowerCase()=='full') Android.setFullScreen(true);
+		//else Android.setFullScreen(false);
+		Android.setFullScreen(mode);
+		
 	};    
     this.PreventScreenLock = function(bool) {
-    	if (bool) console.log('app: NO display timeout ');
-    	else  console.log('app: normal display timeout ');
+    	// is done by frame app
+    	//if (bool) console.log('app: NO display timeout ');
+    	//else  console.log('app: normal display timeout ');
     };
 	
 	this.CreateLocator = function(options) {
@@ -177,22 +174,28 @@ function kwdGeoLocatorSdk (options) {
 	var that = this;
 	
 	/* this invokes to simulated callback call with geo data
-	 * 
+	 * - controlled by setInterval
+	 * - gets data actively from Android 
 	 */
-	this.change = function(newdata) {
+	this.change = function() {
 
+	
 		//geodata.provider = 'gps' // to be changed by onerror
-		geodata.speed = newdata.coords.speed;
+		/*geodata.speed = newdata.coords.speed;
 		geodata.accuracy = newdata.coords.accuracy;
 		geodata.latitude = newdata.coords.latitude;
 		geodata.longitude = newdata.coords.longitude;
 		geodata.altitude = newdata.coords.altitude;
 		geodata.bearing = newdata.coords.heading;
-
-		// (test values see droidscript.js)
-				
-		//console.log ('speed: '+geodata.speed);
-		if (callback_name !== null) callback_name.call(this,geodata);
+		*/
+		var str = Android.getLocationData();
+		if (str) {
+			geodata = JSON.parse(str);
+			// (test values see droidscript.js)
+						
+			//console.log ('current provider: '+geodata.provider);
+			if (callback_name !== null) callback_name.call(this,geodata);
+		}
 	};
 	
 	this.invoke = function() {
@@ -224,7 +227,7 @@ function kwdGeoLocatorSdk (options) {
 	 * 
 	 */
 	this.SetRate = function(rate) {
-		if (rate) timeout = rate*1000;
+		//if (rate) timeout = rate*1000;
 	};
 	
 	/*
@@ -233,10 +236,13 @@ function kwdGeoLocatorSdk (options) {
 	 * - TODO: wenn sich schlecht macht, einfach provider umschalten
 	 */
 	this.Start = function() {
-		if(navigator.geolocation) {
+	//	if(navigator.geolocation) {
 			//navigator.geolocation.watchPosition(that.change,that.onError);	
-			timeout_id = setInterval(this.invoke,timeout);
-		}
+		//	timeout_id = setInterval(this.invoke,timeout);
+	//	}
+		//console.log(r);
+		Android.startLocator();
+		timeout_id = setInterval(this.change,timeout);
 	};
 	
 	this.Stop = function() {
@@ -244,12 +250,13 @@ function kwdGeoLocatorSdk (options) {
 			//navigator.geolocation.clearWatch(that.change);	
 		//}
 		if (timeout_id !== false) clearInterval(timeout_id);
+		Android.StopLocator();
 	};
 	
 	// construct code
 	// TODO: Android code call for creating LocationManager
 	// TEST
-	Android.createLocator(options); // you don't need return value fro Java, since object will be stored there 
+	Android.createLocator(options); // you don't need return value from Java, since object will be stored there 
 } 
 
 // make instance
