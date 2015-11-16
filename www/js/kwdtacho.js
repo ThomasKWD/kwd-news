@@ -96,7 +96,7 @@ function KwdTachoApp() {
 	this.version = 1.51; // may be overwritten by value from kwdTachoVersion 
 	this.defaultMargin = 10;
 	this.debug = true;
-	this.mydebug = null; // for DS debug
+	this.mydebug = null; // for DS debug object
 	this.tablet = false;
 
 	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
@@ -231,7 +231,7 @@ function KwdTachoApp() {
 	if(kwdTachoVersion) this.version = kwdTachoVersion;
 	if(kwdProjectStage) this.stage = kwdProjectStage;
 	else this.stage = this.STAGE_BASIC;
-	if(kwdDebudMode) this.debug = kwdDebudMode;
+	if(kwdDebugMode!==undefined) this.debug = kwdDebugMode; // can also be == false
 	
 	switch(this.stage) {
 		case this.STAGE_BASIC : kstage = new KwdStageBasic(this); break;
@@ -247,7 +247,6 @@ function KwdTachoApp() {
 }
 
 
-var kstage = null; // preset global var
 kta = new KwdTachoApp();
 
 // Konstanten
@@ -2292,6 +2291,7 @@ function getDisplayMinSize() {
 
 /* berechnet alle Größen und Positionen der Anzeigen
  * - initial: gesetzt wenn bei Programmstart aufgerufen
+ * TODO: not 'initial' but put all this stuff into initApp
  */
 function scaleDisplays(initial) {
 		
@@ -2943,7 +2943,7 @@ function getCurrentSpeedUnits() {
 */
 function initApp()  {
 
-	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div)
+	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div) -> setTimeout
 
     kta.tablet = app.IsTablet(); // returns boolean
     
@@ -2951,6 +2951,8 @@ function initApp()  {
 	//DEBUG vs. release vs. Emulator & Test: 
 	if(kta.browsermode || kta.debug) {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
+		document.getElementById('debuginfo').style.display = 'block';
+		document.getElementById('debuginfo').innerHTML = 'browser or debug';
 	}
 	else {
 		kwd_hideById('geoaccuracy');
@@ -2958,10 +2960,9 @@ function initApp()  {
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
 	
     
-    // ONSTART
     //if(!kta.browsermode) kta.useSystemSize = true;
 	
-	// add the back arrows to dialogs
+	// add the back arrows to dialogs ()
 	var els = document.getElementsByClassName('dialog');
 	for(var i = els.length-1;i>=0;i--) {
 		var e = els[i];
@@ -2987,13 +2988,15 @@ function initApp()  {
 	if(!kta.browsermode) {
 		//kwd_hideById('speedstats'); //$('#speedstats').hide();
 		kwd_hideById('switchnightmode'); //$('#resetmaxspeed').hide();
-		if(!kta.debug) kwd_hideById('switchaccuracy'); // until PLUS is published
 		//kwd_hideById('resetmaxspeed'); //$('#resetmaxspeed').hide();
 		//kwd_hideById('resetaveragespeed');//$('#resetaveragespeed').hide();
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
-	
+	if (!kta.debug) 
+	{
+		kwd_hideById('switchaccuracy'); // until PLUS is published
+	}
 	
 
 	analogDisplays = new AnalogSpeedBoxList(); 

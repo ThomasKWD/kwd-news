@@ -1,6 +1,7 @@
-/* useful when main files already packed and version number is to be corrected
- * this value will be read by the kwdTachoApp object
+/* useful when main files already packed and
+ * version number or other global settings are to be corrected
+ * these values will be read by the kwdTachoApp object
  */
-kwdTachoVersion = 1.52; // is float val by purposes
-kwdProjectStage = 'basic'; // will be set in KwdTachoApp object as well // can left unset if default desired
-kwdDebudMode = true;
+kwdTachoVersion = 1.52; // is float val by purpose
+kwdProjectStage = 'basic'; // can left unset if default desired
+kwdDebugMode = false; 

@@ -422,6 +422,13 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
     width:100%;
     max-width:360px;
 }
+#debuginfo {
+	position:absolute;
+	z-index:1000;
+	top:0;
+	left:0;
+	display:none;
+}
 #wait {
     width:200px;
     height:2em;
@@ -437,6 +444,7 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
     color:black;
     padding:25px;
     display:none;
+    z-index:10;
 }
 #infocard * {
     color:black;

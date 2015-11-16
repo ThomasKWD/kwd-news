@@ -2,7 +2,7 @@
  * // verwende source id : de.kuehne_webdienste.kwdtacho
  */
 
-function StageBasicObject() {
+function StageBasic_Accuracy() {
 	
 	/* prevents that accuracy gets enabled 
 	 * 
@@ -37,7 +37,7 @@ function KwdStageBasic() {
 	
 	// construct
 	
-	this.accuracy = new StageBasicObject();
+	this.accuracy = new StageBasic_Accuracy();
 } 
 
 // initantiate in kwdtacho.js
