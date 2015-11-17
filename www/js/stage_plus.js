@@ -5,27 +5,40 @@
 /* Code for project stage BASIC
  * // verwende source id : de.kuehne_webdienste.kwdtacho
  */
-
+/*könnte von base class abgeleitet sein
+*/
 function StagePlus_Accuracy() {
 	
-	/* prevents that accuracy gets enabled 
+	/* sets accuracy depending on saved state
 	 * 
 	 */
-	this.init = function (set,id,gaugecount) {
-		set.switchit(id,false);
-		if(displayAccuracy) displayAccuracy.hide();
+	this.init = function (set,id,gaugecount)
+	{
+		if (set.get(id)==false && displayAccuracy) displayAccuracy.hide();
+		else gaugecount++;
 		return gaugecount;
 	};
-	this.show = function(set,id,gaugecount) {
-		//set.switchit(id,false);
-		// include message that function not available
-		menustack.push('nobasicdialog');
-		showHint('Not available in this app','Nicht verfügbar in dieser App');
+	
+	
+	this.show = function(set,id,gaugecount)
+	{
+		if (displayAccuracy && !displayAccuarcy.isVisible())
+		{
+			gaugecount++;
+			set.switchit(id,true);
+		}
 		return gaugecount;
 	};
-	this.hide = function(set,id,gaugecount) {
-		// actually this function is never reached in BASIC (except on devicess where accuracy has already been used)
-		if(displayAccuracy) displayAccuracy.hide();
+	
+	
+	this.hide = function(set,id,gaugecount)
+	{
+		if (displayAccuracy && displayAccuarcy.isVisible())
+		{
+			gaugecount--;
+			set.switchit(id,true);
+		}
+
 		return gaugecount;		
 	};
 }
@@ -33,7 +46,8 @@ function StagePlus_Accuracy() {
 function KwdStagePlus() {
 	
 	// construct
-	
+	// TODO: make function general for displays 
+	// or also other objects or structures
 	this.accuracy = new StagePlus_Accuracy();
 } 
 
