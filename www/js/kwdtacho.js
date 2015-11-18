@@ -505,6 +505,7 @@ function OnPause()
 // --> the double check should prevent fade
 function OnResume() 
 { 
+	app.Debug('OnResume');
     app.PreventScreenLock(true);
     
     startGps();
