@@ -967,9 +967,10 @@ function KwdGpsTools () {
 	   		var c = accuracy;
 	   		// c depends on value, assume: <5 == very good (green). > 100 == very poor (orange)
 	   		// the formula is left verbose for understanding
+	   		
 	   		if (c>100) c = 100;
 	   		if (c<5) c = 5;
-	   		c = 125 - c;
+	   		c = 105 - c;
 	   		displayAccuracy.getTextElement().style.color = 'hsl('+c+',100%,43%)'; // set color	   			 	       
         }
         else {
@@ -1309,12 +1310,11 @@ function AutoSettings(newstoragename,newsetclass) {
     
     this.switchit = function(id,value) {
 
-		if(typeof id != 'string') throw('switchit NEW!!');
-		
 		var elem = document.getElementById(id);  
         var sw = elem.classList.contains(setclass); // get current state
+        var setto = false;
         if(value===undefined) setto =!sw;
-        else setto = (value == 'true') ? true : false;
+        else setto = (value == true) ? true : false;
         var ret = false;
                 
         if(sw && !setto) {
@@ -2993,7 +2993,7 @@ function initApp()  {
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
-	if (!kta.debug) 
+	if (!kta.debug && kta.stage == kta.STAGE_BASIC) 
 	{
 		kwd_hideById('switchaccuracy'); // until PLUS is published
 	}
@@ -3063,6 +3063,7 @@ function initApp()  {
     
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
 	if(settings.get('switchhudsettings')===true) settings.switchit('switchhudsettings'); // auto saved will be overidden here, because all switchers are auto-saved
+	
 	if (settings.get('settimeformat')==false) {
 		kwd_hideById('seconds-text'); //$('#seconds-text').hide();
 		kta.clockseconds = false;
@@ -3408,7 +3409,19 @@ function initApp()  {
 					break;
 	            case 'switchhudsettings':
 	           		gpstool.switchHud();
-	                settings.switchit(check);
+	                if(settings.switchit(check))
+	                {
+	                	// needed for android SDK which reads the href value
+	                	// to perform an action in the framework-app activity
+	                	// ! the on|off seem to be in the wrong { } block but they are correct
+	                	// ! because the SDK function will read it before this code is reached again (right when the touch  event is fired)
+	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_off");
+	                }
+	                else 
+	                {
+	                	// need for android SDK which reads the href value
+	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_on");
+	                }
 	            	break;
 	            case 'switchwarning':
 	                if (settings.switchit(check)) {
@@ -3617,6 +3630,7 @@ function initApp()  {
 				case '#confirmturngpson' :
 					if(kta.androidmode) // is redundant
 					{
+						// TODO: only once when app starts
 						Android.callGPSSettings();
 					} 
 					break;	

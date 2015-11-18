@@ -1,9 +1,10 @@
+
 /* Code for project stage BASIC
  * // verwende source id : de.kuehne_webdienste.kwdtacho
  */
 
 function StageBasic_Accuracy() {
-	
+
 	/* prevents that accuracy gets enabled 
 	 * 
 	 */
@@ -22,7 +23,7 @@ function StageBasic_Accuracy() {
 	this.hide = function(set,id,gaugecount) {
 		// actually this function is never reached in BASIC (except on devicess where accuracy has already been used)
 		if(displayAccuracy) displayAccuracy.hide();
-		return gaugecount;		
+		return gaugecount;
 	};
 }
 

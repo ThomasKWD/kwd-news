@@ -250,7 +250,7 @@ function kwdGeoLocatorSdk (options) {
 			//navigator.geolocation.clearWatch(that.change);	
 		//}
 		if (timeout_id !== false) clearInterval(timeout_id);
-		Android.StopLocator();
+		Android.stopLocator();
 	};
 	
 	// construct code
