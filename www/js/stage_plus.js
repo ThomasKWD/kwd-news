@@ -22,10 +22,11 @@ function StagePlus_Accuracy() {
 	
 	this.show = function(set,id,gaugecount)
 	{
-		if (displayAccuracy && !displayAccuarcy.isVisible())
+		if (displayAccuracy)
 		{
 			gaugecount++;
 			set.switchit(id,true);
+			displayAccuracy.show();
 		}
 		return gaugecount;
 	};
@@ -33,10 +34,11 @@ function StagePlus_Accuracy() {
 	
 	this.hide = function(set,id,gaugecount)
 	{
-		if (displayAccuracy && displayAccuarcy.isVisible())
+		if (displayAccuracy)
 		{
 			gaugecount--;
-			set.switchit(id,true);
+			set.switchit(id,false);
+			displayAccuracy.hide();
 		}
 
 		return gaugecount;		
