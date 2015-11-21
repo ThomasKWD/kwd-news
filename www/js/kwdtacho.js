@@ -3185,7 +3185,7 @@ function initApp()  {
     }
 
 
-    if(settings.get('switchnews2')!=true) menustack.push('newsdialog2'); // true means ok set means don't show again
+    if(settings.get('switchnews3')!=true) menustack.push('newsdialog3'); // true means ok set means don't show again
         
     // this is the WARNING
     if(settings.get('switchredwarning')!=true)  {
@@ -3528,7 +3528,7 @@ function initApp()  {
 			    	}
     				break;
     			// all dismissable dialogs
-	            case 'switchnews2':
+	            case 'switchnews3':
    	            case 'switchredwarning':
    	            case 'switchkeepmaxspeed':
    	            case 'switchkeepaveragespeed':
@@ -3536,7 +3536,7 @@ function initApp()  {
 	            	break;
 	            case 'switchdialogs':
             		menustack.push('explainswitchdialog');
-		            settings.switchit('switchnews2',false);
+		            settings.switchit('switchnews3',false);
 	   	            settings.switchit('switchredwarning',false);
 	   	            settings.switchit('switchkeepmaxspeed',false);
 	   	            settings.switchit('switchkeepaveragespeed',false);
