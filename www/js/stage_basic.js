@@ -1,13 +1,13 @@
 
 /* Code for project stage BASIC
  * // verwende source id : de.kuehne_webdienste.kwdtacho
+ * 
+ * - accuracy enabled
  */
 
 function StageBasic_Accuracy() {
 
 	/* prevents that accuracy gets enabled 
-	 * 
-	 */
 	this.init = function (set,id,gaugecount) {
 		set.switchit(id,false);
 		if(displayAccuracy) displayAccuracy.hide();
@@ -25,6 +25,40 @@ function StageBasic_Accuracy() {
 		if(displayAccuracy) displayAccuracy.hide();
 		return gaugecount;
 	};
+*/
+	// sets accuracy depending on saved state
+	this.init = function (set,id,gaugecount)
+	{
+		if (set.get(id)==false && displayAccuracy) displayAccuracy.hide();
+		else gaugecount++;
+		return gaugecount;
+	};
+	
+	
+	this.show = function(set,id,gaugecount)
+	{
+		if (displayAccuracy)
+		{
+			gaugecount++;
+			set.switchit(id,true);
+			displayAccuracy.show();
+		}
+		return gaugecount;
+	};
+	
+	
+	this.hide = function(set,id,gaugecount)
+	{
+		if (displayAccuracy)
+		{
+			gaugecount--;
+			set.switchit(id,false);
+			displayAccuracy.hide();
+		}
+
+		return gaugecount;		
+	};
+
 }
 
 function KwdStageBasic() {

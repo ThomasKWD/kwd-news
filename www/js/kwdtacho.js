@@ -2947,13 +2947,17 @@ function initApp()  {
 	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div) -> setTimeout
 
     kta.tablet = app.IsTablet(); // returns boolean
-    
-
+	var debugstr = "";
+	if (kta.debug) debugstr += kta.stage + ' ';
+	if (kta.browsermode) debugstr += "browser ";
+	if (kta.androidmode) debugstr += "android-SDK ";
+	if (debugstr) document.getElementById('debuginfo').innerHTML = debugstr;
+	
+	
 	//DEBUG vs. release vs. Emulator & Test:
 	if(kta.browsermode || kta.debug) {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
 		document.getElementById('debuginfo').style.display = 'block';
-		document.getElementById('debuginfo').innerHTML = 'browser or debug';
 	}
 	else {
 		kwd_hideById('geoaccuracy');
@@ -2994,11 +2998,6 @@ function initApp()  {
 		//kwd_hideById('maxspeed'); //$('#maxspeed').hide();
 		//kwd_hideById('averagespeed'); //$('#averagespeed').hide();
 	}
-	if (!kta.debug && kta.stage == kta.STAGE_BASIC) 
-	{
-		kwd_hideById('switchaccuracy'); // until PLUS is published
-	}
-	
 
 	analogDisplays = new AnalogSpeedBoxList(); 
  	dona = analogDisplays.add('digital-on-analog','--'); // dona must only be scaled once since it is scaled with gauge later
@@ -3759,10 +3758,10 @@ function OnStart() {
 	if (app.kwd_droidscript_emulator) { // find emulator
 		kta.browsermode = true;
 		app.Debug('browser mode');
-		// change project stage as needed for testing
-		kta.stage = 'plus';
 	} 
 	else app.Debug('droidscript mode');
+
+	app.Debug('project stage: '+kta.stage);
 	
 	if(app.GetOSVersion()>=14) { // 14 == Android 4.0.1
 		kta.advancedstyles = true;

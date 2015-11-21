@@ -233,6 +233,9 @@ a.switcher:active {
 		color:#dd0000;
 	 	/* TODO: in Nachtmodus/dezent: Schrift statt bg gefärbt */
 	 }
+	 #accuracytext {
+	 	font-weight: normal !important;
+	 }
   .first-display {
    		border-top-color:transparent;
    		margin-top:0;
