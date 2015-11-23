@@ -98,6 +98,7 @@ function KwdTachoApp() {
 	this.debug = true;
 	this.mydebug = null; // for DS debug object
 	this.tablet = false;
+	this.menuscrollinfo = 0; // to hide hint for "swipe up"  after 2-3 uses (>1 : turn off)
 
 	//this.maxaverage_standalone = false; // TODO: geplant für  Anzeige, wenn analog-Display aus
 	this.maxaverage_infopos = [0.7, 0.6, 0.32];
@@ -204,7 +205,8 @@ function KwdTachoApp() {
                         }
                         //else throw 'cannot resize exit button';
                         // TODO: Hinweis später wieder weg.
-                        showHint('Swipe up to see all','Menü nach oben schieben');
+                        if (kta.menuscrollinfo <2) showHint('Swipe up to see all','Menü nach oben schieben');
+                        kta.menuscrollinfo ++;
                     }
                     else {
                         var eb = document.getElementById('exit-button-bg');
@@ -2394,14 +2396,15 @@ function scaleDisplays(initial) {
 	// zentriere alle Dialoge:
 	// - nur sichtbare
 	// - wird nur gebraucht on resize mit offenem dialog
-	var els = document.getElementsByClassName('dialog');
-	for(i=els.length-1;i>=0;i--) {
-		//app.Debug('computed:'+getComputedStyle(els[i],null).display);
-		if(getComputedStyle(els[i],null).display != 'none') {  // TODO: lieber flag oder visible oder translate arbeiten
-			kta.centerVisibleDialog(els[i].id);
+	if(initial || kta.onResize) {
+		var els = document.getElementsByClassName('dialog');
+		for(i=els.length-1;i>=0;i--) {
+			//app.Debug('computed:'+getComputedStyle(els[i],null).display);
+			if(getComputedStyle(els[i],null).display != 'none') {  // TODO: lieber flag oder visible oder translate arbeiten
+				kta.centerVisibleDialog(els[i].id);
+			}
 		}
-	}
-	
+	}		
 	    
     if (initial) {    
     
@@ -2484,6 +2487,7 @@ function scaleDisplays(initial) {
 	   // correct border-radius
     }
     
+    kta.onResize = false;
     
 }    // scaleDisplays
 
@@ -2959,9 +2963,6 @@ function initApp()  {
 		document.getElementById('splashscreen').style.opacity = 0.1; // debug
 		document.getElementById('debuginfo').style.display = 'block';
 	}
-	else {
-		kwd_hideById('geoaccuracy');
-	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
 	
     
@@ -3399,7 +3400,7 @@ function initApp()  {
 	                doPosition = true;
 	                break;
 				case 'switchaccuracy':
-					if(!settings.get(check)) {
+					if(settings.get(check)===false) { // can be true|false|undefined
 						layout_gauges = kstage.accuracy.show(settings,check,layout_gauges);
 					}
 					else {
@@ -3731,6 +3732,8 @@ function initApp()  {
         if(!kta.resizes) kta.resizes = 1;
         app.Debug("window resize #"+kta.resizes);
         kta.resizes++;
+        // switch for next scaleDisplays
+        kta.onResize = true;
 
 		 if(TO !== false) clearTimeout(TO);
 		 TO = setTimeout(refreshall, 100);
