@@ -74,7 +74,6 @@ function kwd_setElementHtml(element,str) {
 	}
 }
 
-
 // class for global vars
 // kta = ...
 function KwdTachoApp() {
@@ -92,6 +91,7 @@ function KwdTachoApp() {
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.androidmode = false;
 	this.stage = '';     // 'basic'|'plus'|'premium'
+	this.kstage = null; // will be set with object
 	this.nojquery = false;
 	this.version = 1.51; // may be overwritten by value from kwdTachoVersion 
 	this.defaultMargin = 10;
@@ -236,9 +236,9 @@ function KwdTachoApp() {
 	if(kwdDebugMode!==undefined) this.debug = kwdDebugMode; // can also be == false
 	
 	switch(this.stage) {
-		case this.STAGE_BASIC : kstage = new KwdStageBasic(this); break;
-		case this.STAGE_PLUS :  kstage = new KwdStagePlus(this); break;
-		case this.STAGE_PREMIUM : kstage = new KwdStagePremimum(this); break;
+		case this.STAGE_BASIC : this.kstage = new KwdStageBasic(this); break;
+		case this.STAGE_PLUS :  this.kstage = new KwdStagePlus(this); break;
+		case this.STAGE_PREMIUM : this.kstage = new KwdStagePremimum(this); break;
 		default: throw  "no project stage defined";
 	}
 	
@@ -639,7 +639,7 @@ function KwdGpsTools () {
 
 	/* makes the correct speed value *only for output*
 	*/
-	function displaySpeedWithFactor(dspeed,dest_element) {
+	function displaySpeedWithFactor(dspeed,dest_element,specialtick_element) {
 		
 		dspeed *= speedfactor;
 		
@@ -653,6 +653,10 @@ function KwdGpsTools () {
 		}
 		else {
        		kwd_setElementHtml(dest_element,Math.round(dspeed)); // fast enough and must kill span if still there 	        	
+		}
+		
+		if(specialtick_element) {
+			gauge.setSpecialTickValue(specialtick_element,dspeed);
 		}
 		
 		return dspeed;
@@ -724,7 +728,7 @@ function KwdGpsTools () {
     		if(cas.n>0) average_speed = cas.sum  / cas.n;
 		} // refresh only
 		
-		displaySpeedWithFactor(average_speed, '.averagespeedtext'); // sets more than 1 elements, just like .speed 
+		displaySpeedWithFactor(average_speed, '.averagespeedtext',analogGaugeAverageTick); // sets more than 1 elements, just like .speed 
     };
     // disabled for later:
     /*
@@ -882,7 +886,7 @@ function KwdGpsTools () {
 			
             app.SaveNumber(storage_tachocurrentmax,maxspeed); // is called quite often shortly after reset but not more often than once a second
             app.SaveNumber(kta.storage.maxspeed_time,maxspeedtime); // is called quite often shortly after reset but not more often than once a second
-			displaySpeedWithFactor(maxspeed,'.maxspeedtext'); // ! hier *mit* . !
+			displaySpeedWithFactor(maxspeed,'.maxspeedtext',analogGaugeMaxTick); // ! hier *mit* . !
         }
         return maxspeed;
     };
@@ -2152,10 +2156,14 @@ function setTachoLayout() {
 		analogDisplays.showMaxAverage(false);
 		kwd_hideById('analog-speedstats-wrapper');
 		maxaverage_visible = false;
+		gauge.setSpecialTickVisibility(analogGaugeAverageTick,false);
+		gauge.setSpecialTickVisibility(analogGaugeMaxTick,false);		// IDEA: analogGaugeAverageTick.setVisibility(false);
 	}
 	else {
 		digitalSpeedDisplays.showMaxAverage(true);
 		analogDisplays.showMaxAverage(true);		
+		gauge.setSpecialTickVisibility(analogGaugeAverageTick,true);
+		gauge.setSpecialTickVisibility(analogGaugeMaxTick,true);
 		kwd_showById('digital-speedstats-wrapper');
 	}
 
@@ -2315,13 +2323,18 @@ function scaleDisplays(initial) {
     if (screen_w <  screen_h) {
        isLandscape = false;
        w = screen_w;
-       screen_longest = screen_h; 
+		screen_longest = screen_h; 
+	    // adapt banner size
+	    kta.kstage.changeAdBanner('100%',(screen_h*0.1)+'px');
     }
     else {
        isLandscape = true;
        w = h = screen_h;
        screen_longest = screen_w; 
+	    // adapt banner size
+	    kta.kstage.changeAdBanner('100%',(screen_h*0.2)+'px');
     }
+    
     
     var screen_analog = screen_longest / zoom_treshhold;
     
@@ -2951,11 +2964,18 @@ function initApp()  {
 	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div) -> setTimeout
 
     kta.tablet = app.IsTablet(); // returns boolean
+    if(kta.tablet) {
+    	document.getElementById('menubutton').style.display = 'block';	
+    }
+    
 	var debugstr = "";
-	if (kta.debug) debugstr += kta.stage + ' ';
-	if (kta.browsermode) debugstr += "browser ";
-	if (kta.androidmode) debugstr += "android-SDK ";
-	if (debugstr) document.getElementById('debuginfo').innerHTML = debugstr;
+	if (kta.debug) 
+	{
+		debugstr += kta.stage + ' ';
+		if (kta.browsermode) debugstr += "browser ";
+		if (kta.androidmode) debugstr += "android-SDK ";
+		document.getElementById('debuginfo').innerHTML = debugstr;
+	}
 	
 	
 	//DEBUG vs. release vs. Emulator & Test:
@@ -2965,7 +2985,15 @@ function initApp()  {
 	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
 	
-    
+    // hide DS note in androidmode
+    if(kta.androidmode) {
+    	var els = document.getElementsByClassName('droidscriptonly');
+    	if (els) {
+    		for (var i=0;i<els.length;i++) {
+    			els[i].style.display = 'none';
+    		}
+    	}
+    }
     //if(!kta.browsermode) kta.useSystemSize = true;
 	
 	// add the back arrows to dialogs ()
@@ -2975,9 +3003,17 @@ function initApp()  {
 		if((e.id != 'warningdialog') && (e.id != 'newsdialog')) {
 			e.firstElementChild.insertAdjacentHTML('afterbegin','<a href="#back" class="back-arrow"><span class="icon-left-big"></span></a>'); 
 		}
+		// re-style dialogs for tablet
+		/* not until tablet style is ready
+		 if(kta.tablet) {			
+			e.style.borderTopLeftRadius = '0';
+			e.style.borderBottomLeftRadius = '0';
+			e.style.borderLeftWidth = '0';
+		}*/
 	} 
 	
     // init gauge before first scaleDisplays!
+	// ! no more auto draw + scale on init gauge (only on later config!) 
     gauge = new CssGauge( {
 		'wrapper':'cssgauge-wrapper',
 		'gauge':'cssgauge',
@@ -2988,6 +3024,18 @@ function initApp()  {
 		'overallAngle':250, // degrees, better < 340
 		'value':0 // must be < max Range
 	});
+
+	// generate special ticks for gauge
+	analogGaugeMaxTick = gauge.addSpecialTick('#aa0000',0);
+	analogGaugeAverageTick = gauge.addSpecialTick('#A87E00',0);
+	gauge.draw();
+	gauge.setSpecialTickVisibility(analogGaugeMaxTick, false);
+	gauge.setSpecialTickVisibility(analogGaugeAverageTick, false);
+	gauge.scale();
+	gauge.setValue(0);
+	//gauge.initSpecialTicks(); // re-init values after re-draw()
+
+
 	
 	// TODO: enable again:-> add to displays list
 	// for testing in browser
@@ -3024,6 +3072,7 @@ function initApp()  {
 	digitalAverageSpeed = digitalSpeedDisplays.add('digital-average','--','average'); 
 	
 	displayDigitalspeed.setFirst(true);	
+
 	
 	// TODO: 10.11.2015 check if new problem
 	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
@@ -3060,7 +3109,7 @@ function initApp()  {
     if(settings.get('switchtime')==false) displayTime.hide(); else { layout_gauges++; startClock(); }
     if(settings.get('switchposition')==false) displayLocation.hide(); else layout_gauges++;
     // inside the stage function will be decided:
-    layout_gauges = kstage.accuracy.init(settings,'switchaccuracy',layout_gauges);
+    layout_gauges = kta.kstage.accuracy.init(settings,'switchaccuracy',layout_gauges);
     
     if(settings.get('switchaltitude')==false) displayAltitude.hide(); else layout_gauges++;
 	if(settings.get('switchhudsettings')===true) settings.switchit('switchhudsettings'); // auto saved will be overidden here, because all switchers are auto-saved
@@ -3401,10 +3450,10 @@ function initApp()  {
 	                break;
 				case 'switchaccuracy':
 					if(settings.get(check)===false) { // can be true|false|undefined
-						layout_gauges = kstage.accuracy.show(settings,check,layout_gauges);
+						layout_gauges = kta.kstage.accuracy.show(settings,check,layout_gauges);
 					}
 					else {
-						layout_gauges = kstage.accuracy.hide(settings,check,layout_gauges);
+						layout_gauges = kta.kstage.accuracy.hide(settings,check,layout_gauges);
 					}
 					doPosition = true;
 					break;
@@ -3414,14 +3463,14 @@ function initApp()  {
 	                {
 	                	// needed for android SDK which reads the href value
 	                	// to perform an action in the framework-app activity
-	                	// ! the on|off seem to be in the wrong { } block but they are correct
-	                	// ! because the SDK function will read it before this code is reached again (right when the touch  event is fired)
-	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_off");
+	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_on");
+	                	kta.kstage.changeAdBanner('','',false);
 	                }
 	                else 
 	                {
 	                	// need for android SDK which reads the href value
-	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_on");
+	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_off");
+	                	kta.kstage.changeAdBanner('','',true);
 	                }
 	            	break;
 	            case 'switchwarning':
@@ -3443,12 +3492,14 @@ function initApp()  {
 	                
 	                break;
 	            case 'switchautorange':
-	            	if(settings.get('tachoswitch')!=true) {
+	            	/*if(settings.get('tachoswitch')!=true) {
 	            		settings.switchit('tachoswitch');
+	            		layout_gauges++;
 	            		doPosition = true;
 	            	}
 	            	setTachoLayout();
-	                resetTachoRange("save",10);  // current minimum
+	                */
+	               resetTachoRange("save",10);  // current minimum
 	                showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
 	                break;
 	            case 'switchunits':
@@ -3634,14 +3685,14 @@ function initApp()  {
 						// TODO: only once when app starts
 						Android.callGPSSettings();
 					} 
-					break;	
+					break;
 					
 				case 'back-arrow':
 					OnBack();
 					break;					
 
 	            default: dodefault = true;
-	            break;
+	            	break;
 	        }
 	
 	        if (unittext) {

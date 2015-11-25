@@ -63,12 +63,25 @@ function StageBasic_Accuracy() {
 
 function KwdStageBasic() {
 	
+	/* changes size of ads banner
+	 * - in BASIC always turns off 
+	 */
+	this.changeAdBanner = function(x,y,onoff) {
+		var e = document.getElementById('add-banner');
+		if (e) {
+			e.style.display = 'none';
+		}
+	};
+
+
 	/* control accuracy display
 	 * 
 	 */
 	this.switchAccuracy = function(onoff) {
 		
 	};
+	
+	
 	
 	// construct
 	

@@ -64,6 +64,14 @@ http://blog.michelledinan.com/08/2012/drawing-triangles-with-css/
   height: 3px;
   background-color: #ff0000;
 }
+.g-specialtick {
+	width:30px;
+	height:7px;
+  -webkit-transition: 1s -webkit-transform linear;
+          transition: 1s transform linear;
+    -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
+}
 .g-minor {
 	width: 10px;
 	height:1px;

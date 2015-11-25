@@ -33,6 +33,9 @@ function CssGauge(init_settings) {
 	var previous_value = -1; // zum Vergleich (nicht zeichnen, wenn keine Änderung)
 	var scale = 0;
 	
+	var specialTicks = [];
+	
+	
 	// public
 	
 	/* passt die Größe dem umgebenden div (settings.wrapper) an
@@ -110,6 +113,7 @@ function CssGauge(init_settings) {
 		var step = parseFloat(settings.majorStep);
 		var majorcount = parseFloat(settings.maxRange) / step + 1;
 		
+		// note: try to make minors befor majors ! then you don't need z-index
 
 		// make minor ticks
 		var minorcount = parseInt(settings.minorTicks) * (majorcount -1);
@@ -128,8 +132,12 @@ function CssGauge(init_settings) {
 				'<div id="major'+i+'" class="g-item g-tick g-majortick"></div> <div id="tick'+i+'" class="g-item g-tickval"><div id="inner'+i+'" class="g-tickval-inner">'+i*step+'</div></div>');
 		}
 		
-		// TODO: try to make minors befor majors ! then you don't need z-index
-		
+		//generate special ticks
+		//extra style tag that overwrites css class settings 
+		for (var i=0;i<specialTicks.length;i++) {
+			tickscontainerRef.insertAdjacentHTML('beforeend',
+				'<div id="'+specialTicks[i].id+'" class="g-item g-specialtick" style="background-color:'+specialTicks[i].color+'"></div>');			
+		}
 		
 		// position major ticks
 		// to the left edge, vert. centered
@@ -152,7 +160,6 @@ function CssGauge(init_settings) {
 			'left': tickbordergap + 'px',
 			'transform-origin': (gauge_width/2-tickbordergap)+'px center 0'
 		});*/
-		
 		
 		// pre-position tick values
 		// left +3 is layout gap between stroke and number
@@ -237,6 +244,19 @@ function CssGauge(init_settings) {
 			});*/
 		}
 		
+		// init specialticks for rotation
+		// to the left edge, vert. centered
+		// the left edge is given by the html since border of gauge is outside
+		var tickbordergap = 0; // means px
+			
+		for(var i = 0;i < specialTicks.length;i++) {
+			var e  = document.getElementById(specialTicks[i].id);
+			e.style.top = (gauge_height/2-e.offsetHeight/2) + 'px';
+			e.style.left = tickbordergap + 'px';
+			e.style.webkitTransformOrigin = (gauge_width/2-tickbordergap)+'px center 0';
+			e.style.transformOrigin = (gauge_width/2-tickbordergap)+'px center 0';
+		}
+
 		initial = false;
 	}; // draw
 	
@@ -262,6 +282,106 @@ function CssGauge(init_settings) {
 		return false;
 	};
 	
+	/* adds a special tick object, which is kept also on config change
+	 * - sets color
+	 * - the special ticks is re-generated as well on draw() -- not generated in *here* !
+	 * - they can also be styled like other ticks
+	 * - ! it is not checked whether tick is already added before! - TODO: check this 
+	 */
+	this.addSpecialTick = function(color,initValue) {
+		
+		var newid = 'specialtick'+specialTicks.length+1;
+		
+		specialTicks.push({
+			'id' : newid,
+			'color' : color, // valid css color string
+			'value' : initValue,  
+			'visible' : true
+		});
+		
+		return newid;
+	};
+	
+	/* sets the tick position
+	 * - hides tick if out of range
+	 * - shows tick if previously hidden!
+	 * - animates change if defined by css
+	 * - TODO: set own value again, if newval not set
+	 * return: true: success, false: cannot set tick (out of range or other problem)
+	 */
+	this.setSpecialTickValue = function(indexorid,newval)
+	{
+		var i;
+		if(indexorid.indexOf('special')!=-1) {
+			for(i=0;i<specialTicks.length;i++)
+			{
+				if (specialTicks[i].id == indexorid)
+				{
+					var v = parseFloat(newval);
+					specialTicks[i].value = v;
+
+ 					if (specialTicks[i].visible == true) {
+
+						// i should be correct
+						if (i>=0 && i<specialTicks.length) {
+							// get DOM element
+							var el = document.getElementById(specialTicks[i].id);
+							if (el) {				
+								if (!settings || newval > settings.maxRange) {
+									el.style.display = 'none'; // hide
+								}
+								else {
+									el.style.display = 'block'; // make visible
+									// Berechnung wie bei major ticks!
+									var offset = v * angle_range_ratio + (zero_angle+90); // +90 since base position is left
+									el.style.webkitTransform = 'rotate('+offset+'deg)';
+									el.style.transform = 'rotate('+offset+'deg)';
+									return true;
+								}
+							}
+						}
+					}
+					break;
+				}
+			}
+		}
+		return false;
+	};
+	
+	this.setSpecialTickVisibility = function(id,onoff) {
+		
+		var i;
+		for(i=0;i<specialTicks.length;i++) {
+			if(specialTicks[i].id==id) {
+				
+				specialTicks[i].visible = onoff;
+				
+				var el = document.getElementById(id);
+				if (el) {
+					if (onoff && settings && specialTicks[i].value <= settings.maxRange) {
+						el.style.display = 'block';
+						this.setSpecialTickValue(id,specialTicks[i].value);
+					}
+					else {
+						el.style.display = 'none';
+					}
+				}
+				
+			}
+		}
+	};
+
+	/* inits the ticks with existing values (value, visible)
+	 * 
+	 */
+	this.initSpecialTicks = function() {
+		for (var i=0;i<specialTicks.length;i++) {
+			var tick = specialTicks[i];
+			if(tick.value) this.setSpecialTickValue(tick.id,tick.value);
+			this.setSpecialTickVisibility(tick.id,tick.visible);
+		}
+	};
+
 	/* vielleicht ist es auch einfacher, Einzelmethoden zu machen!!
 	   - erwartet Settings in Objekt-Notation
 	   - gibt aktuelle Settings zurück
@@ -269,7 +389,7 @@ function CssGauge(init_settings) {
 	   - ! setzt jedoch Wert nicht! 
 	   TODO: check values (e.g. relation majorStep to MinorTicks to maxRange)
 	*/
-	this.config = function(new_config) {
+	this.config = function(new_config,initial) {
 		if (typeof new_config == 'object') {
 			settings = new_config;
 			
@@ -283,19 +403,23 @@ function CssGauge(init_settings) {
 			angle_range_ratio = parseFloat(settings.overallAngle) / parseFloat(settings.maxRange); // loc. var for performance
 			zero_angle = - parseFloat(settings.overallAngle) / 2;
 			
-			this.draw();
-			this.scale();
+			if(!initial) {
+				this.draw();
+				this.scale();
+				this.initSpecialTicks(); // re-init values after re-draw()
+			}
 			previous_value = -1; // force value reset
 		}
 		return settings;		
 	};
 	
-	// construct
+
 	
+	// construct	
 	tickscontainerRef = document.getElementById('g-ticks-container');
 	if (typeof init_settings == "object") { 
-		this.config(init_settings);  // includes draw, and scale since initial
-		this.setValue(settings.value);
+		this.config(init_settings,true);  // includes draw, and scale since initial
+		//this.setValue(settings.value);
 		//if(this.setValue(0)==false)alert("schei");
 		//alert(this.config().maxRange);
 	}

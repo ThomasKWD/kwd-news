@@ -65,7 +65,11 @@ function DroidScriptApp () {
 		return 22; // is Android 5.1
 	};
 	this.IsTablet = function() {
-		return true;
+		var w = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		var h = window.innerHeight || document.documentElement.clientHeight	|| document.body.clientHeight;
+		var min = (w>h) ? h : w;
+		if (min >= 700) return true;
+		else return false;
 	};
 	this.EnableBackKey = function(mode) {
 		console.log('app.EnableBackKey:'+mode);
@@ -178,7 +182,7 @@ function kwdGeoLocator (options) {
 	 */
 	this.change = function() {
 		var r = Math.random();
-		r = r*5 - 2.5;
+		r = r*5 - 2;
 		// override random:
 		//r = 1;
 		

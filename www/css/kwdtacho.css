@@ -469,10 +469,17 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 #menubutton {
     position:absolute;
     top:0;
-    right:0;
+    left:0;
     font-size:2em;
-    padding:0.5em 0em 1em 1em;
+    padding:0.5em 1em 1em 0em;
     margin: 0 -0.25em 0 0;
+    display:none;
+}
+#menubuttonlink {
+	margin:0;
+	border-left-width:0;
+	border-top-left-radius:0;
+	border-bottom-left-radius:0;
 }
 #gpswarning {
     position:fixed;
@@ -631,6 +638,13 @@ für Skins addClass mit verschachtelten Klassen,
 	
 }
 
+
+#add-banner {
+	position:fixed;
+	width:100%;
+	height:auto;
+	bottom:0;
+}
 /*
 TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
 */

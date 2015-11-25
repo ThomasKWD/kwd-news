@@ -46,6 +46,26 @@ function StagePlus_Accuracy() {
 }
 
 function KwdStagePlus() {
+
+	/* changes size of ads banner
+	 * - values must be css strings e.g. '100px' or '50%'
+	 * - 0 value or empty string leads to no-change (don't use '0' as string)
+	 * - onoff: true: show, false: hide
+	 * 
+	 * TODO: provide parameter for timeout (turn off after milliseconds) - or use onoff parameter
+	 */
+	this.changeAdBanner = function(x,y,onoff) {
+		var e = document.getElementById('add-banner');
+		if (e) {
+			if (onoff===false) e.style.display = 'none';
+			else {
+				if (x) e.style.width = x;
+				if (y) e.style.height = y;
+				if (onoff) e.style.display = 'block'; // 2nd if because onoff can also be undefined
+			}			
+		}
+	};
+
 	
 	// construct
 	// TODO: make function general for displays 
