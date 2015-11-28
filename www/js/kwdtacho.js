@@ -109,7 +109,7 @@ function KwdTachoApp() {
 		maxspeed_time : 'tachomaxtime'
 	};
 	
-	this.setFastOptions = function(fast_on) {
+	this.setFastOptions = function(fast_on, showhints) {
 	
 		if (typeof fast_on == 'undefined') return; // also returns undefined!
 	
@@ -119,14 +119,14 @@ function KwdTachoApp() {
 		if(fast_on) {
 			elfas[0].classList.add('icon-lock-open');
 			elfas[0].classList.remove('icon-lock');
-			showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
+			if (showhints!==false) showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
 			this.fastoptions = true;
 			return true;
 		}
 		else {
 			elfas[0].classList.remove('icon-lock-open');			
 			elfas[0].classList.add('icon-lock');
-			showHint('Go to settings to change anything','Änderugnen nur in den Einstellungen');
+			if (showhints!==false) showHint('Go to settings to change meters','Änderungen nur in den Einstellungen');
 			this.fastoptions = false;
 			return false;
 		}
@@ -2842,18 +2842,18 @@ function setTachoUnits(newunits) {
 	gpstool.averageSpeed(0); // ==0 leads to refresh without changing the values
 }    
 
-function setAltimeterUnits(newunits) {
+function setAltimeterUnits(newunits,showhints) {
 	var txt = '';
 	var factor = 1;
 	if(newunits=='setalt-ft') {
 		txt = 'ft';
 		factor = 3.280839;
-		showHint('Feet','Fuß');
+		if (showhints!==false) showHint('Feet','Fuß');
 	}
 	else {
 		txt = 'm';
 		factor = 1;
-		showHint('Meters','Meter');
+		if (showhints!==false) showHint('Meters','Meter');
 	}
 	gpstool.altitudeFactor(factor);
 	
@@ -3118,9 +3118,6 @@ function initApp()  {
 		kwd_hideById('seconds-text'); //$('#seconds-text').hide();
 		kta.clockseconds = false;
 	}             
-	if (settings.get('switchfastoptions')==false) {
-		kta.setFastOptions(false);
-	}
 
 	
 	var skin;
@@ -3131,6 +3128,9 @@ function initApp()  {
 	
 	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
         
+	if (settings.get('switchfastoptions')==false) {
+		kta.setFastOptions(false,false); // 2nd false: don't show any Messages
+	}
 
 
     //settings.init('backkey',true); // init bewirkt, dass true nur gesetzt wird, wenn es nicht geladen werden konnte
@@ -3142,7 +3142,7 @@ function initApp()  {
 
 	var units = 'setalt-m';
 	if(settings.get('setalt-ft')) units = 'setalt-ft';
-	setAltimeterUnits(units);
+	setAltimeterUnits(units,false); // false: don't show any Messages
 	units = 'kmh';
 	if(settings.get('setmph')) units = 'mph';
 	else if(settings.get('setms')) units = 'ms';

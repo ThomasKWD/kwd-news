@@ -3,8 +3,9 @@
 
 function DroidScriptApp () {
     //private:
-    debug_on = true;
-	popuptimeout = false;
+    var debug_on = true;
+	var popup_timeout = false;
+	var popup_element = 'toastmessage';
 	
 	this.kwd_droidscript_emulator = true; // to check in contrast to real DroidScript
 	
@@ -21,14 +22,17 @@ function DroidScriptApp () {
 	};
 	
 	this.clearPopup = function() {
-		//$('.toastmessage').fadeOut(400);
+		var el = document.getElementById(popup_element);
+		el.style.display = 'none';
+
 	};
 	this.ShowPopup = function(msg) {
-		//if(popuptimeout!==false) clearTimeout(popuptimeout);
+		if(popup_timeout!==false) clearTimeout(popup_timeout);
 		this.Debug("popup: "+msg);
-		//$('.toastmessage').text(msg);
-		//$('.toastmessage').show();
-		//setTimeout(this.clearPopup,5000);
+		var el = document.getElementById(popup_element);
+		el.style.display = 'block';
+		el.innerHTML = msg;
+		popup_timeout = setTimeout(this.clearPopup,5000);
 	};
 	
 	/* return the probable correct value of screen orientation
