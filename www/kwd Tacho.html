@@ -451,11 +451,12 @@
 		<a id="switchkeepaveragespeed" class="switcher" href="#"><span class="fa-black icon-ok"></span><span lang="de">Nicht mehr anzeigen</span><span lang="en">Don't show again</span></a>				
 	</div>
 	
-	<div id="explainswitchdialog" class="dialog sub-dialog infodialog skin">
+	<div id="explainswitchdialog" class="dialog sub-dialog infodialog skin yesnodialog">
 		<h3><span lang="en">Dialogs and Warnings</span><span lang="de">Abfragen und Warnungen</span></h3>
-		<p lang="en">All warnings and other dialogs that have been turned off by "Don't show again", will be turned on again now.</p>
+		<p lang="en">All warnings and dialogs that have been turned off by "Don't show again", will be turned on again now.</p>
 		<p lang="de">Alle Abfragen und Warnungen, die zuvor mit "Nicht mehr anzeigen" ausgeschaltet wurden, werden wieder eingeschaltet.</p>
-		<a class="btn btn-cancel" href="#cancel"><span lang="en">Continue</span><span lang="de">Weiter</span></a>
+		<a class="btn btn-cancel" href="#cancel"><span lang="en">Cancel</span><span lang="de">Abbrechen</span></a>
+		<a class="btn btn-yes" href="#confirmresetexplaindialogs"><span lang="en">On again</span><span lang="de">Wieder ein</span></a>
 	</div>
 	
 	<div id="nobasicdialog" class="dialog sub-dialog infodialog yesnodialog skin">
@@ -469,7 +470,7 @@
 	<!--only available in androidmode -->
 		<div id="nogpsdialog" class="dialog sub-dialog infodialog yesnodialog skin">
 		<h3><span lang="en">No GPS</span><span lang="de">Kein GPS</span></h3>
-		<p lang="en">In your device GPS is not on. You will need this to display speed. Turn it on now?</p>
+		<p lang="en">Your device's GPS is not turned on. Turn it on now to display speed?</p>
 		<p lang="de">GPS ist derzeit aus in ihrem Gerät. Dies benötigen Sie, um Geschwindigkeit anzuzeigen. Jetzt einschalten?</p>
 		<a class="btn btn-cancel" href="#cancel"><span lang="en">Cancel</span><span lang="de">Abrrechen</span></a>
 		<a class="btn btn-yes" href="#confirmturngpson"><span lang="en">Turn on GPS</span><span lang="de">GPS Einschalten</span></a>

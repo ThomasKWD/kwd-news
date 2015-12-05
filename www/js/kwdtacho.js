@@ -86,7 +86,6 @@ function KwdTachoApp() {
 	// public members
 	this.language = 'en';
 	this.tachounit = 'kmh';
-	this.fastoptions = true;
 	this.clockseconds = true;
 	this.browsermode = false; // true: run in browser with 'emulator'(droidscript.js)
 	this.androidmode = false;
@@ -108,28 +107,44 @@ function KwdTachoApp() {
 		average_no_groups : 'tachoaveragenogroups',
 		maxspeed_time : 'tachomaxtime'
 	};
+
+	// private members
+	var fastoptions = true;
+
+	// TODO: function for hud!!
 	
-	this.setFastOptions = function(fast_on, showhints) {
-	
-		if (typeof fast_on == 'undefined') return; // also returns undefined!
-	
-		var elfas = (document.getElementById('switchfastoptions')).getElementsByClassName('fa');
-		if (elfas.length !=1) throw '>1 .fa inside #switchfastoptions';
-	
-		if(fast_on) {
-			elfas[0].classList.add('icon-lock-open');
-			elfas[0].classList.remove('icon-lock');
-			if (showhints!==false) showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
-			this.fastoptions = true;
-			return true;
+	/* - gives the current fast-option state when first param undefined
+	 * - also depending on state of hud-mode (hud: true |false)
+	 * - sets fastoption with first param fast_on
+	 * - 2nd param showhints is useful for calling this function on app init
+	 */
+	this.fastOptions = function(fast_on, showhints)
+	{
+		if (fast_on !== undefined)
+		{
+			var elfas = (document.getElementById('switchfastoptions')).getElementsByClassName('fa');
+			if (elfas.length !=1) throw '>1 .fa inside #switchfastoptions';
+		
+			if(fast_on) {
+				elfas[0].classList.add('icon-lock-open');
+				elfas[0].classList.remove('icon-lock');
+				if (showhints!==false) showHint('Touch meters to change','Auf Anzeigen tippen für Umschaltungen');
+				fastoptions = true;
+				return true;
+			}
+			else {
+				elfas[0].classList.remove('icon-lock-open');			
+				elfas[0].classList.add('icon-lock');
+				if (showhints!==false) showHint('Go to settings to change meters','Änderungen nur in den Einstellungen');
+				fastoptions = false;
+				return false;
+			}
 		}
-		else {
-			elfas[0].classList.remove('icon-lock-open');			
-			elfas[0].classList.add('icon-lock');
-			if (showhints!==false) showHint('Go to settings to change meters','Änderungen nur in den Einstellungen');
-			this.fastoptions = false;
-			return false;
-		}
+
+		// *always* return current (new) state:
+		if (gpstool && gpstool.isHud()) return false;
+		if (!fastoptions) return false;
+		return true;
 	};
 	
 	/* setzt die gewünschte Skin
@@ -2956,6 +2971,364 @@ function getCurrentSpeedUnits() {
 }
 
 
+function processTouchEvent(element) { 
+	
+		// Nachdem spezielle Abfragen/Anpassungen, id für switcher/button gleichsetzen
+		var check = element.kwdSwitcherId || element.kwdButtonId || element.kwdDisplayId;
+		if(!check) 
+		{
+			// name for general click
+			check = "undetermined_touch"; 
+		}
+
+		// all menu items are handled here too
+
+    	resetMenuFade();  // TODO: nicht bei kwdDisplayId
+    	var dodefault = false; // assume to find an entry *here*
+        var doPosition = false;
+        var unittext = '';
+        	        
+        switch (check) {
+        	case 'setlanguage':
+		    	if (kta.language=='de') {
+		    		setLanguage('en');
+		    		showHint ('Erneut tippen für Deutsch');
+		    	}
+		    	else {
+		    		setLanguage('de');
+		    		showHint ('Touch again for English');
+		    	}
+		    	app.SaveText(kta.storage.language,kta.language); // new val already in kta.language
+		        break;
+        	case 'moresettings':
+		        menustack.push('moresettingsdialog');
+        		break;
+        	case 'showinfo':
+		        menustack.push('infocard');
+		        break;
+		    case 'tachosettings':
+    	        menustack.push('tachosettingsdialog');
+    	        break;
+    	    case 'altitudesettings':
+		        menustack.push('altitudeunitsettings');
+    	        break;
+            case 'tachoswitch' :
+            	if(settings.get(check)==false) {
+            		layout_gauges ++;
+            	}      
+            	else layout_gauges --;
+                settings.switchit(check);
+                setTachoLayout();            	
+                doPosition = true;
+            	break;
+            case 'digitalanalog':     	
+            case 'digital' :
+            case 'analog' :
+            	settings.radio('radio',check);
+            	if(settings.get('tachoswitch')!=true) settings.switchit('tachoswitch'); // always activate tacho as well
+                setTachoLayout();            	
+                doPosition=true;
+                break;
+            case 'switchtime':
+                if(settings.switchit(check)) {
+                	displayTime.show();
+                	layout_gauges++ ;
+                	startClock();
+                }
+                else {
+                	displayTime.hide();
+                	layout_gauges--;
+                	stopClock();
+                }
+                doPosition = true;
+                break;
+            case 'switchaltitude':
+                
+                if(settings.switchit(check)) {
+                	displayAltitude.show();
+                	layout_gauges++ ;
+                }
+                else {
+                	displayAltitude.hide();
+                	layout_gauges--;
+                }
+                doPosition = true;
+                break;
+            case 'switchposition':
+                if(settings.switchit(check)) {
+                	displayLocation.show();
+                	layout_gauges++ ;
+                }
+                else {
+                	displayLocation.hide();
+	                layout_gauges--;
+                } 
+                doPosition = true;
+                break;
+			case 'switchaccuracy':
+				if(settings.get(check)===false) { // can be true|false|undefined
+					layout_gauges = kta.kstage.accuracy.show(settings,check,layout_gauges);
+				}
+				else {
+					layout_gauges = kta.kstage.accuracy.hide(settings,check,layout_gauges);
+				}
+				doPosition = true;
+				break;
+            case 'switchhudsettings':
+           		gpstool.switchHud();
+                if(settings.switchit(check))
+                {
+                	// needed for android SDK which reads the href value
+                	// to perform an action in the framework-app activity
+                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_on");
+                	kta.kstage.changeAdBanner('','',false);
+                }
+                else 
+                {
+                	// need for android SDK which reads the href value
+                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_off");
+                	kta.kstage.changeAdBanner('','',true);
+                }
+            	break;
+            case 'switchwarning':
+                if (settings.switchit(check)) {
+                    displayHints = true;
+	                showHint('All notes active','Alle Hinweise aktiviert.');
+	                if(kta.debug) 	{
+						if(!kta.mydebug) kta.mydebug = app.CreateDebug();
+						app.ShowDebug(true);
+					}
+                }
+                else {
+                  showHint('All notes disabled','Alle Hinweise deaktiviert.');
+				  displayHints = false;
+	                if(kta.debug) 	{
+						app.ShowDebug(false);
+					}					  
+				}  
+                
+                break;
+            case 'switchautorange':
+            	/*if(settings.get('tachoswitch')!=true) {
+            		settings.switchit('tachoswitch');
+            		layout_gauges++;
+            		doPosition = true;
+            	}
+            	setTachoLayout();
+                */
+               resetTachoRange("save",10);  // current minimum
+                showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
+                break;
+            case 'switchunits':
+            	menustack.push('unitsettings');
+				break;
+            case 'setkmh': unittext = 'kmh'; break;      	
+            case 'setmph': unittext = 'mph'; break;    	
+            case 'setms':  unittext = 'ms'; break;   	
+            case 'setkn':  unittext = 'kn'; break;   	
+            case 'switchfastoptions':
+            	settings.switchit(check);
+     			kta.fastOptions(!kta.fastOptions()); // = toggle
+            	break;
+            case 'dona-tachounit':
+            case 'kmh-digital':
+				if (kta.fastOptions()) {
+					var newunit = 'kmh';
+					if(settings.get('setkmh')) newunit = 'mph';
+					if(settings.get('setmph')) newunit = 'kn';
+					if(settings.get('setkn')) newunit = 'ms';
+					setTachoUnits(newunit);
+					settings.radio('unitradio','set'+newunit);
+				}
+				else dodefault = true;					
+            	break;
+            	
+			case 'tacho-container' :
+		    	if(kta.fastOptions() && settings.get('tachoswitch')!=false) {
+		    		var next;
+		    		if (settings.get('digitalanalog')!=false) next = 'digital';
+		    		else if (settings.get('digital')!=false) next = 'analog';
+		    		else next = 'digitalanalog';
+		    			
+			       	settings.radio('radio',next);
+			        setTachoLayout();            	
+			        doPosition = true;
+			        switch(next) {
+			        	case 'digitalanalog':showHint('Touch again for Digital display','Erneut Tippen für Digital'); break;
+			        	case 'digital': showHint('Touch again for Analog display','Erneut Tippen für Analog'); break;
+			        	case 'analog': showHint('Touch again for both displays','Erneut Tippen für Digital + Analog'); break;
+			        }
+		    	} else dodefault = true;
+		    	
+		    	break; 
+            	
+            	
+            case 'm-alt':
+            	if (kta.fastOptions()) {
+					if(settings.get('setalt-ft')) check = 'setalt-m'; // TODO: getter of set element of a radio group
+	            	else check = 'setalt-ft';
+	            }
+	            else {
+	            	dodefault = true;
+	            	break; // break nur im else und nicht unten!
+	            }
+            case 'setalt-ft':
+            case 'setalt-m':
+            	settings.radio('altunits',check);
+            	setAltimeterUnits(check);
+            	//OnBack();
+            	break;
+            case 'geoaltitude':
+            	var au = 'm';
+            	if (settings.get('setalt-ft')) au = 'ft';
+				showHint('Altitude in '+au,'Höhe in '+au);
+            	break;
+			case 'time': 
+				// teste if + break!
+				if (!kta.fastOptions()) break;
+			case 'settimeformat':
+				kwd_setTimeFormat(); // TODO: repeat function with *menu entry* for case fast_options == off
+				break;
+			case 'geolocation':
+			    if(kta.fastOptions()) {    		
+			        if(gpstool.switchLocFormat()=='decimal') 
+			        	showHint('Touch again for degree values','Tippen für Grad-Anzeige');
+			        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
+		    	}
+				break;
+			// all dismissable dialogs
+            case 'switchnews3':
+            case 'switchredwarning':
+            case 'switchkeepmaxspeed':
+            case 'switchkeepaveragespeed':
+            	settings.switchit(check);
+            	break;
+            case 'switchdialogs':
+        		menustack.push('explainswitchdialog');
+            	break;
+            case 'resetmaxspeed':
+				menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
+				break;
+            case 'resetaveragespeed':
+				menustack.push('askresetaveragespeed',true); // TODO: error when second param not yet used?
+				break;
+			case 'switchskins':
+				menustack.push('skinsettingsdialog');
+				break;
+			case 'setskin-default':
+			case 'setskin-glass':
+			case 'setskin-subtle':
+            	settings.radio('skinradio',check);				
+				kta.setSkin(check);					
+				break;
+			case 'averagespeed':
+			case 'digital-average':
+				// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
+				var u = getCurrentSpeedUnits();
+				showHint('Average speed ('+u+')','Durchschnittliche Geschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
+				break;
+			case 'maxspeed':
+			case 'digital-max':
+				var u = getCurrentSpeedUnits();
+				// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
+				showHint('Last maximal speed ('+u+')','Letzte Höchstgeschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
+				break;
+			case 'switchmaxaverage' :					
+				if(settings.switchit(check)) {
+					showHint('Max and average value on',' Max- und Mittelwert an');
+				}
+				else {
+					showHint('Max and average value off',' Max- und Mittelwert aus');
+				}
+				setTachoLayout();
+				
+				doPosition = true;
+				/* ALT					 
+				if(settings.switchit(check)) {
+					// on
+					digitalSpeedDisplays.showMaxAverage(true);
+					analogDisplays.showMaxAverage(true);
+				}
+				else {
+					// off
+					digitalSpeedDisplays.showMaxAverage(false);
+					analogDisplays.showMaxAverage(false);
+				}
+				*/
+				break;				
+
+			// .btn
+			
+            case '#exit' : Quit(); break;
+            case '#cancel' : OnBack(); break; 
+            case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
+            case '#info' :
+                menustack.push('infocard');
+                //app.ShowDebug(false);
+                break;
+			case '#warningcont' :
+				// TODO: check if another menu COULD come in between!
+				OnBack();
+				break;
+			case '#confirmresetmaxspeed' : 				
+				gpstool.maxSpeed(0,true); 
+				showHint('Maximum speed cleared','Höchstgeschwindigkeit gelöscht');
+				OnBack();
+				break;				
+			case '#confirmresetlastmaxspeed' : 
+				// bring up confirm dialog				
+				OnBack();
+				menustack.push('askresetmaxspeed');
+				break;				
+			case '#confirmresetaveragespeed' : 				
+				gpstool.clearAverage();
+				showHint('Average speed cleared','Mittlere Geschwindigkeit gelöscht');
+				OnBack();
+				break;
+			case '#confirmresetlastaveragespeed' : 
+				// bring up confirm dialog				
+				OnBack();
+				menustack.push('askresetaveragespeed');
+				break;				
+			// only android 
+			case '#confirmturngpson' :
+				if(kta.androidmode) // is redundant
+				{
+					// TODO: only once when app starts
+					Android.callGPSSettings();
+				} 
+				break;
+			case '#confirmresetexplaindialogs':
+	            settings.switchit('switchnews3',false);
+   	            settings.switchit('switchredwarning',false);
+   	            settings.switchit('switchkeepmaxspeed',false);
+   	            settings.switchit('switchkeepaveragespeed',false);
+				break; 
+				
+			case 'back-arrow':
+				OnBack();
+				break;					
+
+            default: dodefault = true;
+            	break;
+        }
+
+        if (unittext) {
+        	// TODO: eleganter: set von 'check' abschneiden und Aufruf (siehe setAltimeterUnits())
+        	settings.radio('unitradio',check);
+        	setTachoUnits(unittext);
+        	//OnBack(); // proceed like Android select menu
+        }
+        else if(doPosition) {
+        	scaleDisplays();
+        	positionDisplays();
+		}
+        // always (cases are checked inside functions)
+		startGps();        
+		
+		return dodefault;
+}
+
 /* vereint alle Programmstartfunktionen
 (sinn siehe caller)
 */
@@ -3129,7 +3502,7 @@ function initApp()  {
 	setLanguage(app.LoadText(kta.storage.language,'auto')); // auto bis einmal gesetzt, dann immer definiert
         
 	if (settings.get('switchfastoptions')==false) {
-		kta.setFastOptions(false,false); // 2nd false: don't show any Messages
+		kta.fastOptions (false,false); // 2nd false: don't show any Messages
 	}
 
 
@@ -3261,7 +3634,7 @@ function initApp()  {
 	// - need listener for touchstart AND touchend (otherwise you can destroy or disturb scrolling in browser )
 	var wrapel = document.getElementById('touch-wrapper');
 	
-	// - on touchstart we save the evnt if it is interesting to us
+	// - on touchstart we save the event if it is interesting to us
 	// - we only need to know whether the x/y has changed
 	// - also could deny, if event is already under way
 	// - we also color the menuitem manually if given
@@ -3328,13 +3701,20 @@ function initApp()  {
 		return true;
 	});
 	
+    if(wrapel) wrapel.addEventListener('touchmove',function(evt) {
+    	// TODO: allow move in a small range as long as touchstart-target not left
+    	
+		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+    	this.kwdCancelTouch  = true;
+      	return true;
+    });
+	
+	
 	// todo: man könnte element-id bei touchstart speichern, und hier nur noch einen großen switch
 	if (wrapel) wrapel.addEventListener('touchend',function(evt) {
 		
 		if (this.kwdCancelTouch) 
 			return true;
-
-		var dodefault = true;
 
 /*		if(this.kwdSwitcherId) 
 			document.getElementById(this.kwdSwitcherId).style.backgroundColor = 'transparent';
@@ -3357,357 +3737,8 @@ function initApp()  {
 			}
 		} */
 
-	
-		// TODO: Nachdem spezielle Abfragen/Anpassungen, id für switcher/button gleichsetzen
-		var check = this.kwdSwitcherId || this.kwdButtonId || this.kwdDisplayId;
-		if(!check) return true;
-		
 
-		if(check) {
-			// NEW: all menu items are handled here too
-
-	    	resetMenuFade();  // TODO: nicht bei kwdDisplayId
-	    	dodefault = false; // assume to find an entry *here*
-	        var doPosition = false;
-	        var unittext = '';
-	        	        
-	        switch (check) {
-	        	case 'setlanguage':
-			    	if (kta.language=='de') {
-			    		setLanguage('en');
-			    		showHint ('Erneut tippen für Deutsch');
-			    	}
-			    	else {
-			    		setLanguage('de');
-			    		showHint ('Touch again for English');
-			    	}
-			    	app.SaveText(kta.storage.language,kta.language); // new val already in kta.language
-			        break;
-	        	case 'moresettings':
-			        menustack.push('moresettingsdialog');
-	        		break;
-	        	case 'showinfo':
-			        menustack.push('infocard');
-			        break;
-			    case 'tachosettings':
-	    	        menustack.push('tachosettingsdialog');
-	    	        break;
-	    	    case 'altitudesettings':
-			        menustack.push('altitudeunitsettings');
-	    	        break;
-	            case 'tachoswitch' :
-	            	if(settings.get(check)==false) {
-	            		layout_gauges ++;
-	            	}      
-	            	else layout_gauges --;
-	                settings.switchit(check);
-	                setTachoLayout();            	
-	                doPosition = true;
-	            	break;
-	            case 'digitalanalog':     	
-	            case 'digital' :
-	            case 'analog' :
-	            	settings.radio('radio',check);
-	            	if(settings.get('tachoswitch')!=true) settings.switchit('tachoswitch'); // always activate tacho as well
-	                setTachoLayout();            	
-	                doPosition=true;
-	                break;
-	            case 'switchtime':
-	                if(settings.switchit(check)) {
-	                	displayTime.show();
-	                	layout_gauges++ ;
-	                	startClock();
-	                }
-	                else {
-	                	displayTime.hide();
-	                	layout_gauges--;
-	                	stopClock();
-	                }
-	                doPosition = true;
-	                break;
-	            case 'switchaltitude':
-	                
-	                if(settings.switchit(check)) {
-	                	displayAltitude.show();
-	                	layout_gauges++ ;
-	                }
-	                else {
-	                	displayAltitude.hide();
-	                	layout_gauges--;
-	                }
-	                doPosition = true;
-	                break;
-	            case 'switchposition':
-	                if(settings.switchit(check)) {
-	                	displayLocation.show();
-	                	layout_gauges++ ;
-	                }
-	                else {
-	                	displayLocation.hide();
-		                layout_gauges--;
-	                } 
-	                doPosition = true;
-	                break;
-				case 'switchaccuracy':
-					if(settings.get(check)===false) { // can be true|false|undefined
-						layout_gauges = kta.kstage.accuracy.show(settings,check,layout_gauges);
-					}
-					else {
-						layout_gauges = kta.kstage.accuracy.hide(settings,check,layout_gauges);
-					}
-					doPosition = true;
-					break;
-	            case 'switchhudsettings':
-	           		gpstool.switchHud();
-	                if(settings.switchit(check))
-	                {
-	                	// needed for android SDK which reads the href value
-	                	// to perform an action in the framework-app activity
-	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_on");
-	                	kta.kstage.changeAdBanner('','',false);
-	                }
-	                else 
-	                {
-	                	// need for android SDK which reads the href value
-	                	document.getElementById('switchhudsettings').setAttribute('href', "#switchhud_off");
-	                	kta.kstage.changeAdBanner('','',true);
-	                }
-	            	break;
-	            case 'switchwarning':
-	                if (settings.switchit(check)) {
-	                    displayHints = true;
-		                showHint('All notes active','Alle Hinweise aktiviert.');
-		                if(kta.debug) 	{
-							if(!kta.mydebug) kta.mydebug = app.CreateDebug();
-							app.ShowDebug(true);
-						}
-	                }
-	                else {
-	                  showHint('All notes disabled','Alle Hinweise deaktiviert.');
-					  displayHints = false;
-		                if(kta.debug) 	{
-							app.ShowDebug(false);
-						}					  
-					}  
-	                
-	                break;
-	            case 'switchautorange':
-	            	/*if(settings.get('tachoswitch')!=true) {
-	            		settings.switchit('tachoswitch');
-	            		layout_gauges++;
-	            		doPosition = true;
-	            	}
-	            	setTachoLayout();
-	                */
-	               resetTachoRange("save",10);  // current minimum
-	                showHint('Speedometer auto range reset','Auto-Bereich zurückgesetzt');
-	                break;
-	            case 'switchunits':
-	            	menustack.push('unitsettings');
-					break;
-	            case 'setkmh': unittext = 'kmh'; break;      	
-	            case 'setmph': unittext = 'mph'; break;    	
-	            case 'setms':  unittext = 'ms'; break;   	
-	            case 'setkn':  unittext = 'kn'; break;   	
-	            case 'switchfastoptions':
-	            	settings.switchit(check);
-         			kta.setFastOptions(!kta.fastoptions); // = toggle
-	            	break;
-	            case 'dona-tachounit':
-	            case 'kmh-digital':
-					if (kta.fastoptions) {
-						var newunit = 'kmh';
-						if(settings.get('setkmh')) newunit = 'mph';
-						if(settings.get('setmph')) newunit = 'kn';
-						if(settings.get('setkn')) newunit = 'ms';
-						setTachoUnits(newunit);
-						settings.radio('unitradio','set'+newunit);
-					}
-					else dodefault = true;					
-	            	break;
-	            	
-				case 'tacho-container' :
-			    	if(kta.fastoptions && settings.get('tachoswitch')!=false) {
-			    		var next;
-			    		if (settings.get('digitalanalog')!=false) next = 'digital';
-			    		else if (settings.get('digital')!=false) next = 'analog';
-			    		else next = 'digitalanalog';
-			    			
-				       	settings.radio('radio',next);
-				        setTachoLayout();            	
-				        doPosition = true;
-				        switch(next) {
-				        	case 'digitalanalog':showHint('Touch again for Digital display','Erneut Tippen für Digital'); break;
-				        	case 'digital': showHint('Touch again for Analog display','Erneut Tippen für Analog'); break;
-				        	case 'analog': showHint('Touch again for both displays','Erneut Tippen für Digital + Analog'); break;
-				        }
-			    	} else dodefault = true;
-			    	
-			    	break; 
-	            	
-	            	
-	            case 'm-alt':
-	            	if (kta.fastoptions) {
-						if(settings.get('setalt-ft')) check = 'setalt-m'; // TODO: getter of set element of a radio group
-		            	else check = 'setalt-ft';
-		            }
-		            else {
-		            	dodefault = true;
-		            	break; // break nur im else und nicht unten!
-		            }
-	            case 'setalt-ft':
-	            case 'setalt-m':
-	            	settings.radio('altunits',check);
-	            	setAltimeterUnits(check);
-	            	//OnBack();
-	            	break;
-	            case 'geoaltitude':
-	            	var au = 'm';
-	            	if (settings.get('setalt-ft')) au = 'ft';
-					showHint('Altitude in '+au,'Höhe in '+au);
-	            	break;
-				case 'time': 
-					// teste if + break!
-					if (!kta.fastoptions) break;
-				case 'settimeformat':
-					kwd_setTimeFormat(); // TODO: repeat function with *menu entry* for case fast_options == off
-					break;
-				case 'geolocation':
-				    if(kta.fastoptions) {    		
-				        if(gpstool.switchLocFormat()=='decimal') 
-				        	showHint('Touch again for degree values','Tippen für Grad-Anzeige');
-				        else showHint('Touch again for decimal values','Tippen für Dezimal-Anzeige');
-			    	}
-    				break;
-    			// all dismissable dialogs
-	            case 'switchnews3':
-   	            case 'switchredwarning':
-   	            case 'switchkeepmaxspeed':
-   	            case 'switchkeepaveragespeed':
-	            	settings.switchit(check);
-	            	break;
-	            case 'switchdialogs':
-            		menustack.push('explainswitchdialog');
-		            settings.switchit('switchnews3',false);
-	   	            settings.switchit('switchredwarning',false);
-	   	            settings.switchit('switchkeepmaxspeed',false);
-	   	            settings.switchit('switchkeepaveragespeed',false);
-	            	break;
-	            case 'resetmaxspeed':
-					menustack.push('askresetmaxspeed',true); // TODO: error when second param not yet used?
-					break;
-	            case 'resetaveragespeed':
-					menustack.push('askresetaveragespeed',true); // TODO: error when second param not yet used?
-					break;
-				case 'switchskins':
-					menustack.push('skinsettingsdialog');
-					break;
-				case 'setskin-default':
-				case 'setskin-glass':
-				case 'setskin-subtle':
-	            	settings.radio('skinradio',check);				
-					kta.setSkin(check);					
-					break;
-				case 'averagespeed':
-				case 'digital-average':
-					// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
-					var u = getCurrentSpeedUnits();
-					showHint('Average speed ('+u+')','Durchschnittliche Geschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
-					break;
-				case 'maxspeed':
-				case 'digital-max':
-					var u = getCurrentSpeedUnits();
-					// scheint zu funktionieren, da von innen nach außem Event gefunden :-)
-					showHint('Last maximal speed ('+u+')','Letzte Höchstgeschwindigkeit ('+u+')'); // TODO: start Zeit (seit letztem Reset) angeben
-					break;
-				case 'switchmaxaverage' :
-					// NEU:
-					if(settings.switchit(check)) {
-						// TODO: show hint
-					}
-					else {
-						// TODO: show hint						
-					}
-					setTachoLayout();
-					
-					doPosition = true;
-					/* ALT					 
-					if(settings.switchit(check)) {
-						// on
-						digitalSpeedDisplays.showMaxAverage(true);
-						analogDisplays.showMaxAverage(true);
-					}
-					else {
-						// off
-						digitalSpeedDisplays.showMaxAverage(false);
-						analogDisplays.showMaxAverage(false);
-					}
-					*/
-					break;				
-
-				// .btn
-				
-	            case '#exit' : Quit(); break;
-	            case '#cancel' : OnBack(); break; 
-	            case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
-	            case '#info' :
-	                menustack.push('infocard');
-	                //app.ShowDebug(false);
-	                break;
-				case '#warningcont' :
-					// TODO: check if another menu COULD come in between!
-					OnBack();
-					break;
-				case '#confirmresetmaxspeed' : 				
-					gpstool.maxSpeed(0,true); 
-					showHint('Maximum speed cleared','Höchstgeschwindigkeit gelöscht');
-					OnBack();
-					break;				
-				case '#confirmresetlastmaxspeed' : 
-					// bring up confirm dialog				
-					OnBack();
-					menustack.push('askresetmaxspeed');
-					break;				
-				case '#confirmresetaveragespeed' : 				
-					gpstool.clearAverage();
-					showHint('Average speed cleared','Mittlere Geschwindigkeit gelöscht');
-					OnBack();
-					break;
-				case '#confirmresetlastaveragespeed' : 
-					// bring up confirm dialog				
-					OnBack();
-					menustack.push('askresetaveragespeed');
-					break;				
-				// only android 
-				case '#confirmturngpson' :
-					if(kta.androidmode) // is redundant
-					{
-						// TODO: only once when app starts
-						Android.callGPSSettings();
-					} 
-					break;
-					
-				case 'back-arrow':
-					OnBack();
-					break;					
-
-	            default: dodefault = true;
-	            	break;
-	        }
-	
-	        if (unittext) {
-	        	// TODO: eleganter: set von 'check' abschneiden und Aufruf (siehe setAltimeterUnits())
-	        	settings.radio('unitradio',check);
-	        	setTachoUnits(unittext);
-	        	//OnBack(); // proceed like Android select menu
-	        }
-	        else if(doPosition) {
-	        	scaleDisplays();
-	        	positionDisplays();
-			}
-	        // always (cases are checked inside functions)
-			startGps();        
-		} // end of switchers + buttons
+		var dodefault = processTouchEvent(this);
 		
 		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
 		
@@ -3719,12 +3750,46 @@ function initApp()  {
 		return true;
 	}); 
     
-    if(wrapel) wrapel.addEventListener('touchmove',function(evt) {
-    	
+    // equal to 'touchend'
+    // for cases 'touchend' is not triggered at all in some cases
+	if (wrapel) wrapel.addEventListener('touchcancel',function(evt) {
+		
+		if (this.kwdCancelTouch) 
+			return true;
+
+/*		if(this.kwdSwitcherId) 
+			document.getElementById(this.kwdSwitcherId).style.backgroundColor = 'transparent';
+		/*if(this.kwdButtonId && this.kwdButtonId != 'back-arrow') {
+			// Schleife über alle Buttons, da keine Button id verfügbar!!
+			var els = document.getElementsByClassName('.btn');
+			if (els) for(var i = els.length-1; i >= 0; i-- ) {
+				if(!els[i].id || els[i].id != 'donate-button')
+					els[i].style.backgroundColor = '#888';
+			}
+		}*/
+			
+
+		/*var ts = evt.changedTouches;
+		if(ts.length) {
+			//TODO: prüfe ob bereich (z.B. bis 3-5 pixel Abweichung nötig )
+			if((this.kwdpageX != ts[0].pageX) || (this.kwdpageY != ts[0].pageY)) {
+				this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+				return true; // event-Bearbeitung abgebrochen
+			}
+		} */
+
+
+		var dodefault = processTouchEvent(this);
+		
 		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-    	this.kwdCancelTouch  = true;
-      	return true;
-    });
+		
+		if(!dodefault) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			return false;
+		}
+		return true;
+	}); 
     
 
 
