@@ -108,6 +108,8 @@ function KwdTachoApp() {
 		maxspeed_time : 'tachomaxtime'
 	};
 
+	this.menubutton = null; 
+	
 	// private members
 	var fastoptions = true;
 
@@ -244,6 +246,11 @@ function KwdTachoApp() {
 		}    		
 	};
 
+	this.initMenuButton = function(id, enabled)
+	{
+		this.menubutton = new MenuButton(id,enabled);		
+	};
+	
 	// construct
 	if(kwdTachoVersion) this.version = kwdTachoVersion;
 	if(kwdProjectStage) this.stage = kwdProjectStage;
@@ -260,7 +267,7 @@ function KwdTachoApp() {
 	if(app.android_sdk) {
 		app.Debug("Android SDK mode found");
 		this.androidmode = true;
-	}
+	}	
 }
 
 
@@ -545,7 +552,11 @@ function OnBack()
 		menustack.pop(); // you can read the popped element and react!
 	    // no gauges warning now with *counter* 
 	}
-	if(menustack.current()!==false) resetMenuFade();
+	if(menustack.current()!==false) {
+		resetMenuFade();
+		//kta.menubutton.hide();
+	}
+	else kta.menubutton.show();
 	resetHud(); 
 	// TODO: irgendwie scheint das resetHud erst bei Klick *im* Hauptmenü zu reagieren
 }
@@ -828,7 +839,7 @@ function KwdGpsTools () {
 	 			app.Debug(e);
 	 			return false;
 	 		}
-	 		app.Debug(str);
+			app.Debug('average speed save: '+str); 			
 	 		app.SaveText(kta.storage.average_no_groups,str);
 	 	}
 	 	return true;
@@ -856,7 +867,7 @@ function KwdGpsTools () {
  		var str = app.LoadText(kta.storage.average_no_groups,'');
  		var err=0;
  		if (str) {
- 			
+			app.Debug('average speed load: '+str); 			
  			if(average_list.length) average_list.length = 0; // for the unusual case of loading after init of app delete list:
  			try {
  				average_list = JSON.parse(str);
@@ -2079,10 +2090,49 @@ function AnalogSpeedBoxList() {
 // in browser global var important:
 var gauge = null;
 
+
+function MenuButton(id,on) {
+	var enabled = true;
+	var visible = false;
+	var elem_id;
+	var elem;
+	
+	this.show = function()
+	{
+		if (enabled && !visible)
+		{
+			elem.style.display = 'block';
+			visible = true;
+		}
+	};
+	
+	this.hide = function()
+	{		
+		if (enabled && visible)
+		{
+			elem.style.display = 'none';
+			visible = false;
+		}			
+	};
+	
+	this.fade = function() {
+		if (enabled)
+		{
+			
+		}		
+	};	
+	
+	// construct 
+	enabled = on;
+	elem_id = id;
+	elem = document.getElementById(id);
+}
+
 //TODO: stop timeout by scroll event
 function fadeMenus() {
 	//if(menustack.current()!==false) $('.dialog').fadeOut();// TODO: fade mit complete function
 	menustack.clear();
+	resetHud();
 }
 var menutimeout = false;
 function resetMenuFade() {
@@ -2091,6 +2141,9 @@ function resetMenuFade() {
 	if(menustack.current()=='infocard') newtimeout*=4; // 4 min
 	menutimeout = setTimeout(fadeMenus,newtimeout);
 }
+
+
+
 var fadetimeout = false;
 
 // only called onInit and OnBack
@@ -2122,6 +2175,7 @@ function fadehud() {
         //$('.autofade').fadeOut('slow');
 		//$('#hg').addClass('hgchange');
 		document.getElementById('hg').classList.add('hgchange');
+		kta.menubutton.hide();
     }
     else clearTimeout(fadetimeout);
 }
@@ -2973,6 +3027,8 @@ function getCurrentSpeedUnits() {
 
 function processTouchEvent(element) { 
 	
+		// always handle menubutton:
+		if (menustack.current()===false && kta && kta.menubutton) kta.menubutton.show();
 		// Nachdem spezielle Abfragen/Anpassungen, id für switcher/button gleichsetzen
 		var check = element.kwdSwitcherId || element.kwdButtonId || element.kwdDisplayId;
 		if(!check) 
@@ -2980,6 +3036,7 @@ function processTouchEvent(element) {
 			// name for general click
 			check = "undetermined_touch"; 
 		}
+		app.Debug("touch event: "+check);
 
 		// all menu items are handled here too
 
@@ -3261,6 +3318,14 @@ function processTouchEvent(element) {
 			
             case '#exit' : Quit(); break;
             case '#cancel' : OnBack(); break; 
+            case '#menubutton':
+            	if (menustack.current()==false) OnBack();
+            	else
+            	{
+            		menustack.clear();
+            		resetHud();
+            	}
+            	break;
             case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
             case '#info' :
                 menustack.push('infocard');
@@ -3303,6 +3368,7 @@ function processTouchEvent(element) {
    	            settings.switchit('switchredwarning',false);
    	            settings.switchit('switchkeepmaxspeed',false);
    	            settings.switchit('switchkeepaveragespeed',false);
+   	            OnBack();
 				break; 
 				
 			case 'back-arrow':
@@ -3337,9 +3403,8 @@ function initApp()  {
 	// TODO: here may be checks whether html not rendered ready (e.g. check a width of a certain important div) -> setTimeout
 
     kta.tablet = app.IsTablet(); // returns boolean
-    if(kta.tablet) {
-    	document.getElementById('menubutton').style.display = 'block';	
-    }
+    kta.initMenuButton('menubutton',kta.tablet);
+    
     
 	var debugstr = "";
 	if (kta.debug) 
@@ -3858,7 +3923,8 @@ function initApp()  {
     
     //$('#splashscreen').hide();
     document.getElementById('splashscreen').style.display = 'none';
-    
+    // show menu button only if no dialogs open
+    if (menustack.current()==false) kta.menubutton.show();
     app.Debug('num gauges:'+layout_gauges);
     resetHud();
     resetMenuFade();

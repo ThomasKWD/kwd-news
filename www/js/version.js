@@ -4,4 +4,4 @@
  */
 kwdTachoVersion = 1.56; // is float val by purpose
 kwdProjectStage = 'basic'; // can left unset if default desired
-kwdDebugMode = true; 
+kwdDebugMode = false; 
