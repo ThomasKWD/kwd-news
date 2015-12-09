@@ -1,5 +1,6 @@
 
-/* #83C2FD */
+/* #83C2FD kwd back blue */
+/* #DF3F2E kwd red */
 /* #DD0000 warning */
  
 * {box-sizing:border-box;font-family:Tahoma,Verdana,Univers,sans-serif;
@@ -110,7 +111,7 @@ a.switcher:active {
         padding-right:20px;
     }
     .switcher .fa {
-        color:#dd0000;
+        color:#DF3F2E;
     }        
     .switcher .fa-black {
     	color:#000000;
@@ -141,7 +142,7 @@ a.switcher:active {
 .gps {
 }
 .no-gps {
-	color:#dd0000 !important;
+	color:#DF3F2E !important;
 }
 /* some properties are set by JS */
 #digital-on-analog {
@@ -158,7 +159,7 @@ a.switcher:active {
     text-align:center;
 }
 .gps-warning {
-	color:#DD0000;
+	color:#DF3F2E;
 }
 .gps-warning-text {
 	font-size:1.75em;
@@ -230,7 +231,7 @@ a.switcher:active {
 	 }
 	 #geoaccuracy {
 	 	/*background-color:#880000;*/
-		color:#dd0000;
+		color:#DF3F2E;
 	 	/* TODO: in Nachtmodus/dezent: Schrift statt bg gefärbt */
 	 }
 	 #accuracytext {
@@ -396,10 +397,10 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
 }
 #warningdialog {
     color:white;
-    border-color:#CC0000;
+    border-color:#DF3F2E;
 }
 #warningdialog h3 {
-    color:red;
+    color:#DF3F2E;
     text-align:center;
 }
 #warningdialog p {
@@ -490,12 +491,12 @@ TODO: Schriftgrößen aller digitalen Anzeigen inkl. .unitlabel
     right:0;
     font-size:15px;
     font-weight:bold;
-    color:#dd0000;
+    color:#DF3F2E;
     color:white;
     padding:0.3em;
     background-color: rgba(0,0,0,0.6);
-    border-left:3px solid #dd0000;
-    border-bottom:3px solid #dd0000;
+    border-left:3px solid #DF3F2E;
+    border-bottom:3px solid #DF3F2E;
     border-bottom-left-radius: 10px;
     box-shadow:0px 2px 3px rgba(0,0,0,0.75);
 }
@@ -576,7 +577,7 @@ für Skins addClass mit verschachtelten Klassen,
 }
 .gauge.skin-subtle .g-minor,
 .gauge.skin-subtle .g-majortick {
-	background-color:white;
+	background-color:white !important;
 }
 .display-box.skin-subtle {
 	border-color:white;

@@ -2227,6 +2227,8 @@ function setTachoLayout() {
 		maxaverage_visible = false;
 		gauge.setSpecialTickVisibility(analogGaugeAverageTick,false);
 		gauge.setSpecialTickVisibility(analogGaugeMaxTick,false);		// IDEA: analogGaugeAverageTick.setVisibility(false);
+		// reset tick color:
+		document.getElementById('g-ticks-container').classList.remove('tick-base-color');
 	}
 	else {
 		digitalSpeedDisplays.showMaxAverage(true);
@@ -2234,6 +2236,8 @@ function setTachoLayout() {
 		gauge.setSpecialTickVisibility(analogGaugeAverageTick,true);
 		gauge.setSpecialTickVisibility(analogGaugeMaxTick,true);
 		kwd_showById('digital-speedstats-wrapper');
+		// tick color make alle blue (no mor reds)
+		document.getElementById('g-ticks-container').classList.add('tick-base-color');
 	}
 
     // setze Tacho

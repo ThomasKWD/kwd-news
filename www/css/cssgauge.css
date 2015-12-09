@@ -62,7 +62,11 @@ http://blog.michelledinan.com/08/2012/drawing-triangles-with-css/
   /* make less vars here!! */
   width: 20px;
   height: 3px;
-  background-color: #ff0000;
+  background-color: #DF3F2E;
+}
+/* add this when no red major ticks desired */
+.tick-base-color .g-majortick {
+  background-color: #83C2FD;	
 }
 .g-specialtick {
 	width:30px;
