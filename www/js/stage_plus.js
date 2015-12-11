@@ -47,6 +47,16 @@ function StagePlus_Accuracy() {
 
 function KwdStagePlus() {
 
+	/* banner position
+	 * - landscape in menu: make menus left and ad right
+	 * - portrait in menu: make ad on bottom - if no space, turn off ad
+	 * - off-menu: turn off ad after 1 min. + make close button
+	 */
+	this.calculateAdPosition = function(x,y,onoff)
+	{
+		
+	};
+
 	/* changes size of ads banner
 	 * - values must be css strings e.g. '100px' or '50%'
 	 * - 0 value or empty string leads to no-change (don't use '0' as string)

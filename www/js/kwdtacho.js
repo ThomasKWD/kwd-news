@@ -752,8 +752,9 @@ function KwdGpsTools () {
     		// calculate current average value
     		// ! hier *mit* #
     		if(cas.n>0) average_speed = cas.sum  / cas.n;
-		} // refresh only
+		} 
 		
+		// refresh only		
 		displaySpeedWithFactor(average_speed, '.averagespeedtext',analogGaugeAverageTick); // sets more than 1 elements, just like .speed 
     };
     // disabled for later:
@@ -847,12 +848,15 @@ function KwdGpsTools () {
  	
  	/* löscht alle Mittelwert-Daten
  	 * - löscht vorsichtshalber auch gespeicherte Liste, falls Programm unterbrochen wird bevor erneut regulär gespeichert wurde.
+ 	 * - TODO: must invoke display change!
  	 */
  	this.clearAverage = function() {
  		average_list.length = 0;
  		average_newentry = true;
 		average_old_n = average_old_sum = 0; // damit richtig weiter berechnet
+ 		average_speed = 0;
  		app.SaveText(kta.storage.average_no_groups,'');
+ 		this.averageSpeed(0);
  	};
  	
  	/* load function for average speed
@@ -2132,14 +2136,14 @@ function MenuButton(id,on) {
 function fadeMenus() {
 	//if(menustack.current()!==false) $('.dialog').fadeOut();// TODO: fade mit complete function
 	menustack.clear();
-	resetHud();
+	resetHud(); // may cause unexpected fade in + out if no menu open
 }
 var menutimeout = false;
 function resetMenuFade() {
 	if(menutimeout!==false) clearTimeout(menutimeout);
 	var newtimeout = 1000*60; // 60s
 	if(menustack.current()=='infocard') newtimeout*=4; // 4 min
-	menutimeout = setTimeout(fadeMenus,newtimeout);
+	if(menustack.current()!==false) menutimeout = setTimeout(fadeMenus,newtimeout);
 }
 
 

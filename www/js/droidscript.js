@@ -195,7 +195,7 @@ function kwdGeoLocator (options) {
 		geodata.speed += r; //= (geodata.speed<20000) ? geodata.speed * 1.1 : geodata.speed * 0.9; // nice simu
 		if (geodata.speed<0) geodata.speed = 0;
 		//geodata.speed=51/3.6;
-		
+		geodata.speed=0; // debug average reset
 		// set an altitude
 		geodata.altitude = Math.random() * 300;
 		
