@@ -3422,7 +3422,7 @@ function initApp()  {
 	
 	//DEBUG vs. release vs. Emulator & Test:
 	if(kta.browsermode || kta.debug) {
-		document.getElementById('splashscreen').style.opacity = 0.1; // debug
+		document.getElementById('splashscreen').style.opacity = 0.5; // debug
 		document.getElementById('debuginfo').style.display = 'block';
 	}
 	if (kta.version) document.getElementById('appversion').innerHTML = kta.version.toFixed(2);
@@ -3926,7 +3926,16 @@ function initApp()  {
     
     
     //$('#splashscreen').hide();
+    // ! this loop does not work since the 'classList'== els itself is immediately changed
+    // ! on classList.remove() thus the index i becomes invalid 
     document.getElementById('splashscreen').style.display = 'none';
+    var els = document.getElementsByClassName('hide-on-startup');
+    if (els)
+    	for(var i=0;i<els.length;i++)
+    	{
+    		//els[i].classList.remove('hide-on-startup');
+    		els[i].style.opacity = '1.0';
+    	}
     // show menu button only if no dialogs open
     if (menustack.current()==false) kta.menubutton.show();
     app.Debug('num gauges:'+layout_gauges);
