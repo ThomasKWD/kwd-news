@@ -848,7 +848,6 @@ function KwdGpsTools () {
  	
  	/* löscht alle Mittelwert-Daten
  	 * - löscht vorsichtshalber auch gespeicherte Liste, falls Programm unterbrochen wird bevor erneut regulär gespeichert wurde.
- 	 * - TODO: must invoke display change!
  	 */
  	this.clearAverage = function() {
  		average_list.length = 0;
