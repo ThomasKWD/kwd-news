@@ -547,7 +547,11 @@ function OnBack()
     
 	// just check if there is any open menu
 	// otherwise show main menu
-	if(!menustack.current()) menustack.push('settingsdialog');
+	if(!menustack.current()) 
+	{
+		kta.menubutton.show();
+		menustack.push('settingsdialog');
+	}
 	else {
 		menustack.pop(); // you can read the popped element and react!
 	    // no gauges warning now with *counter* 
@@ -556,7 +560,7 @@ function OnBack()
 		resetMenuFade();
 		//kta.menubutton.hide();
 	}
-	else kta.menubutton.show();
+	
 	resetHud(); 
 	// TODO: irgendwie scheint das resetHud erst bei Klick *im* Hauptmenü zu reagieren
 }
@@ -2097,6 +2101,7 @@ var gauge = null;
 function MenuButton(id,on) {
 	var enabled = true;
 	var visible = false;
+	var elem_width;
 	var elem_id;
 	var elem;
 	
@@ -2104,7 +2109,8 @@ function MenuButton(id,on) {
 	{
 		if (enabled && !visible)
 		{
-			elem.style.display = 'block';
+			//elem.style.display = 'block';
+			elem.style.transform = 'translateX(0)';
 			visible = true;
 		}
 	};
@@ -2113,7 +2119,8 @@ function MenuButton(id,on) {
 	{		
 		if (enabled && visible)
 		{
-			elem.style.display = 'none';
+			//elem.style.display = 'none';
+			elem.style.transform = 'translateX('+elem_width+'px)';
 			visible = false;
 		}			
 	};
@@ -2129,8 +2136,19 @@ function MenuButton(id,on) {
 	enabled = on;
 	elem_id = id;
 	elem = document.getElementById(id);
+	// get and save size for translate animation
+	//elem_width = getComputedStyle(elem,null).width;
+	elem_width = elem.offsetWidth;
+	//elem.style.display='none';
 }
 
+
+var menubuttontimeout = false;
+function resetMenuButtonFade()
+{
+	if(menubuttontimeout!==false) clearTimeout(menubuttontimeout);
+	menubuttontimeout = setTimeout(kta.menubutton.hide,5000);
+}
 //TODO: stop timeout by scroll event
 function fadeMenus() {
 	//if(menustack.current()!==false) $('.dialog').fadeOut();// TODO: fade mit complete function
@@ -2191,12 +2209,11 @@ function fadehud() {
 function resetHud() {
 
     kwd_showByClass('autofade');
-    
-    //$('#hg').removeClass('hgchange');
     document.getElementById('hg').classList.remove('hgchange');
-    
-    
-    if(fadetimeout!==false) clearTimeout(fadetimeout);
+	
+	if(fadetimeout!==false) clearTimeout(fadetimeout);
+	// also stop menubuttontimeout! 
+	if(menubuttontimeout!==false) clearTimeout(menubuttontimeout);
 
 	if (!menustack.current()) {
         fadetimeout = setTimeout(fadehud,5000);
@@ -3035,7 +3052,11 @@ function getCurrentSpeedUnits() {
 function processTouchEvent(element) { 
 	
 		// always handle menubutton:
-		if (menustack.current()===false && kta && kta.menubutton) kta.menubutton.show();
+		if (menustack.current()===false && kta && kta.menubutton)
+		{
+			kta.menubutton.show();
+			resetMenuButtonFade();
+		}
 		// Nachdem spezielle Abfragen/Anpassungen, id für switcher/button gleichsetzen
 		var check = element.kwdSwitcherId || element.kwdButtonId || element.kwdDisplayId;
 		if(!check) 
@@ -3456,6 +3477,8 @@ function initApp()  {
 			e.style.borderLeftWidth = '0';
 		}*/
 	} 
+	
+	
 	
     // init gauge before first scaleDisplays!
 	// ! no more auto draw + scale on init gauge (only on later config!) 
