@@ -347,6 +347,14 @@ function showHint (msg,msg_de) {
 	}
 }
 
+/* when infocard is demanded
+ * (currently there is just one entry point, but...)
+ */
+function showAppInfo() {
+	kta.kstage.changeAdBanner(0,0,false);
+    menustack.push('infocard');
+}
+
 /* starts gps sensor 
  * - checks if clock is the only display, then don't start + even stop when already running
  * - doesn't check if max/average enabled since it will be handled in stopGps()  
@@ -566,7 +574,8 @@ function OnBack()
 	else 
 	{
 		// case: all menus have been closed right now
-		kta.kstage.changeAdBanner(0,0,true);
+		//kta.kstage.changeAdBanner(0,0,true);
+		kta.kstage.startBannerCounter();
 	}
 	
 	resetHud(); 
@@ -3097,7 +3106,7 @@ function processTouchEvent(element) {
 		        menustack.push('moresettingsdialog');
         		break;
         	case 'showinfo':
-		        menustack.push('infocard');
+		        showAppInfo();
 		        break;
 		    case 'tachosettings':
     	        menustack.push('tachosettingsdialog');
@@ -3355,17 +3364,17 @@ function processTouchEvent(element) {
             case '#exit' : Quit(); break;
             case '#cancel' : OnBack(); break; 
             case '#menubutton':
-            	if (menustack.current()==false) OnBack();
+            	if (menustack.current()===false) OnBack();
             	else
             	{
             		menustack.clear();
+            		kta.kstage.startBannerCounter();
             		resetHud();
             	}
             	break;
             case '#settings' : OnMenu(); break; // TODO: check if can be started inside menus!! (Hope menus ly over :-)
             case '#info' :
-                menustack.push('infocard');
-                //app.ShowDebug(false);
+            	showAppInfo();
                 break;
 			case '#warningcont' :
 				// TODO: check if another menu COULD come in between!
@@ -3927,7 +3936,7 @@ function initApp()  {
 	if (kta.stage!=kta.STAGE_BASIC) 
 		var el = document.getElementById('close-banner').addEventListener('click',function(evt)
 		{
-			kta.kstage.changeAdBanner(0,0,false); //  banner.hide();
+			kta.kstage.changeAdBanner(0,0,false); //  banner.hide(); // TODO: recognize running counter
 			// maybe not needed:
 			    evt.preventDefault();
 		        evt.stopPropagation();

@@ -675,9 +675,12 @@ für Skins addClass mit verschachtelten Klassen,
 	height:20px;
 	line-height:20px;
 	font-size:12px;
+	font-weight:bold;
+	text-align:center;
 	top:-20px;
 	right:0;
-	rborder:1px solid #DF3F2E;
+	border:1px solid #DF3F2E;
+	background-color:rgba(255,255,255,0.75);
 	color:#DF3F2E;
 }
 /*

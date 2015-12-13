@@ -53,8 +53,10 @@ von basic eingebunden werden, wenn gebraucht (z.B. Banner)
 function KwdStagePlus() {
 	
 	var counter_timeout = false;
-	var counter_step = 10;
+	var counter_step = 15;
 	var banner_elem = document.getElementById('add-banner');
+	var close_banner_elem = document.getElementById('close-banner');
+	var that = this;
 
 	/* banner position
 	 * - landscape in menu: make menus left and ad right
@@ -66,16 +68,19 @@ function KwdStagePlus() {
 		
 	};
 
-	this.startBannerCounter = function(seconds)
+	this.countBanner = function() 
 	{
-		
+		if(counter_timeout) clearTimeout(counter_timeout);
+		counter_step--;
+		close_banner_elem.innerHTML = counter_step;		
+		if (counter_step>0) counter_timeout = setTimeout(that.countBanner,950);
+		else {
+			banner_elem.style.display = 'none';
+			close_banner_elem.innerHTML = '<span class="icon-cancel"></span>';
+		}	
 	};
 	
-	this.cancelBannerCounter =function()
-	{
-		
-	};
-	
+
 	/* changes size of ads banner
 	 * - values must be css strings e.g. '100px' or '50%'
 	 * - 0 value or empty string leads to no-change (don't use '0' as string)
@@ -91,17 +96,36 @@ function KwdStagePlus() {
 			else {
 				if (x) e.style.width = x;
 				if (y) e.style.height = y;
-				if (onoff) e.style.display = 'block'; // 2nd if because onoff can also be undefined
+				if (onoff) {
+					e.style.display = 'block'; // 2nd if because onoff can also be undefined
+					counter_step=0; // stops running counter
+					that.countBanner();
+				}
 			
 			}			
 		}
 	};
 
+	this.startBannerCounter = function(seconds)
+	{
+		if(counter_timeout) clearTimeout(counter_timeout); // in case of multi starts
+		if(seconds) counter_step = seconds; else counter_step = 15;
+		close_banner_elem.innerHTML = counter_step;
+		counter_timeout = setTimeout(that.countBanner,950);
+	};
+	
+	this.cancelBannerCounter =function()
+	{
+		if(counter_timeout) clearTimeout(counter_timeout);
+	};
+	
 	
 	// construct
 	// TODO: make function general for displays 
 	// or also other objects or structures
 	this.accuracy = new StagePlus_Accuracy();
+	
+	// TODO: banner: start initial timeout for removing "close banner hint"
 } 
 
 // instanciate in kwdtacho.js
