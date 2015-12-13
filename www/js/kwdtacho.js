@@ -553,7 +553,7 @@ function OnBack()
 {
     if (kta.browsermode) app.Debug('OnBack'); // why cannot see this msg??
     
-	// just check if there is any open menu
+	// check if there is any open menu
 	// otherwise show main menu
 	if(!menustack.current()) 
 	{
@@ -564,7 +564,7 @@ function OnBack()
 	}
 	else {
 		menustack.pop(); // you can read the popped element and react!
-	    // no gauges warning now with *counter* 
+	    
 	}
 	
 	if(menustack.current()!==false) {
@@ -3991,8 +3991,11 @@ function initApp()  {
     		//els[i].classList.remove('hide-on-startup');
     		els[i].style.opacity = '1.0';
     	}
-    // show menu button only if no dialogs open
-    if (menustack.current()==false) kta.menubutton.show();
+    // show menu button and ad counter only if no dialogs open
+    if (menustack.current()==false) {
+		kta.menubutton.show();
+		kta.kstage.startBannerCounter();
+	}
     app.Debug('num gauges:'+layout_gauges);
     resetHud();
     resetMenuFade();

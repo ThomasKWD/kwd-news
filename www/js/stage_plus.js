@@ -72,10 +72,14 @@ function KwdStagePlus() {
 	{
 		if(counter_timeout) clearTimeout(counter_timeout);
 		counter_step--;
-		close_banner_elem.innerHTML = counter_step;		
-		if (counter_step>0) counter_timeout = setTimeout(that.countBanner,950);
+		
+		if (counter_step>0) {
+			close_banner_elem.innerHTML = counter_step;
+			counter_timeout = setTimeout(that.countBanner,950);
+		}
 		else {
-			banner_elem.style.display = 'none';
+			// -1 check useful for call from this.changeBanner
+			if (counter_step > -1) banner_elem.style.display = 'none';
 			close_banner_elem.innerHTML = '<span class="icon-cancel"></span>';
 		}	
 	};
@@ -99,7 +103,7 @@ function KwdStagePlus() {
 				if (onoff) {
 					e.style.display = 'block'; // 2nd if because onoff can also be undefined
 					counter_step=0; // stops running counter
-					that.countBanner();
+					this.countBanner();
 				}
 			
 			}			
@@ -108,6 +112,7 @@ function KwdStagePlus() {
 
 	this.startBannerCounter = function(seconds)
 	{
+		banner_elem.style.display = "block"; // make visible for count
 		if(counter_timeout) clearTimeout(counter_timeout); // in case of multi starts
 		if(seconds) counter_step = seconds; else counter_step = 15;
 		close_banner_elem.innerHTML = counter_step;
