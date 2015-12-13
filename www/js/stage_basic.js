@@ -86,6 +86,7 @@ function KwdStageBasic() {
 	// construct
 	
 	this.accuracy = new StageBasic_Accuracy();
+	//geplant: this.banner = new StageBasic_Banner();	
 } 
 
 // initantiate in kwdtacho.js

@@ -551,14 +551,22 @@ function OnBack()
 	{
 		kta.menubutton.show();
 		menustack.push('settingsdialog');
+		// TODO: control if ad banner hides menu entries
+		kta.kstage.changeAdBanner(0,0,true);
 	}
 	else {
 		menustack.pop(); // you can read the popped element and react!
 	    // no gauges warning now with *counter* 
 	}
+	
 	if(menustack.current()!==false) {
 		resetMenuFade();
 		//kta.menubutton.hide();
+	}
+	else 
+	{
+		// case: all menus have been closed right now
+		kta.kstage.changeAdBanner(0,0,true);
 	}
 	
 	resetHud(); 
@@ -1450,9 +1458,9 @@ function KwdPopupStack() {
 				
 				if (el.scrollHeight > getDisplayHeight()) // TODO: need to calculate border??
 				{
-					//el.style.width = getDisplayWidth() + 'px';
+					// ganze display breite nutzen
 					el.style.maxWidth = getDisplayWidth() + 'px';
-				 	app.Debug('found big infodialog:'+el.scrollHeight);
+				 	//app.Debug('found big infodialog:'+el.scrollHeight);
 				
 					// suche nach Buttons
 					var i = 0;
@@ -3915,6 +3923,18 @@ function initApp()  {
 		
 		return true;    	
     });
+	
+	if (kta.stage!=kta.STAGE_BASIC) 
+		var el = document.getElementById('close-banner').addEventListener('click',function(evt)
+		{
+			kta.kstage.changeAdBanner(0,0,false); //  banner.hide();
+			// maybe not needed:
+			    evt.preventDefault();
+		        evt.stopPropagation();
+				
+		        return false;
+		});
+
     
    	var els = document.getElementsByClassName('card');
    	for(var i=els.length-1;i>=0;i--) {

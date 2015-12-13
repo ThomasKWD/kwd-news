@@ -668,6 +668,18 @@ für Skins addClass mit verschachtelten Klassen,
 	border:1px solid red;
 	background-color:white;
 }
+
+#close-banner {
+	position:absolute;
+	width:20px;
+	height:20px;
+	line-height:20px;
+	font-size:12px;
+	top:-20px;
+	right:0;
+	rborder:1px solid #DF3F2E;
+	color:#DF3F2E;
+}
 /*
 TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud aktiviert)
 */
@@ -684,6 +696,14 @@ TODO: Unterscheidung .hud-able .hud (letztere wird erst hinzugefügt, wenn hud a
 	#displays-wrapper .unitlabel,
 	#digitalspeed-wrapper .unitlabel {
 		bottom:30px;
+	}
+	#close-banner {
+		width:40px;
+		height:40px;
+		top:-40px;
+		font-size:20px;
+		line-height:40px;
+		padding:6px;
 	}
 
 	@media (orientation:portrait) {

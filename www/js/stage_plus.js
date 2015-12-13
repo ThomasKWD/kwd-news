@@ -45,7 +45,16 @@ function StagePlus_Accuracy() {
 	};
 }
 
+/*
+TODO: die Objekte von plus sollten einfach auch in PRO eingebunden werden
+wenn die Funktion identisch ist, in manchen Fällen sollten einfach die Unterobjekte
+von basic eingebunden werden, wenn gebraucht (z.B. Banner)
+*/
 function KwdStagePlus() {
+	
+	var counter_timeout = false;
+	var counter_step = 10;
+	var banner_elem = document.getElementById('add-banner');
 
 	/* banner position
 	 * - landscape in menu: make menus left and ad right
@@ -57,21 +66,33 @@ function KwdStagePlus() {
 		
 	};
 
+	this.startBannerCounter = function(seconds)
+	{
+		
+	};
+	
+	this.cancelBannerCounter =function()
+	{
+		
+	};
+	
 	/* changes size of ads banner
 	 * - values must be css strings e.g. '100px' or '50%'
 	 * - 0 value or empty string leads to no-change (don't use '0' as string)
 	 * - onoff: true: show, false: hide
-	 * 
-	 * TODO: provide parameter for timeout (turn off after milliseconds) - or use onoff parameter
-	 */
+	 * TODO: a separate object AdBanner()
+	 *
+	  */
 	this.changeAdBanner = function(x,y,onoff) {
-		var e = document.getElementById('add-banner');
+		//var e = document.getElementById('add-banner');
+		var e = banner_elem;
 		if (e) {
 			if (onoff===false) e.style.display = 'none';
 			else {
 				if (x) e.style.width = x;
 				if (y) e.style.height = y;
 				if (onoff) e.style.display = 'block'; // 2nd if because onoff can also be undefined
+			
 			}			
 		}
 	};
@@ -83,4 +104,4 @@ function KwdStagePlus() {
 	this.accuracy = new StagePlus_Accuracy();
 } 
 
-// initantiate in kwdtacho.js
+// instanciate in kwdtacho.js
