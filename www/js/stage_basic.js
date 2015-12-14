@@ -73,6 +73,11 @@ function KwdStageBasic() {
 		}
 	};
 
+	this.startBannerCounter = function(seconds)
+	{
+		app.Debug('startBannerCounter: do nothing');
+	};
+	
 
 	/* control accuracy display
 	 * 

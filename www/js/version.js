@@ -3,5 +3,5 @@
  * these values will be read by the kwdTachoApp object
  */
 kwdTachoVersion = 1.57; // is float val by purpose
-kwdProjectStage = 'plus'; // can left unset if default desired
-kwdDebugMode = true; 
+kwdProjectStage = 'basic'; // can left unset if default desired
+kwdDebugMode = false; 
