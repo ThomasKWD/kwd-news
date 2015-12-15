@@ -3548,8 +3548,8 @@ function initApp()  {
 	displayTime = displays.add('time');
 	displayAltitude = displays.add('geoaltitude','--');
 	displayLocation = displays.add('geolocation','--');
-	displayAccuracy = displays.add('geoaccuracy'); // TODO: does deny reset text work?
-	// TODO: enable again: displayAccuracy.getTextElement().style.fontSize = '35%'; // smaller font than other displays
+	displayAccuracy = displays.add('geoaccuracy');
+	//displayDistance = displays.add('"
 	
 	digitalSpeedDisplays = new DigitalSpeedBoxList();
 	displayDigitalspeed = digitalSpeedDisplays.add('digitalspeed','--');
@@ -3559,7 +3559,6 @@ function initApp()  {
 	displayDigitalspeed.setFirst(true);	
 
 	
-	// TODO: 10.11.2015 check if new problem
 	scaleDisplays(true); // must be before all the settings-dependend turn-offs of displays (in contrast to positionDisplays)
 
 
@@ -3743,15 +3742,9 @@ function initApp()  {
     
 	// adds listener to wrapper! - it works through capturing OR bubbling!
 	// this is for all dialogs and settings (no info card and no display-boxes):
-	// - need listener for touchstart AND touchend (otherwise you can destroy or disturb scrolling in browser )
 	var wrapel = document.getElementById('touch-wrapper');
 	
-	// - on touchstart we save the event if it is interesting to us
-	// - we only need to know whether the x/y has changed
-	// - also could deny, if event is already under way
-	// - we also color the menuitem manually if given
-	// 
-	 if(wrapel) wrapel.addEventListener('touchstart',function(evt) {
+	if(wrapel) wrapel.addEventListener('click',function(evt) {
 		
 		this.kwdSwitcherId = '';
 		this.kwdButtonId = '';
@@ -3809,102 +3802,19 @@ function initApp()  {
 			}
 		}
 		
+		var dodefault = processTouchEvent(this);
+		
+		//this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
+		
+		if(!dodefault) {
+			evt.stopPropagation();
+			evt.preventDefault();
+			return false;
+		} 
 		
 		return true;
 	});
 	
-    if(wrapel) wrapel.addEventListener('touchmove',function(evt) {
-    	// TODO: allow move in a small range as long as touchstart-target not left
-    	
-		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-    	this.kwdCancelTouch  = true;
-      	return true;
-    });
-	
-	
-	// todo: man könnte element-id bei touchstart speichern, und hier nur noch einen großen switch
-	if (wrapel) wrapel.addEventListener('touchend',function(evt) {
-		
-		if (this.kwdCancelTouch) 
-			return true;
-
-/*		if(this.kwdSwitcherId) 
-			document.getElementById(this.kwdSwitcherId).style.backgroundColor = 'transparent';
-		/*if(this.kwdButtonId && this.kwdButtonId != 'back-arrow') {
-			// Schleife über alle Buttons, da keine Button id verfügbar!!
-			var els = document.getElementsByClassName('.btn');
-			if (els) for(var i = els.length-1; i >= 0; i-- ) {
-				if(!els[i].id || els[i].id != 'donate-button')
-					els[i].style.backgroundColor = '#888';
-			}
-		}*/
-			
-
-		/*var ts = evt.changedTouches;
-		if(ts.length) {
-			//TODO: prüfe ob bereich (z.B. bis 3-5 pixel Abweichung nötig )
-			if((this.kwdpageX != ts[0].pageX) || (this.kwdpageY != ts[0].pageY)) {
-				this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-				return true; // event-Bearbeitung abgebrochen
-			}
-		} */
-
-
-		var dodefault = processTouchEvent(this);
-		
-		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-		
-		if(!dodefault) {
-			evt.stopPropagation();
-			evt.preventDefault();
-			return false;
-		}
-		return true;
-	}); 
-    
-    // equal to 'touchend'
-    // for cases 'touchend' is not triggered at all in some cases
-	if (wrapel) wrapel.addEventListener('touchcancel',function(evt) {
-		
-		if (this.kwdCancelTouch) 
-			return true;
-
-/*		if(this.kwdSwitcherId) 
-			document.getElementById(this.kwdSwitcherId).style.backgroundColor = 'transparent';
-		/*if(this.kwdButtonId && this.kwdButtonId != 'back-arrow') {
-			// Schleife über alle Buttons, da keine Button id verfügbar!!
-			var els = document.getElementsByClassName('.btn');
-			if (els) for(var i = els.length-1; i >= 0; i-- ) {
-				if(!els[i].id || els[i].id != 'donate-button')
-					els[i].style.backgroundColor = '#888';
-			}
-		}*/
-			
-
-		/*var ts = evt.changedTouches;
-		if(ts.length) {
-			//TODO: prüfe ob bereich (z.B. bis 3-5 pixel Abweichung nötig )
-			if((this.kwdpageX != ts[0].pageX) || (this.kwdpageY != ts[0].pageY)) {
-				this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-				return true; // event-Bearbeitung abgebrochen
-			}
-		} */
-
-
-		var dodefault = processTouchEvent(this);
-		
-		this.kwdSwitcherId = this.kwdButtonId  = this.kwdDisplayId = '';
-		
-		if(!dodefault) {
-			evt.stopPropagation();
-			evt.preventDefault();
-			return false;
-		}
-		return true;
-	}); 
-    
-
-
     // findet alle ext-link, wenn bubble
     document.getElementById('infocard').addEventListener('click',function(evt) { // bewusst hier click!
 		
