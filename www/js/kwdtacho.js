@@ -2252,7 +2252,7 @@ function resetHud() {
       
 */
 function setTachoLayout() {
-     
+
     var maxaverage_visible = true;
     
     // Aktivität von max/average separat setzen
@@ -2280,7 +2280,6 @@ function setTachoLayout() {
     // setze Tacho
     if (settings.get('tachoswitch')!=false) {
     	
-	  //$('#tacho-container').show();
 	  var el = document.getElementById('tacho-container');
 	  if (el) el.style.display = 'block';
 	 
@@ -2298,37 +2297,30 @@ function setTachoLayout() {
 	        // es muss jeweils nur max/average für *analog* gesetzt/gelöscht werden, da für digital innerhalb des display-wrappers
 	        if(maxaverage_visible) kwd_showById('analog-speedstats-wrapper');
 
-	        document.getElementById('cssgauge-wrapper').style.top = '10px';	        
-	        //$('#cssgauge-wrapper').show();
+	        // disabled since done in scaleDisplays: document.getElementById('cssgauge-wrapper').style.top = '10px';	        
 	        //document.getElementById('cssgauge-wrapper').style.display = 'block';  // just see if error :-)
-	        //$('#digital-on-analog').show();    
 	        document.getElementById('digital-on-analog').style.display = 'block';
-	        //$('#cssgauge').addClass('dona');
 	        document.getElementById('cssgauge').classList.add('dona');
 	        displayDigitalspeed.hide();
-	        //$('#digitalspeed-wrapper').hide();
 	        document.getElementById('digitalspeed-wrapper').style.display = 'none';   
 	    }
 	    else if (a && !d) {
 	        cssgauge_visible = true;
 	        if(maxaverage_visible) kwd_showById('analog-speedstats-wrapper');
 	        
-	        document.getElementById('cssgauge-wrapper').style.top = '10px';
-	        //kwd_showById('cssgauge-wrapper'); // $('#cssgauge-wrapper').show(); 
-	        kwd_hideById('digital-on-analog'); //$('#digital-on-analog').hide();
-	        document.getElementById('cssgauge').classList.remove('dona'); //$('#cssgauge').removeClass('dona');
+	        // disabled since done in scaleDisplays: document.getElementById('cssgauge-wrapper').style.top = '10px';
+	        kwd_hideById('digital-on-analog'); 
+	        document.getElementById('cssgauge').classList.remove('dona'); 
 	        displayDigitalspeed.hide();
-	        kwd_hideById('digitalspeed-wrapper'); //$('#digitalspeed-wrapper').hide();   
+	        kwd_hideById('digitalspeed-wrapper'); 
 	    }
 	    else if (!a && d) {
 	        cssgauge_visible = false;
 	        if(maxaverage_visible) kwd_hideById('analog-speedstats-wrapper');
 	        
 	        document.getElementById('cssgauge-wrapper').style.top = '-2000px';
-	        //$('#cssgauge-wrapper').hide();
 	        //document.getElementById('cssgauge-wrapper').style.display = 'none';	        
 	        displayDigitalspeed.show();
-	        //$('#digitalspeed-wrapper').show();
 	        document.getElementById('digitalspeed-wrapper').style.display = 'block';   
 	    }
 	    else {
@@ -2415,7 +2407,7 @@ function getDisplayMinSize() {
  * TODO: not 'initial' but put all this stuff into initApp
  */
 function scaleDisplays(initial) {
-		
+		    
     app.Debug("scaleDisplays: "+(initial ? 'app start' : 'normal'));
     // TODO: catch the case window.devicePixelRatio is not existent or set to 0 (could be in old browser versions)
     app.Debug('window.devicePixelRatio: '+window.devicePixelRatio);
@@ -2622,8 +2614,7 @@ function scaleDisplays(initial) {
  * TODO: Wenn keine zusatz-displays:  Digital & avr/max ist Höhe begrenzt --> Höhe vorab berechnen und scale inkl. y-Wert 
  */
 function positionDisplays() {
-		
-	
+			
 	var hscreen = getDisplayHeight(); // TODO: put into kta!
 	var screen_w = getDisplayWidth();
 	var screen_ratio = screen_w / hscreen;
@@ -3007,25 +2998,7 @@ var kwd_addEvent = (function( window, document ) {
 
 
 
-/* may change in behaviour - uses click for browsermode
- * 
- */
-function kwd_addTouchEvent(addid,addclass,newcallback) {
-	
-	var eventtype = kta.browsermode ? 'click':'touchstart';
-	
-	if(addid) {
-		
-		document.getElementById(addid).addEventListener(eventtype,newcallback);
-	}
-	else if(addclass){
-		var els = document.getElementsByClassName(addclass);
-		for(var i=els.length-1;i>=0;i--) {
-			els[i].addEventListener(eventtype,newcallback);
-		}
-	}
-	
-}
+//function kwd_addTouchEvent(addid,addclass,newcallback) { -- see old code!
 
 /* do not check fastoptions here!! */
 function kwd_setTimeFormat(evt) {
