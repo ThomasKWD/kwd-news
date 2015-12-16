@@ -2614,7 +2614,7 @@ function scaleDisplays(initial) {
  * TODO: Wenn keine zusatz-displays:  Digital & avr/max ist Höhe begrenzt --> Höhe vorab berechnen und scale inkl. y-Wert 
  */
 function positionDisplays() {
-			
+	
 	var hscreen = getDisplayHeight(); // TODO: put into kta!
 	var screen_w = getDisplayWidth();
 	var screen_ratio = screen_w / hscreen;
